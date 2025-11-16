@@ -59,3 +59,33 @@ footer {
   background: #333;
   color: #fff;
 }
+/* Animation fade */
+section {
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}/* Dark Mode */
+.dark {
+  background: #111;
+  color: #eee;
+}
+
+.dark section {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark nav a {
+  color: #ddd;
+}
+
+.dark button {
+  background: #fff;
+  color: #000;
+}
+
+.dark footer {
+  background: #000;
+}
