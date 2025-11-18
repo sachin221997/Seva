@@ -25,6 +25,12 @@ function createAccount() {
     });
     }
 // Login function
+function logout() {
+  firebase.auth().signOut().then(() => {
+    alert("You have logged out.");
+    window.location.href = "login.html";
+  });
+}
 function login() {
   let email = document.getElementById("username").value;
   let password = document.getElementById("password").value;
