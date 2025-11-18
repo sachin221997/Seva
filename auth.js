@@ -44,3 +44,26 @@ function login() {
       alert(error.message);
     });
     }
+function bookService(serviceName) {
+  let user = firebase.auth().currentUser;
+
+  if (!user) {
+    alert("Please login first!");
+    window.location.href = "login.html";
+    return;
+  }
+
+  let booking = {
+    userEmail: user.email,
+    service: serviceName,
+    time: new Date().toISOString()
+  };
+
+  firebase.firestore().collection("bookings").add(booking)
+    .then(() => {
+      alert("Booking Confirmed! A Seva worker will contact you soon.");
+    })
+    .catch(error => {
+      alert(error.message);
+    });
+    }
