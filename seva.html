@@ -5,7 +5,13 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+<script>
+firebase.auth().onAuthStateChanged((user) => {
+  if (!user) {
+    window.location.href = "login.html"; // force login
+  }
+});
+</script>
 <h1>🫶 Seva Care</h1>
   <nav>
     <a href="index.html">Home</a>
@@ -22,7 +28,7 @@
     <li>Leg Massage - ₹200</li>
     <li>Talking & Emotional Support - Free</li>
   </ul>
-
+<button onclick="logout()">Logout</button>
   <button onclick="alert('Thank you for booking! A Seva worker will contact you soon.')">
     Book Now
   </button>
