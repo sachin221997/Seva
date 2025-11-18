@@ -61,8 +61,9 @@ function bookService(serviceName) {
 
   firebase.firestore().collection("bookings").add(booking)
     .then(() => {
-      alert("Booking Confirmed! A Seva worker will contact you soon.");
-    })
+    window.location.href = "confirmation.html";
+})
+  
     .catch(error => {
       alert(error.message);
     });
