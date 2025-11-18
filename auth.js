@@ -11,7 +11,19 @@ const firebaseConfig = {
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+function createAccount() {
+  let email = document.getElementById("email").value;
+  let password = document.getElementById("password").value;
 
+  firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then(() => {
+      alert("Account Created Successfully! You can log in now.");
+      window.location.href = "login.html";
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+    }
 // Login function
 function login() {
   let email = document.getElementById("username").value;
