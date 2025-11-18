@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Worker Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script src="worker.js"></script>
+
+    <script>
+        // Protect Dashboard
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = "worker-login.html";
+            } else {
+                loadBookings();
+            }
+        });
+
+        function loadBookings() {
+            firebase.firestore().collection("bookings")
+                .orderBy("time", "desc")
+                .get()
+                .then(snapshot => {
+                    let container = document.getElementById("bookings");
+                    container.innerHTML = "";
+
+                    snapshot.forEach(doc => {
+                        let data = doc.data();
+                        container.innerHTML += `
+                            <div class="booking-card">
+                                <p><b>Service:</b> ${data.service}</p>
+                                <p><b>User Email:</b> ${data.userEmail}</p>
+                                <p><b>Time:</b> ${data.time}</p>
+                            </div>
+                            <hr>
+                        `;
+                    });
+                });
+        }
+
+        function workerLogout() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = "worker-login.html";
+            });
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <h1>🧑‍🔧 Worker Dashboard</h1>
+
+    <!-- Booking List -->
+    <div id="bookings">
+        <p>Loading bookings...</p>
+    </div>
+
+    <br>
+    <button onclick="workerLogout()">Logout</button>
+
+</body>
+</html>
