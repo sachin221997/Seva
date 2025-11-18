@@ -11,58 +11,91 @@
 
     <script src="worker.js"></script>
 
-    <script>
-        // Protect Dashboard
-        firebase.auth().onAuthStateChanged(user => {
-            if (!user) {
-                window.location.href = "worker-login.html";
-            } else {
-                loadBookings();
-            }
-        });
-
-        function loadBookings() {
-            firebase.firestore().collection("bookings")
-                .orderBy("time", "desc")
-                .get()
-                .then(snapshot => {
-                    let container = document.getElementById("bookings");
-                    container.innerHTML = "";
-
-                    snapshot.forEach(doc => {
-                        let data = doc.data();
-                        container.innerHTML += `
-                            <div class="booking-card">
-                                <p><b>Service:</b> ${data.service}</p>
-                                <p><b>User Email:</b> ${data.userEmail}</p>
-                                <p><b>Time:</b> ${data.time}</p>
-                            </div>
-                            <hr>
-                        `;
-                    });
-                });
+<script>
+    // Protect Dashboard
+    firebase.auth().onAuthStateChanged(user => {
+        if (!user) {
+            window.location.href = "worker-login.html";
+        } else {
+            loadBookings();
         }
+    });
 
-        function workerLogout() {
-            firebase.auth().signOut().then(() => {
-                window.location.href = "worker-login.html";
+    // Load all pending bookings
+    function loadBookings() {
+        firebase.firestore().collection("bookings")
+        .orderBy("time", "desc")
+        .get()
+        .then(snapshot => {
+            let container = document.getElementById("bookings");
+            container.innerHTML = "";
+
+            snapshot.forEach(doc => {
+                let data = doc.data();
+
+                container.innerHTML += `
+                    <div class="booking-card">
+                        <p><b>Service:</b> ${data.service}</p>
+                        <p><b>User Email:</b> ${data.userEmail}</p>
+                        <p><b>Time:</b> ${data.time}</p>
+
+                        <button onclick="acceptJob('${doc.id}', '${data.service}', '${data.userEmail}')">
+                            Accept Job
+                        </button>
+                    </div>
+                    <hr>
+                `;
             });
-        }
-    </script>
+        });
+    }
+
+    // Accept Job Function
+    function acceptJob(id, service, userEmail) {
+        let workerEmail = firebase.auth().currentUser.email;
+
+        let acceptedJob = {
+            bookingId: id,
+            worker: workerEmail,
+            userEmail: userEmail,
+            service: service,
+            time: new Date().toISOString(),
+            status: "accepted"
+        };
+
+        firebase.firestore().collection("acceptedJobs").add(acceptedJob)
+        .then(() => {
+            firebase.firestore().collection("bookings").doc(id).delete();
+            alert("Job Accepted Successfully!");
+            loadBookings();
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    }
+
+    // Logout
+    function workerLogout() {
+        firebase.auth().signOut().then(() => {
+            window.location.href = "worker-login.html";
+        });
+    }
+</script>
 
 </head>
 
 <body>
 
-    <h1>🧑‍🔧 Worker Dashboard</h1>
+<h1>👨‍🔧 Worker Dashboard</h1>
 
-    <!-- Booking List -->
-    <div id="bookings">
-        <p>Loading bookings...</p>
-    </div>
+<!-- Bookings -->
+<div id="bookings">
+    <p>Loading bookings...</p>
+</div>
 
-    <br>
-    <button onclick="workerLogout()">Logout</button>
+<br>
+
+<button onclick="workerLogout()">Logout</button>
 
 </body>
 </html>
+
