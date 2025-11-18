@@ -7,9 +7,10 @@
 <body>
 
 <header>
-  <h1>Login</h1>
+  <h1>Seva</h1>
   <nav>
     <a href="index.html">Home</a>
+    <a href="seva.html">Seva</a>
     <a href="login.html">Login</a>
     <a href="contact.html">Contact</a>
   </nav>
@@ -28,7 +29,7 @@
 function loginUser() {
   let user = document.getElementById("username").value;
   let pass = document.getElementById("password").value;
-  
+
   if(user === "admin" && pass === "1234"){
     alert("Login Successful!");
     window.location.href = "seva.html";
