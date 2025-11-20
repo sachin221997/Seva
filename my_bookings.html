@@ -28,7 +28,7 @@
         }
 
         nav a {
-            margin: 0 10px;
+            margin: 10px;
             text-decoration: none;
             color: #4a90e2;
             font-weight: bold;
@@ -40,13 +40,24 @@
             margin: 15px auto;
             padding: 15px;
             border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             text-align: left;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         .title {
             font-size: 22px;
             color: #333;
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 80%;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -76,7 +87,7 @@
 <script src="auth.js"></script>
 
 <script>
-auth.onAuthStateChanged(async (user) => {
+auth.onAuthStateChanged(async user => {
     if (!user) {
         window.location.href = "login.html";
         return;
@@ -102,14 +113,19 @@ auth.onAuthStateChanged(async (user) => {
                 const b = doc.data();
 
                 list.innerHTML += `
-                    <div class="card">
-                        <b>Service:</b> ${b.service}<br>
-                        <b>Status:</b> ${b.status}<br>
-                        <b>Price:</b> ₹${b.price}<br>
-                        <b>Platform Fee:</b> ₹${b.platformFee}<br>
-                        <b>Assigned Worker:</b> ${b.assignedWorkerId ? b.assignedWorkerId : "Not assigned yet"}<br>
-                        <b>Date:</b> ${new Date(b.time).toLocaleString()}<br>
-                    </div>
+                <div class="card">
+                    <b>Service:</b> ${b.service}<br>
+                    <b>Status:</b> ${b.status}<br>
+                    <b>Price:</b> ₹${b.price}<br>
+                    <b>Assigned Worker:</b> ${b.assignedWorkerId || "Not Assigned"}<br>
+                    <b>Date:</b> ${new Date(b.time).toLocaleString()}<br><br>
+
+                    ${
+                        b.status === "completed"
+                        ? `<button onclick="location.href='rate_worker.html?booking=${doc.id}'">Rate Worker</button>`
+                        : ""
+                    }
+                </div>
                 `;
             });
         });
@@ -117,4 +133,4 @@ auth.onAuthStateChanged(async (user) => {
 </script>
 
 </body>
-  </html>
+</html>
