@@ -2,113 +2,91 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seva Care - Home</title>
+
     <style>
         body {
+            font-family: Arial;
+            background: #f1f5ff;
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f8ff;
+            padding: 0;
+            text-align: center;
         }
 
         header {
-            background: #4a90e2;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 28px;
+            background: white;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            color: #4a90e2;
+        }
+
+        nav {
+            margin-top: 10px;
+        }
+
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #4a90e2;
             font-weight: bold;
         }
 
         .hero {
-            background: linear-gradient(135deg, #5cbdf3, #4a90e2);
-            color: white;
-            text-align: center;
-            padding: 80px 20px;
+            padding: 30px;
         }
 
-        .hero h1 {
-            font-size: 40px;
-            margin-bottom: 10px;
+        .hero h2 {
+            color: #333;
+            font-size: 24px;
         }
 
-        .hero p {
-            font-size: 18px;
-        }
-
-        .btn {
-            background: white;
-            color: #4a90e2;
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 20px;
-        }
-
-        .services {
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        .services h2 {
-            font-size: 32px;
-        }
-
-        .service-box {
-            background: white;
-            width: 80%;
-            max-width: 350px;
-            padding: 20px;
-            margin: 15px auto;
-            border-radius: 12px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-
-        .contact {
-            padding: 40px;
-            text-align: center;
+        button {
             background: #4a90e2;
             color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 18px;
+            border-radius: 10px;
+            margin-top: 20px;
+            width: 70%;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 15px;
+            background: #fff;
+            color: #555;
+            font-size: 14px;
         }
     </style>
 </head>
+
 <body>
 
-<header>Seva Care</header>
+<header>
+    <h1>❤️ Seva Care</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="seva.html">Services</a>
+        <a href="login.html">Login</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+</header>
 
-<div class="hero">
-    <h1>Welcome to Seva Care</h1>
-    <p>Your trusted platform for all home and personal services</p>
-    <a href="role.html" class="btn">Choose Role</a>
-    <a href="#services" class="btn">Explore Services</a>
-</div>
+<section class="hero">
+    <h2>Welcome to Seva Care</h2>
+    <p>India’s trusted platform for home services and earning opportunities.</p>
 
-<div class="services" id="services">
-    <h2>Our Services</h2>
+    <button onclick="location.href='role.html'">Choose Your Role</button>
+</section>
 
-    <div class="service-box">
-        <h3>Home Cleaning</h3>
-        <p>Professional and trusted cleaning experts.</p>
-    </div>
-
-    <div class="service-box">
-        <h3>Massage Service</h3>
-        <p>Relax your body and mind at home.</p>
-    </div>
-
-    <div class="service-box">
-        <h3>Electrician / Plumber</h3>
-        <p>Instant repairs and emergency support.</p>
-    </div>
-</div>
-
-<div class="contact">
-    <h2>Contact Us</h2>
-    <p>Email: sachiny4561@gmail.com</p>
-    <p>Phone: +91 8755816570</p>
-</div>
+<footer>
+    <p>© 2025 Seva – Spreading Care & Happiness ❤️</p>
+</footer>
 
 </body>
 </html>
