@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Worker Dashboard - Seva Care</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #f1f5ff;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #4a90e2;
+        }
+
+        .card {
+            background: white;
+            width: 85%;
+            margin: 15px auto;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
+        }
+
+        button {
+            background: #4a90e2;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            width: 80%;
+            font-size: 18px;
+        }
+
+        #logoutBtn {
+            background: #d9534f;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Worker Dashboard</h1>
+    <p id="workerEmail">Loading...</p>
+
+    <div class="card">
+        <h2>Your Status</h2>
+        <p>You are logged in as a <b>Worker</b>.</p>
+    </div>
+
+    <div class="card">
+        <h2>Upcoming Jobs</h2>
+        <p id="jobsList">No jobs assigned yet.</p>
+    </div>
+
+    <div class="card">
+        <h2>Your Earnings</h2>
+        <p id="earningAmount">₹0</p>
+    </div>
+
+    <button id="logoutBtn" onclick="logout()">Logout</button>
+
+    
+    <!-- Firebase v10 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+    <!-- Your JS -->
+    <script src="auth.js"></script>
+
+    <script>
+        // Load worker info
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            document.getElementById("workerEmail").innerText =
+                "Logged in as: " + user.email;
+
+            // Load worker data from Firestore
+            const doc = await db.collection("users").doc(user.uid).get();
+
+            if (doc.exists) {
+                const data = doc.data();
+
+                // Show earnings
+                document.getElementById("earningAmount").innerText =
+                    "₹" + (data.earnings || 0);
+            }
+        });
+    </script>
+
+</body>
+                           </html>
