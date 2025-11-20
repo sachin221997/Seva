@@ -1,74 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Rate Your Service - Seva Care</title>
+<meta charset="UTF-8" />
+<title>Rate Worker - Seva Care</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #f1f5ff;
-            text-align: center;
-            padding: 20px;
-        }
+<style>
+    body {
+        font-family: Arial;
+        background: #f1f5ff;
+        margin: 0;
+        text-align: center;
+        padding: 20px;
+    }
 
-        .card {
-            background: white;
-            width: 85%;
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+    h1 {
+        color: #4a90e2;
+    }
 
-        textarea {
-            width: 90%;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-            margin-top: 15px;
-        }
+    .card {
+        background: white;
+        width: 90%;
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        text-align: left;
+    }
 
-        button {
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 12px;
-            width: 80%;
-            border-radius: 10px;
-            font-size: 18px;
-            margin-top: 15px;
-        }
+    .btn {
+        background: #4a90e2;
+        color: white;
+        border: none;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 18px;
+        margin-top: 15px;
+        width: 90%;
+    }
 
-        .stars span {
-            font-size: 35px;
-            cursor: pointer;
-        }
-    </style>
+    select, textarea {
+        width: 90%;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+</style>
 </head>
 
 <body>
 
-<h1>Rate Your Service</h1>
-<p id="serviceInfo">Loading...</p>
+<h1>⭐ Rate Your Worker</h1>
 
-<div class="card">
-    <h3>Give Rating</h3>
+<div id="loading">Loading booking info...</div>
 
-    <div class="stars">
-        <span onclick="setRating(1)">⭐</span>
-        <span onclick="setRating(2)">⭐</span>
-        <span onclick="setRating(3)">⭐</span>
-        <span onclick="setRating(4)">⭐</span>
-        <span onclick="setRating(5)">⭐</span>
-    </div>
+<div id="rateBox" style="display:none;" class="card">
+    <h2 id="service"></h2>
 
-    <textarea id="reviewText" rows="4" placeholder="Write your review..."></textarea>
+    <p><b>Worker:</b> <span id="workerName">Loading...</span></p>
 
-    <button onclick="submitReview()">Submit Review</button>
+    <label><b>Select Rating (1–5 stars):</b></label><br>
+    <select id="rating">
+        <option value="5">⭐ 5 - Excellent</option>
+        <option value="4">⭐ 4 - Very Good</option>
+        <option value="3">⭐ 3 - Good</option>
+        <option value="2">⭐ 2 - Poor</option>
+        <option value="1">⭐ 1 - Very Bad</option>
+    </select><br><br>
+
+    <label><b>Write a Review:</b></label><br>
+    <textarea id="reviewText" rows="4" placeholder="Write your experience..."></textarea>
+
+    <button class="btn" onclick="submitReview()">Submit Review</button>
 </div>
-
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
@@ -78,64 +82,90 @@
 <script src="auth.js"></script>
 
 <script>
-let rating = 0;
-let bookingId = "";
-let workerId = "";
+// Extract booking ID from URL
+const urlParams = new URLSearchParams(window.location.search);
+const bookingId = urlParams.get("booking");
 
-function setRating(n) {
-    rating = n;
-    alert("You selected " + n + " star(s)");
+if (!bookingId) {
+    document.body.innerHTML = "<h2>Invalid link. No booking ID provided.</h2>";
 }
 
+// Load booking details
 auth.onAuthStateChanged(async user => {
-    if (!user) return window.location.href = "login.html";
-
-    const urlParams = new URLSearchParams(window.location.search);
-    bookingId = urlParams.get("booking");  // ?booking=ID
-
-    if (!bookingId) {
-        alert("Invalid booking");
+    if (!user) {
+        alert("Login required!");
+        window.location.href = "login.html";
         return;
     }
 
-    // Load booking
-    const docRef = await db.collection("bookings").doc(bookingId).get();
-    if (!docRef.exists) {
-        alert("Booking not found");
+    const bookingRef = db.collection("bookings").doc(bookingId);
+    const bookingDoc = await bookingRef.get();
+
+    if (!bookingDoc.exists) {
+        document.getElementById("loading").innerHTML = "Booking not found!";
         return;
     }
 
-    const data = docRef.data();
-    workerId = data.assignedWorkerId;
+    const b = bookingDoc.data();
 
-    document.getElementById("serviceInfo").innerText =
-        `Service: ${data.service} | Worker ID: ${workerId}`;
+    document.getElementById("service").innerText = b.service;
+    document.getElementById("loading").style.display = "none";
+
+    // Load worker info
+    const workerRef = db.collection("users").doc(b.assignedWorkerId);
+    const workerDoc = await workerRef.get();
+
+    if (workerDoc.exists) {
+        const w = workerDoc.data();
+        document.getElementById("workerName").innerText = w.email;
+    }
+
+    document.getElementById("rateBox").style.display = "block";
 });
 
 
+// ----------------------------
+// Submit Review
+// ----------------------------
 async function submitReview() {
-    if (rating === 0) return alert("Please select a star rating");
+    const user = auth.currentUser;
+    if (!user) return alert("Login required!");
 
-    const reviewText = document.getElementById("reviewText").value;
+    const rating = Number(document.getElementById("rating").value);
+    const reviewText = document.getElementById("reviewText").value.trim();
 
+    if (reviewText.length < 3) {
+        alert("Please write at least 3 characters.");
+        return;
+    }
+
+    const bookingRef = db.collection("bookings").doc(bookingId);
+    const bookingDoc = await bookingRef.get();
+
+    if (!bookingDoc.exists) return alert("Booking not found!");
+
+    const b = bookingDoc.data();
+
+    // Save review in reviews collection
     await db.collection("reviews").add({
-        bookingId,
-        workerId,
-        rating,
-        reviewText,
-        timestamp: new Date()
+        workerId: b.assignedWorkerId,
+        bookingId: bookingId,
+        userId: auth.currentUser.uid,
+        rating: rating,
+        reviewText: reviewText,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Add rating to worker profile (average rating refresh)
-    await db.collection("users").doc(workerId).update({
+    // Update worker rating totals
+    await db.collection("users").doc(b.assignedWorkerId).update({
         ratingTotal: firebase.firestore.FieldValue.increment(rating),
         ratingCount: firebase.firestore.FieldValue.increment(1)
     });
 
-    alert("Thank you for your review!");
-    window.location.href = "customer_home.html";
+    alert("Thank you! Your review has been submitted.");
+    window.location.href = "my_bookings.html";
 }
 </script>
 
 </body>
-          </html>
+    </html>
