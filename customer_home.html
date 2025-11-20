@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: Arial;
-            text-align: center;
             background: #f1f5ff;
+            text-align: center;
             padding: 20px;
         }
 
@@ -27,8 +27,8 @@
 
         button {
             background: #4a90e2;
-            border: none;
             color: white;
+            border: none;
             padding: 12px 20px;
             border-radius: 10px;
             margin-top: 10px;
@@ -44,23 +44,34 @@
 
 <body>
 
-    <h1>Welcome to Seva Care</h1>
-    <p id="userEmail">Loading...</p>
+    <h1>Customer Dashboard</h1>
+    <p id="customerEmail">Loading...</p>
 
+    <!-- SERVICE LIST -->
     <div class="card">
         <h2>Available Services</h2>
 
-        <button onclick="bookService('Home Cleaning')">Home Cleaning</button><br>
-        <button onclick="bookService('Massage Service')">Massage Service</button><br>
-        <button onclick="bookService('Electrician')">Electrician</button><br>
-        <button onclick="bookService('Plumber')">Plumber</button><br>
-        <button onclick="bookService('Carpenter')">Carpenter</button><br>
-        <button onclick="bookService('Cooking Help')">Cooking Help</button><br>
+        <button onclick="bookService('Home Cleaning')">Home Cleaning</button>
+        <br><br>
+
+        <button onclick="bookService('Massage Service')">Massage Service</button>
+        <br><br>
+
+        <button onclick="bookService('Electrician')">Electrician</button>
+        <br><br>
+
+        <button onclick="bookService('Plumber')">Plumber</button>
+        <br><br>
+
+        <button onclick="bookService('Carpenter')">Carpenter</button>
+        <br><br>
+
+        <button onclick="bookService('Cooking Help')">Cooking Help</button>
     </div>
 
     <button id="logoutBtn" onclick="logout()">Logout</button>
 
-    <!-- Firebase v10 -->
+    <!-- Firebase v10 SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
@@ -69,15 +80,18 @@
     <script src="auth.js"></script>
 
     <script>
-        // Show logged-in user's email
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById("userEmail").innerText = "Logged in as: " + user.email;
-            } else {
+        // Load customer info
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
                 window.location.href = "login.html";
+                return;
             }
+
+            document.getElementById("customerEmail").innerText =
+                "Logged in as: " + user.email;
         });
     </script>
 
 </body>
+</html>
                                                                   </html>
