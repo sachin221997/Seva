@@ -112,7 +112,7 @@ async function bookService(serviceName) {
     return;
   }
 
-  // Create booking with assignedWorkerId null (will be assigned next)
+  // Create booking with assignedWorkerId null first
   let bookingRef = await db.collection("bookings").add({
     customerId: user.uid,
     userEmail: user.email,
@@ -124,85 +124,83 @@ async function bookService(serviceName) {
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
-  // Try to assign a worker immediately (client-side)
+  // Try assigning worker immediately
   try {
     await assignWorkerForBooking(bookingRef.id);
   } catch (err) {
-    console.error("Auto-assign failed (client). Will stay unassigned for now.", err);
+    console.error("Assignment failed:", err);
   }
 
+  // Move to confirmation page
   window.location.href = "confirmation.html";
 }
 
 
-// ----------------------
-// Assign a worker for a booking (client attempt)
-// ----------------------
+// ----------------------------
+// Assign Worker Automatically
+// ----------------------------
 async function assignWorkerForBooking(bookingId) {
-  // Get booking doc
   const bookingDoc = await db.collection("bookings").doc(bookingId).get();
-  if (!bookingDoc.exists) throw new Error("Booking not found");
+  if (!bookingDoc.exists) return;
 
   const booking = bookingDoc.data();
-  if (booking.assignedWorkerId) return; // already assigned
 
-  // Find least busy worker (available)
-  const workerId = await getLeastBusyWorker();
-  if (!workerId) {
-    // no worker found - leave unassigned
-    console.log("No worker available now");
+  // If already assigned, stop
+  if (booking.assignedWorkerId) return;
+
+  // Get available workers
+  const workersSnap = await db.collection("users")
+    .where("role", "==", "worker")
+    .where("available", "==", true)
+    .get();
+
+  if (workersSnap.empty) {
+    console.log("No available workers right now.");
     return;
   }
 
-  // Update booking with assigned worker
+  // Pick least busy worker
+  const workerId = await getLeastBusyWorker(workersSnap);
+
+  if (!workerId) {
+    console.log("Could not find worker.");
+    return;
+  }
+
+  // Assign worker to booking
   await db.collection("bookings").doc(bookingId).update({
     assignedWorkerId: workerId,
     assignedAt: new Date().toISOString(),
     status: "assigned"
   });
 
-  // Optionally mark worker as unavailable (if you want one job at time)
-  // await db.collection("users").doc(workerId).update({ available: false });
-
-  // Optionally notify worker later via cloud function or FCM
   console.log("Assigned worker:", workerId);
 }
 
 
-// ----------------------
-// Helper: find least-busy available worker
-// Strategy: find workers (role=worker) where available==true,
-// and pick the one with smallest number of pending/assigned bookings.
-// ----------------------
-async function getLeastBusyWorker() {
-  // Step 1: get available workers
-  const workersSnap = await db.collection("users")
-    .where("role", "==", "worker")
-    .where("available", "==", true)
-    .get();
+// -------------------------------
+// Helper: Least Busy Worker Logic
+// -------------------------------
+async function getLeastBusyWorker(workersSnap) {
+  let leastBusyWorker = null;
+  let leastJobs = Infinity;
 
-  if (workersSnap.empty) return null;
+  for (const doc of workersSnap.docs) {
+    const workerId = doc.id;
 
-  // Build array of worker ids
-  const workers = workersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-  // Step 2: for each worker, count their pending/assigned bookings
-  // (we run small queries — ok for modest scale)
-  let leastBusy = null;
-  let leastCount = Number.POSITIVE_INFINITY;
-
-  for (const w of workers) {
-    const q = await db.collection("bookings")
-      .where("assignedWorkerId", "==", w.id)
-      .where("status", "in", ["assigned", "in_progress"]) // count active jobs
+    const jobSnap = await db.collection("bookings")
+      .where("assignedWorkerId", "==", workerId)
+      .where("status", "in", ["assigned", "in_progress"])
       .get();
 
-    const count = q.size;
-    if (count < leastCount) {
-      leastCount = count;
-      leastBusy = w.id;
+    const jobCount = jobSnap.size;
+
+    if (jobCount < leastJobs) {
+      leastJobs = jobCount;
+      leastBusyWorker = workerId;
     }
   }
 
-  return leastBusy;
-}
+  return leastBusyWorker;
+    }
+    
