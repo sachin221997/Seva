@@ -1,33 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Contact Us</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Contact Us - Seva Care</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f1f5ff;
+            margin: 0;
+            text-align: center;
+        }
+
+        header {
+            background: white;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            color: #4a90e2;
+        }
+
+        nav {
+            margin-top: 10px;
+        }
+
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #4a90e2;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 85%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        input, textarea {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 15px;
+            background: white;
+            color: #555;
+            font-size: 14px;
+        }
+    </style>
 </head>
+
 <body>
 
 <header>
-  <h1>🫶 Seva Care</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="seva.html">Seva</a>
-    <a href="login.html">Login</a>
-    <a href="contact.html">Contact</a>
-  </nav>
+    <h1>❤️ Seva Care</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="seva.html">Services</a>
+        <a href="login.html">Login</a>
+        <a href="contact.html">Contact</a>
+    </nav>
 </header>
 
-<section>
-  <h2>Send us a message</h2>
-  <form action="https://formspree.io/f/mzzypjpn" method="POST">
-    <input type="text" name="name" placeholder="Your Name" required><br><br>
-    <input type="email" name="email" placeholder="Your Email" required><br><br>
-    <textarea name="message" placeholder="Type your message here..." required></textarea><br><br>
-    <button type="submit">Send</button>
-  </form>
-</section>
+<div class="container">
+    <h2>Contact Us</h2>
+    <p>If you have any questions, complaints, or support requests, feel free to contact us.</p>
+
+    <input type="text" placeholder="Your Name">
+    <input type="email" placeholder="Your Email">
+    <textarea placeholder="Your Message" rows="5"></textarea>
+
+    <button onclick="alert('Message Sent Successfully!')">Send Message</button>
+
+    <h3 style="margin-top:25px;">📞 Contact Info</h3>
+    <p>Email: <b>sachiny4561@gmail.com</b></p>
+    <p>Phone: <b>+91 8755816570</b></p>
+    <p>Address: Haridwar, uttarakhand, India</p>
+</div>
 
 <footer>
-  <p>© 2025 Seva — Spreading Care & Happiness ❤️</p>
+    <p>© 2025 Seva – Spreading Care & Happiness ❤️</p>
 </footer>
 
 </body>
