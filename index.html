@@ -1,33 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My First Website</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seva Care - Home</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f8ff;
+        }
+
+        header {
+            background: #4a90e2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #5cbdf3, #4a90e2);
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .hero h1 {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 18px;
+        }
+
+        .btn {
+            background: white;
+            color: #4a90e2;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .services {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .services h2 {
+            font-size: 32px;
+        }
+
+        .service-box {
+            background: white;
+            width: 80%;
+            max-width: 350px;
+            padding: 20px;
+            margin: 15px auto;
+            border-radius: 12px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        .contact {
+            padding: 40px;
+            text-align: center;
+            background: #4a90e2;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
-<header>
-  <h1>🫶 Seva Care</h1>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="seva.html">Seva</a>
-    <a href="login.html">Login</a>
-    <a href="contact.html">Contact</a>
-  </nav>
-</header>
+<header>Seva Care</header>
 
-<section class="hero">
-  <h2>Hello World!</h2>
-  <p>This is my first website built with HTML, CSS, and JavaScript.</p>
-  <button onclick="toggleDarkMode()">Dark Mode</button>
-</section>
+<div class="hero">
+    <h1>Welcome to Seva Care</h1>
+    <p>Your trusted platform for all home and personal services</p>
+    <a href="role.html" class="btn">Choose Role</a>
+    <a href="#services" class="btn">Explore Services</a>
+</div>
 
-<footer>
-  <p>© 2025 Seva — Spreading Care & Happiness ❤️</p>
-</footer>
+<div class="services" id="services">
+    <h2>Our Services</h2>
 
-<script src="script.js"></script>
+    <div class="service-box">
+        <h3>Home Cleaning</h3>
+        <p>Professional and trusted cleaning experts.</p>
+    </div>
+
+    <div class="service-box">
+        <h3>Massage Service</h3>
+        <p>Relax your body and mind at home.</p>
+    </div>
+
+    <div class="service-box">
+        <h3>Electrician / Plumber</h3>
+        <p>Instant repairs and emergency support.</p>
+    </div>
+</div>
+
+<div class="contact">
+    <h2>Contact Us</h2>
+    <p>Email: sachiny4561@gmail.com</p>
+    <p>Phone: +91 8755816570</p>
+</div>
+
 </body>
 </html>
