@@ -12,9 +12,7 @@
             padding: 20px;
         }
 
-        h1 {
-            color: #4a90e2;
-        }
+        h1 { color: #4a90e2; }
 
         .card {
             background: white;
@@ -36,9 +34,7 @@
             font-size: 18px;
         }
 
-        #logoutBtn {
-            background: #d9534f;
-        }
+        #logoutBtn { background: #d9534f; }
     </style>
 </head>
 
@@ -59,12 +55,11 @@
 
     <div class="card">
         <h2>Your Earnings</h2>
-        <p id="earningAmount">₹0</p>
+        <p id="earningAmount">0</p>
     </div>
 
     <button id="logoutBtn" onclick="logout()">Logout</button>
 
-    
     <!-- Firebase v10 SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
@@ -81,21 +76,43 @@
                 return;
             }
 
+            // Show worker email
             document.getElementById("workerEmail").innerText =
                 "Logged in as: " + user.email;
 
-            // Load worker data from Firestore
-            const doc = await db.collection("users").doc(user.uid).get();
-
-            if (doc.exists) {
-                const data = doc.data();
-
-                // Show earnings
+            // Load worker earnings
+            const docSnap = await db.collection("users").doc(user.uid).get();
+            if (docSnap.exists) {
+                const data = docSnap.data();
                 document.getElementById("earningAmount").innerText =
                     "₹" + (data.earnings || 0);
             }
+
+            // Load assigned jobs
+            db.collection("bookings")
+                .where("assignedWorkerId", "==", user.uid)
+                .onSnapshot((snapshot) => {
+                    const jobsList = document.getElementById("jobsList");
+
+                    if (snapshot.empty) {
+                        jobsList.innerHTML = "No jobs assigned yet.";
+                        return;
+                    }
+
+                    jobsList.innerHTML = "";
+                    snapshot.forEach((doc) => {
+                        const d = doc.data();
+                        jobsList.innerHTML += `
+                            <div style="background:#fff;padding:10px;margin:10px;border-radius:10px">
+                                <b>Service:</b> ${d.service}<br>
+                                <b>Customer:</b> ${d.userEmail}<br>
+                                <b>Status:</b> ${d.status}<br>
+                            </div>
+                        `;
+                    });
+                });
         });
     </script>
 
 </body>
-                           </html>
+</html>
