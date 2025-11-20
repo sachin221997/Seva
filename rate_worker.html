@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rate Your Service - Seva Care</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f1f5ff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            width: 85%;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        textarea {
+            width: 90%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 80%;
+            border-radius: 10px;
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        .stars span {
+            font-size: 35px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Rate Your Service</h1>
+<p id="serviceInfo">Loading...</p>
+
+<div class="card">
+    <h3>Give Rating</h3>
+
+    <div class="stars">
+        <span onclick="setRating(1)">⭐</span>
+        <span onclick="setRating(2)">⭐</span>
+        <span onclick="setRating(3)">⭐</span>
+        <span onclick="setRating(4)">⭐</span>
+        <span onclick="setRating(5)">⭐</span>
+    </div>
+
+    <textarea id="reviewText" rows="4" placeholder="Write your review..."></textarea>
+
+    <button onclick="submitReview()">Submit Review</button>
+</div>
+
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+<script src="auth.js"></script>
+
+<script>
+let rating = 0;
+let bookingId = "";
+let workerId = "";
+
+function setRating(n) {
+    rating = n;
+    alert("You selected " + n + " star(s)");
+}
+
+auth.onAuthStateChanged(async user => {
+    if (!user) return window.location.href = "login.html";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    bookingId = urlParams.get("booking");  // ?booking=ID
+
+    if (!bookingId) {
+        alert("Invalid booking");
+        return;
+    }
+
+    // Load booking
+    const docRef = await db.collection("bookings").doc(bookingId).get();
+    if (!docRef.exists) {
+        alert("Booking not found");
+        return;
+    }
+
+    const data = docRef.data();
+    workerId = data.assignedWorkerId;
+
+    document.getElementById("serviceInfo").innerText =
+        `Service: ${data.service} | Worker ID: ${workerId}`;
+});
+
+
+async function submitReview() {
+    if (rating === 0) return alert("Please select a star rating");
+
+    const reviewText = document.getElementById("reviewText").value;
+
+    await db.collection("reviews").add({
+        bookingId,
+        workerId,
+        rating,
+        reviewText,
+        timestamp: new Date()
+    });
+
+    // Add rating to worker profile (average rating refresh)
+    await db.collection("users").doc(workerId).update({
+        ratingTotal: firebase.firestore.FieldValue.increment(rating),
+        ratingCount: firebase.firestore.FieldValue.increment(1)
+    });
+
+    alert("Thank you for your review!");
+    window.location.href = "customer_home.html";
+}
+</script>
+
+</body>
+          </html>
