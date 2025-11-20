@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Select Role - Seva Care</title>
@@ -11,16 +11,15 @@
             background: #f1f5ff;
             padding: 20px;
         }
-
         h1 { color: #4a90e2; }
 
         .card {
             background: white;
-            padding: 20px;
             width: 80%;
             margin: 15px auto;
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.15);
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         }
 
         button {
@@ -29,8 +28,8 @@
             color: white;
             padding: 12px 20px;
             border-radius: 10px;
-            margin-top: 10px;
             width: 80%;
+            margin-top: 10px;
             font-size: 18px;
         }
     </style>
@@ -44,14 +43,23 @@
     <div class="card">
         <h2>I Need a Service</h2>
         <p>Book massage, cleaning, plumber, electrician, etc.</p>
-        <button onclick="location.href='customer_home.html'">Continue as Customer</button>
+        <button onclick="setCustomer()">Continue as Customer</button>
     </div>
 
     <div class="card">
         <h2>I Want to Work</h2>
         <p>Earn money by providing services.</p>
-        <button onclick="location.href='worker_home.html'">Continue as Worker</button>
+        <button onclick="setWorker()">Continue as Worker</button>
     </div>
 
+
+    <!-- Firebase v10 SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+    <!-- Your JS -->
+    <script src="auth.js"></script>
+
 </body>
-  </html>
+</html>
