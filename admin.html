@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Seva Care</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f1f5ff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #4a90e2;
+        }
+
+        .card {
+            background: white;
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        th {
+            background: #4a90e2;
+            color: white;
+        }
+
+        #logoutBtn {
+            background: #d9534f;
+            padding: 10px 20px;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Admin Dashboard</h1>
+    <p id="adminEmail">Checking access...</p>
+
+    <!-- USERS -->
+    <div class="card">
+        <h2>All Users</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Earnings</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable"></tbody>
+        </table>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="card">
+        <h2>All Bookings</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer Email</th>
+                    <th>Service</th>
+                    <th>Status</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody id="bookingsTable"></tbody>
+        </table>
+    </div>
+
+    <button id="logoutBtn" onclick="logout()">Logout</button>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+    <script src="auth.js"></script>
+    <script src="admin.js"></script>
+
+</body>
+  </html>
