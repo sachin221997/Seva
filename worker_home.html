@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: Arial;
-            text-align: center;
             background: #f1f5ff;
+            text-align: center;
             padding: 20px;
         }
 
@@ -25,8 +25,8 @@
 
         button {
             background: #4a90e2;
-            border: none;
             color: white;
+            border: none;
             padding: 12px 20px;
             border-radius: 10px;
             margin-top: 10px;
@@ -43,19 +43,22 @@
     <h1>Worker Dashboard</h1>
     <p id="workerEmail">Loading...</p>
 
+    <!-- WORKER STATUS -->
     <div class="card">
         <h2>Your Status</h2>
-        <p>You are logged in as a <b>Worker</b>.</p>
+        <p>You are logged in as <b>Worker</b>.</p>
     </div>
 
+    <!-- UPCOMING JOBS -->
     <div class="card">
         <h2>Upcoming Jobs</h2>
-        <p id="jobsList">No jobs assigned yet.</p>
+        <div id="jobsList">No jobs assigned yet.</div>
     </div>
 
+    <!-- EARNINGS -->
     <div class="card">
         <h2>Your Earnings</h2>
-        <p id="earningAmount">0</p>
+        <p id="earningAmount">₹0</p>
     </div>
 
     <button id="logoutBtn" onclick="logout()">Logout</button>
@@ -69,29 +72,21 @@
     <script src="auth.js"></script>
 
     <script>
-        // Load worker info
+        // Load Worker Data
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = "login.html";
                 return;
             }
 
-            // Show worker email
-            document.getElementById("workerEmail").innerText =
-                "Logged in as: " + user.email;
+            document.getElementById("workerEmail").innerText = "Logged in as: " + user.email;
 
-            // Load worker earnings
-            const docSnap = await db.collection("users").doc(user.uid).get();
-            if (docSnap.exists) {
-                const data = docSnap.data();
-                document.getElementById("earningAmount").innerText =
-                    "₹" + (data.earnings || 0);
-            }
-
-            // Load assigned jobs
+            // Load JOBS assigned to worker
             db.collection("bookings")
                 .where("assignedWorkerId", "==", user.uid)
-                .onSnapshot((snapshot) => {
+                .where("status", "in", ["assigned", "in_progress"])
+                .onSnapshot(async (snapshot) => {
+
                     const jobsList = document.getElementById("jobsList");
 
                     if (snapshot.empty) {
@@ -100,17 +95,32 @@
                     }
 
                     jobsList.innerHTML = "";
+
                     snapshot.forEach((doc) => {
                         const d = doc.data();
+
                         jobsList.innerHTML += `
-                            <div style="background:#fff;padding:10px;margin:10px;border-radius:10px">
+                            <div style="background:#fff;padding:15px;margin:10px;border-radius:12px;box-shadow:0px 0px 10px rgba(0,0,0,0.1);">
                                 <b>Service:</b> ${d.service}<br>
-                                <b>Customer:</b> ${d.userEmail}<br>
-                                <b>Status:</b> ${d.status}<br>
+                                <b>Customer Email:</b> ${d.userEmail}<br>
+                                <b>Status:</b> ${d.status}<br><br>
+
+                                ${
+                                    d.status === "assigned" 
+                                    ? `<button onclick="startJob('${doc.id}')">Start Job</button>`
+                                    : `<button onclick="completeJob('${doc.id}')">Complete Job</button>`
+                                }
                             </div>
                         `;
                     });
                 });
+
+            // Load Earnings
+            const docRef = await db.collection("users").doc(user.uid).get();
+            if (docRef.exists) {
+                const data = docRef.data();
+                document.getElementById("earningAmount").innerText = "₹" + (data.earnings || 0);
+            }
         });
     </script>
 
