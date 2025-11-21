@@ -1,35 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+  <title>Login</title>
 </head>
 <body>
 
-<header>
-    <h1>❤️ Seva Care</h1>
-</header>
+<h2>Login</h2>
 
-<section>
-    <h2>Login to Continue</h2>
+<input id="email" type="email" placeholder="Email"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
+<button id="loginBtn">Login</button>
 
-    <input type="email" id="username" placeholder="Email" required><br><br>
-    <input type="password" id="password" placeholder="Password" required><br><br>
+<script type="module">
+  import { signInWithEmailAndPassword } 
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    <button onclick="login()">Login</button>
-</section>
+  import "./firebase.js";
 
-<footer>
-    <p>© 2025 Seva – Spreading Care & Happiness ❤️</p>
-</footer>
+  loginBtn.addEventListener("click", () => {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
 
-<!-- Firebase v10 SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
-<!-- Your JS -->
-<script src="auth.js"></script>
+    signInWithEmailAndPassword(auth, email, pass)
+      .then(() => {
+        window.location.href = "customer_home.html"; 
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  });
+</script>
 
 </body>
 </html>
