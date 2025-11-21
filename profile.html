@@ -1,180 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Profile - Seva Care</title>
+  <meta charset="UTF-8" />
+  <title>Profile - Seva Care</title>
 
-<style>
+  <style>
     body {
-        font-family: Arial;
-        background: #f1f5ff;
-        text-align: center;
-        padding: 20px;
+      font-family: Arial;
+      background: #f1f5ff;
+      text-align: center;
+      padding: 20px;
     }
-
-    h1 {
-        color: #4a90e2;
-    }
+    h1 { color: #4a90e2; }
 
     .card {
-        background: white;
-        width: 90%;
-        margin: 15px auto;
-        padding: 20px;
-        border-radius: 12px;
-        text-align: left;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: white;
+      width: 90%;
+      margin: 15px auto;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: left;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
     input, select {
-        width: 95%;
-        padding: 10px;
-        margin-top: 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
+      width: 95%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
 
     .btn {
-        background: #4a90e2;
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 10px;
-        width: 90%;
-        margin-top: 15px;
-        font-size: 16px;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      width: 90%;
+      margin-top: 15px;
+      font-size: 16px;
     }
 
-    .offlineBtn {
-        background: #d9534f;
+    #logoutBtn {
+      background: #d9534f;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      margin-bottom: 20px;
+      border-radius: 8px;
     }
 
-    .onlineBtn {
-        background: green;
-    }
-</style>
+    .onlineBtn { background: green; }
+    .offlineBtn { background: #d9534f; }
+  </style>
 </head>
 
 <body>
+
 <button id="logoutBtn">Logout</button>
+
 <h1>My Profile</h1>
 <p id="email">Loading...</p>
 
 <div class="card">
-    <h2>Personal Info</h2>
+  <h2>Personal Info</h2>
 
-    <label>Name:</label>
-    <input id="name" placeholder="Enter your name">
+  <label>Name:</label>
+  <input id="name" placeholder="Enter your name">
 
-    <label>Phone:</label>
-    <input id="phone" placeholder="Enter phone number">
+  <label>Phone:</label>
+  <input id="phone" placeholder="Enter phone number">
 
-    <label>Gender:</label>
-    <select id="gender">
-        <option value="">Select</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-    </select>
+  <label>Gender:</label>
+  <select id="gender">
+    <option value="">Select</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Other">Other</option>
+  </select>
 
-    <label>Address:</label>
-    <input id="address" placeholder="Enter address">
+  <label>Address:</label>
+  <input id="address" placeholder="Enter address">
 
-    <button class="btn" onclick="saveProfile()">Save Profile</button>
+  <button class="btn" onclick="saveProfile()">Save Profile</button>
 </div>
 
 <!-- WORKER SECTION -->
 <div id="workerSection" class="card" style="display:none;">
-    <h2>Worker Info</h2>
+  <h2>Worker Info</h2>
 
-    <p><b>Your Rating:</b> <span id="rating">Loading...</span></p>
-    <p><b>Your Earnings:</b> ₹<span id="workerEarnings">0</span></p>
+  <p><b>Your Rating:</b> <span id="rating">Loading...</span></p>
+  <p><b>Your Earnings:</b> ₹ <span id="workerEarnings">0</span></p>
 
-    <h3>Availability</h3>
-    <button id="onlineBtn" class="btn onlineBtn" onclick="setOnline()">Go Online</button>
-    <button id="offlineBtn" class="btn offlineBtn" onclick="setOffline()">Go Offline</button>
+  <h3>Availability</h3>
+  <button class="btn onlineBtn" onclick="setOnline()">Go Online</button>
+  <button class="btn offlineBtn" onclick="setOffline()">Go Offline</button>
 </div>
 
-<button class="btn" style="background:#d9534f;" onclick="logout()">Logout</button>
-
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
-<script src="auth.js"></script>
-
-<script>
-auth.onAuthStateChanged(async user => {
-    if (!user) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    document.getElementById("email").innerText = "Logged in as: " + user.email;
-
-    const userRef = db.collection("users").doc(user.uid);
-    const snap = await userRef.get();
-
-    if (!snap.exists) return;
-
-    const data = snap.data();
-
-    // Load personal info
-    document.getElementById("name").value = data.name || "";
-    document.getElementById("phone").value = data.phone || "";
-    document.getElementById("gender").value = data.gender || "";
-    document.getElementById("address").value = data.address || "";
-
-    // If worker, show worker-specific data
-    if (data.role === "worker") {
-        document.getElementById("workerSection").style.display = "block";
-
-        document.getElementById("workerEarnings").innerText = data.earnings || 0;
-
-        let ratingText = "No Ratings Yet";
-        if (data.ratingCount > 0) {
-            ratingText = (data.ratingTotal / data.ratingCount).toFixed(1) + " ⭐";
-        }
-        document.getElementById("rating").innerText = ratingText;
-    }
-});
-
-
-// Save profile
-async function saveProfile() {
-    const user = auth.currentUser;
-
-    await db.collection("users").doc(user.uid).update({
-        name: document.getElementById("name").value,
-        phone: document.getElementById("phone").value,
-        gender: document.getElementById("gender").value,
-        address: document.getElementById("address").value
-    });
-
-    alert("Profile Updated Successfully!");
-}
-
-
-// Worker Online/Offline toggle
-async function setOnline() {
-    const user = auth.currentUser;
-    await db.collection("users").doc(user.uid).update({ available: true });
-    alert("You are now ONLINE");
-}
-
-async function setOffline() {
-    const user = auth.currentUser;
-    await db.collection("users").doc(user.uid).update({ available: false });
-    alert("You are now OFFLINE");
-}
-</script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, signOut, onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { 
+    getFirestore, 
+    doc, 
+    getDoc, 
+    updateDoc 
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+  // Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
@@ -186,25 +124,82 @@ async function setOffline() {
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
 
-  // Redirect to login if NOT logged in
-  onAuthStateChanged(auth, (user) => {
+  // 🚨 Redirect to login if NOT logged in
+  onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = "login.html";
+      return;
+    }
+
+    // Display email
+    document.getElementById("email").innerText = "Logged in as: " + user.email;
+
+    // Load user data
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) return;
+
+    const data = snap.data();
+
+    // Fill profile
+    document.getElementById("name").value = data.name || "";
+    document.getElementById("phone").value = data.phone || "";
+    document.getElementById("gender").value = data.gender || "";
+    document.getElementById("address").value = data.address || "";
+
+    // If worker, show worker section
+    if (data.role === "worker") {
+      document.getElementById("workerSection").style.display = "block";
+      document.getElementById("workerEarnings").innerText = data.earnings || 0;
+
+      let ratingText = "No Ratings Yet";
+      if (data.ratingCount > 0) {
+        ratingText = (data.ratingTotal / data.ratingCount).toFixed(1) + " ⭐";
+      }
+      document.getElementById("rating").innerText = ratingText;
     }
   });
 
-  // Logout function
+  // ⭐ Save Profile
+  window.saveProfile = async function() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    await updateDoc(doc(db, "users", user.uid), {
+      name: document.getElementById("name").value,
+      phone: document.getElementById("phone").value,
+      gender: document.getElementById("gender").value,
+      address: document.getElementById("address").value
+    });
+
+    alert("Profile Updated Successfully!");
+  }
+
+  // ⭐ Worker Online
+  window.setOnline = async function() {
+    const user = auth.currentUser;
+    await updateDoc(doc(db, "users", user.uid), { available: true });
+    alert("You are now ONLINE");
+  }
+
+  // ⭐ Worker Offline
+  window.setOffline = async function() {
+    const user = auth.currentUser;
+    await updateDoc(doc(db, "users", user.uid), { available: false });
+    alert("You are now OFFLINE");
+  }
+
+  // ⭐ Logout
   logoutBtn.addEventListener("click", () => {
-    signOut(auth)
-      .then(() => {
-        alert("Logged out!");
-        window.location.href = "login.html";
-      })
-      .catch((error) => {
-        alert("ERROR: " + error.message);
-      });
+    signOut(auth).then(() => {
+      alert("Logged out!");
+      window.location.href = "login.html";
+    });
   });
 </script>
+
 </body>
-  </html>
+    </html> 
