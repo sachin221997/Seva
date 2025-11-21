@@ -1,20 +1,17 @@
 // ------------------------------------------------------
 // Firebase Config
-// ------------------------------------------------------
 const firebaseConfig = {
-    apiKey: "AIzaSyCHdxIjbitxh-DhK_JZvTFlSybFgKAuNCU",
-    authDomain: "seva-app-22902.firebaseapp.com",
-    projectId: "seva-app-22902",
-    storageBucket: "seva-app-22902.firebasestorage.app",
-    messagingSenderId: "352057418192",
-    appId: "1:352057418192:web:6f5f7ffa0b34f0d0a4d9d5",
-    measurementId: "G-31BPC3RYNB"
+  apiKey: "AIzaSyB0csJLpaNSVcFo-XL6UFtEtcoyxRFzik",
+  authDomain: "seva-6f191.firebaseapp.com",
+  projectId: "seva-6f191",
+  storageBucket: "seva-6f191.appspot.com",
+  messagingSenderId: "826093348416",
+  appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+  measurementId: "G-78H32SRPCD"
 };
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-
-// Firebase Services
 const auth = firebase.auth();
 const db = firebase.firestore();
 
