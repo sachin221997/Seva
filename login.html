@@ -12,21 +12,41 @@
 <button id="loginBtn">Login</button>
 
 <script type="module">
-  import { signInWithEmailAndPassword } 
+  // Import Firebase functions
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } 
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  import "./firebase.js";
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+  };
 
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Test button click
   loginBtn.addEventListener("click", () => {
+    alert("Login clicked");   // <-- Test if script is running
+
     const email = document.getElementById("email").value;
     const pass = document.getElementById("password").value;
 
+    // Firebase login
     signInWithEmailAndPassword(auth, email, pass)
       .then(() => {
-        window.location.href = "customer_home.html"; 
+        alert("Login successful!"); // Test
+        window.location.href = "customer_home.html";
       })
       .catch((error) => {
-        alert(error.message);
+        alert("ERROR: " + error.message);
       });
   });
 </script>
