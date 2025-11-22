@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Feed — Seva</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family: Arial, sans-serif; padding:16px; max-width:900px;margin:auto;}
+    .post{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:8px;}
+    .title{font-weight:600}
+    .meta{font-size:12px;color:#666}
+    button{padding:8px 12px;margin-top:8px}
+    #notif{position:fixed;right:16px;top:16px;background:#ff3b30;color:white;padding:8px 12px;border-radius:20px}
+  </style>
+</head>
+<body>
+  <h2>Nearby Requests Feed</h2>
+  <div id="notif" style="display:none">New</div>
+  <div id="feed"></div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "PASTE_API_KEY",
+      authDomain: "PASTE_AUTH_DOMAIN",
+      projectId: "PASTE_PROJECT_ID",
+      storageBucket: "PASTE_STORAGE_BUCKET",
+      messagingSenderId: "PASTE_MSG_SENDER",
+      appId: "PASTE_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Haversine distance (km)
+    function distanceKm(lat1, lon1, lat2, lon2){
+      const R = 6371;
+      const dLat = (lat2-lat1) * Math.PI/180;
+      const dLon = (lon2-lon1) * Math.PI/180;
+      const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+      const c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R*c;
+    }
+
+    // require login
+    function requireLogin() {
+      return new Promise((resolve) => {
+        auth.onAuthStateChanged(user => {
+          if (!user) {
+            document.getElementById('feed').innerHTML = '<p>Please login to view feed.</p>';
+            resolve(null);
+          } else resolve(user);
+        });
+      });
+    }
+
+    async function initFeed(){
+      const user = await requireLogin();
+      if (!user) return;
+      // get worker's current location
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const myLat = pos.coords.latitude;
+        const myLng = pos.coords.longitude;
+        const maxKm = 12; // show posts within 12 km
+
+        // Listen to posts in real-time
+        db.collection('posts').where('status','==','open').orderBy('timestamp','desc')
+          .onSnapshot(snapshot => {
+            const feedEl = document.getElementById('feed');
+            feedEl.innerHTML = '';
+            let newCount = 0;
+            snapshot.forEach(doc => {
+              const data = doc.data();
+              if (!data.lat || !data.lng) return;
+              const km = distanceKm(myLat, myLng, data.lat, data.lng);
+              if (km <= maxKm) {
+                newCount++;
+                const div = document.createElement('div');
+                div.className = 'post';
+                const text = data.text || '';
+                div.innerHTML = `
+                  <div class="title">${text ? text : '<i>Voice request</i>'}</div>
+                  <div class="meta">Distance: ${km.toFixed(1)} km • ${new Date(data.timestamp?.toDate?.() || Date.now()).toLocaleString()}</div>
+                `;
+                if (data.voiceUrl) {
+                  const audio = document.createElement('audio');
+                  audio.controls = true;
+                  audio.src = data.voiceUrl;
+                  div.appendChild(audio);
+                }
+                const btn = document.createElement('button');
+                btn.textContent = 'View / Accept';
+                btn.onclick = () => {
+                  window.location.href = `post_details.html?postId=${doc.id}`;
+                };
+                div.appendChild(btn);
+                feedEl.appendChild(div);
+              }
+            });
+            const notifBadge = document.getElementById('notif');
+            if (newCount > 0) {
+              notifBadge.style.display = 'block';
+              notifBadge.textContent = `${newCount} nearby`;
+              setTimeout(()=> notifBadge.style.display='none', 4500);
+            } else {
+              notifBadge.style.display = 'none';
+            }
+          });
+      }, (err) => {
+        document.getElementById('feed').innerHTML = '<p>Unable to get location. Allow location and refresh.</p>';
+      }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+
+    initFeed();
+
+  </script>
+</body>
+</html>
