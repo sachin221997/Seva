@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>My Requests – Seva</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background: #f7f7ff;
+    }
+    h2 {
+      text-align: center;
+      color: #4a90e2;
+    }
+    .card {
+      background: white;
+      padding: 15px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 8px 16px;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>📌 My Requests</h2>
+
+<div id="requests">Loading your requests...</div>
+
+<script>
+  // ----------------------------------------
+  // 🔥 YOUR REAL FIREBASE CONFIG
+  // ----------------------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ----------------------------------------
+  // LOGIN CHECK
+  // ----------------------------------------
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      document.getElementById("requests").innerHTML = "<p>Please login first.</p>";
+    } else {
+      loadRequests(user.uid);
+    }
+  });
+
+  // ----------------------------------------
+  // LOAD USER'S POSTS
+  // ----------------------------------------
+  function loadRequests(uid) {
+    db.collection("posts")
+      .where("userId", "==", uid)
+      .orderBy("timestamp", "desc")
+      .onSnapshot(snapshot => {
+        const box = document.getElementById("requests");
+        box.innerHTML = "";
+
+        if (snapshot.empty) {
+          box.innerHTML = "<p>No requests found.</p>";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const d = doc.data();
+
+          let html = `
+            <div class="card">
+              <p><b>Message:</b> ${d.text || "<i>Voice-only request</i>"}</p>
+              <p><b>Status:</b> ${d.status}</p>
+              <p><b>Posted:</b> ${new Date(d.timestamp?.toDate()).toLocaleString()}</p>
+          `;
+
+          if (d.voiceUrl) {
+            html += `
+              <audio controls src="${d.voiceUrl}" style="width:100%; margin-top: 6px;"></audio>
+            `;
+          }
+
+          if (d.status === "assigned") {
+            html += `
+              <p><b>Accepted By Worker:</b> ${d.acceptedBy}</p>
+            `;
+          }
+
+          html += `
+            <br>
+            <button onclick="openPost('${doc.id}')">View Details</button>
+            </div>
+          `;
+
+          box.innerHTML += html;
+        });
+      });
+  }
+
+  // ----------------------------------------
+  // OPEN POST DETAILS PAGE
+  // ----------------------------------------
+  function openPost(id) {
+    window.location.href = "post_details.html?postId=" + id;
+  }
+</script>
+
+</body>
+  </html>
