@@ -1,140 +1,191 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Post Details — Seva</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Post Details – Seva</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
   <style>
-    body{font-family: Arial, sans-serif;padding:16px;max-width:800px;margin:auto;}
-    button{padding:10px 14px;margin:8px 0}
-    .meta{color:#666;font-size:13px}
+    body {
+      font-family: Arial;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      background: black;
+      color: white;
+      border: none;
+    }
+    .box {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .meta {
+      color: #777;
+      font-size: 13px;
+    }
   </style>
 </head>
+
 <body>
-  <div id="container"></div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
+  <h2>📌 Post Details</h2>
+  <div id="content">Loading...</div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "PASTE_API_KEY",
-      authDomain: "PASTE_AUTH_DOMAIN",
-      projectId: "PASTE_PROJECT_ID",
-      storageBucket: "PASTE_STORAGE_BUCKET",
-      messagingSenderId: "PASTE_MSG_SENDER",
-      appId: "PASTE_APP_ID"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+<script>
+  // ----------------------------------------
+  // 🔥 YOUR REAL FIREBASE CONFIG
+  // ----------------------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+  };
 
-    function getQueryParam(name){
-      const url = new URL(location.href);
-      return url.searchParams.get(name);
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  // ----------------------------------------
+  // GET postId from URL
+  // ----------------------------------------
+  function getParam(name) {
+    const url = new URL(window.location.href);
+    return url.searchParams.get(name);
+  }
+
+  const postId = getParam("postId");
+  const content = document.getElementById("content");
+
+  if (!postId) {
+    content.innerHTML = "<p>Invalid post.</p>";
+  }
+
+  // ----------------------------------------
+  // AUTH CHECK
+  // ----------------------------------------
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      content.innerHTML = "<p>Please login to view this post.</p>";
+      return;
     }
+    loadPost();
+  });
 
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        document.getElementById('container').innerHTML = '<p>Please login to view this post.</p>';
+  // ----------------------------------------
+  // LOAD POST DETAILS
+  // ----------------------------------------
+  function loadPost() {
+    db.collection("posts").doc(postId).onSnapshot(doc => {
+      if (!doc.exists) {
+        content.innerHTML = "<p>Post not found.</p>";
         return;
       }
-      loadPost(user);
-    });
 
-    async function loadPost(user) {
-      const postId = getQueryParam('postId');
-      if (!postId) {
-        document.getElementById('container').innerHTML = '<p>Missing postId.</p>';
-        return;
-      }
-      const docRef = db.collection('posts').doc(postId);
+      const d = doc.data();
 
-      // listen real-time to the post
-      docRef.onSnapshot(doc => {
-        if (!doc.exists) {
-          document.getElementById('container').innerHTML = '<p>Post not found.</p>';
-          return;
-        }
-        const data = doc.data();
-        render(data, postId, user);
-      });
-    }
-
-    async function render(data, postId, user) {
-      const container = document.getElementById('container');
-      container.innerHTML = `
-        <h2>Request Details</h2>
-        <div><strong>Text:</strong> ${data.text || '<i>Voice only</i>'}</div>
-        <div class="meta">Status: ${data.status}</div>
-        <div class="meta">Posted: ${new Date(data.timestamp?.toDate?.() || Date.now()).toLocaleString()}</div>
-        <div id="voiceArea"></div>
-        <div id="actions"></div>
+      let html = `
+        <div class="box">
+          <p><b>Message:</b> ${d.text || "<i>Voice-only request</i>"}</p>
+          <p class="meta"><b>Status:</b> ${d.status}</p>
+          <p class="meta"><b>Posted:</b> ${new Date(d.timestamp?.toDate()).toLocaleString()}</p>
       `;
-      if (data.voiceUrl) {
-        const a = document.getElementById('voiceArea');
-        a.innerHTML = '<p><strong>Voice:</strong></p>';
-        const audio = document.createElement('audio');
-        audio.controls = true;
-        audio.src = data.voiceUrl;
-        a.appendChild(audio);
+
+      if (d.voiceUrl) {
+        html += `
+          <p><b>Voice Message:</b></p>
+          <audio controls src="${d.voiceUrl}" style="width:100%"></audio>
+        `;
       }
 
-      const actions = document.getElementById('actions');
-      actions.innerHTML = '';
+      html += `
+        <br>
+        <div id="actions"></div>
+        </div>
+      `;
 
-      if (data.status === 'open') {
-        const btn = document.createElement('button');
-        btn.textContent = 'Accept Job';
-        btn.onclick = () => acceptJob(postId, user.uid, data.userId);
-        actions.appendChild(btn);
-      } else if (data.status === 'assigned') {
-        actions.innerHTML += `<p>Assigned to: ${data.acceptedBy}</p>`;
-        // if assigned to this user, show contact info link or next steps
-        if (data.acceptedBy === user.uid) {
-          actions.innerHTML += '<p>You accepted this job — contact the customer via profile page.</p>';
-        }
-      } else {
-        actions.innerHTML += `<p>Status: ${data.status}</p>`;
+      content.innerHTML = html;
+
+      // Show Accept button if job still open
+      const actions = document.getElementById("actions");
+
+      if (d.status === "open") {
+        actions.innerHTML = `
+          <button onclick="acceptJob()">Accept Job</button>
+        `;
+      } else if (d.status === "assigned") {
+        actions.innerHTML = `
+          <p><b>Assigned to:</b> ${d.acceptedBy}</p>
+        `;
       }
+    });
+  }
+
+  // ----------------------------------------
+  // ACCEPT JOB
+  // ----------------------------------------
+  async function acceptJob() {
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert("Please login first.");
+      return;
     }
 
-    // Accept job: atomic update with transaction
-    async function acceptJob(postId, workerUid, customerUid) {
-      const docRef = db.collection('posts').doc(postId);
-      try {
-        await db.runTransaction(async (tx) => {
-          const doc = await tx.get(docRef);
-          if (!doc.exists) throw 'Post removed';
-          const status = doc.data().status;
-          if (status !== 'open') throw 'Already assigned';
-          tx.update(docRef, {
-            status: 'assigned',
-            acceptedBy: workerUid,
-            assignedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        });
+    const postRef = db.collection("posts").doc(postId);
 
-        // create notification for the customer
-        await db.collection('notifications').add({
-          type: 'post_assigned',
-          postId,
-          to: customerUid,
-          from: workerUid,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          seen: false
-        });
+    try {
+      await db.runTransaction(async (t) => {
+        const snap = await t.get(postRef);
 
-        alert('Job accepted! Customer has been notified.');
-        // redirect to worker dashboard if you have one
-      } catch (err) {
-        console.error(err);
-        alert('Unable to accept job: ' + err);
-      }
+        if (!snap.exists) throw "Post not found";
+
+        const data = snap.data();
+        if (data.status !== "open") throw "Already assigned";
+
+        t.update(postRef, {
+          status: "assigned",
+          acceptedBy: user.uid,
+          assignedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+
+      // Notify the customer
+      await db.collection("notifications").add({
+        type: "assigned",
+        postId: postId,
+        from: auth.currentUser.uid,
+        to: (await db.collection("posts").doc(postId).get()).data().userId,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        seen: false
+      });
+
+      alert("Job accepted successfully!");
+      window.location.href = "worker-dashboard.html";
+
+    } catch (err) {
+      alert("Error: " + err);
     }
+  }
 
-  </script>
+</script>
+
 </body>
-  </html>
+</html>
