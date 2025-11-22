@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Notifications – Seva</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background: #f7f7ff;
+    }
+    h2 {
+      text-align: center;
+      color: #4a90e2;
+    }
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
+    }
+    .meta {
+      font-size: 12px;
+      color: gray;
+    }
+    button {
+      padding: 8px 14px;
+      background: black;
+      color: white;
+      border-radius: 8px;
+      border: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🔔 Notifications</h2>
+
+<div id="notifBox">Loading notifications...</div>
+
+<script>
+  // ---------------------------------------------
+  // 🔥 YOUR REAL FIREBASE CONFIG
+  // ---------------------------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ---------------------------------------------
+  // LOGIN CHECK
+  // ---------------------------------------------
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      document.getElementById("notifBox").innerHTML = "<p>Please login first.</p>";
+      return;
+    }
+    loadNotifications(user.uid);
+  });
+
+  // ---------------------------------------------
+  // LOAD NOTIFICATIONS IN REALTIME
+  // ---------------------------------------------
+  function loadNotifications(uid) {
+    db.collection("notifications")
+      .where("to", "==", uid)
+      .orderBy("timestamp", "desc")
+      .onSnapshot(snapshot => {
+
+        let box = document.getElementById("notifBox");
+        box.innerHTML = "";
+
+        if (snapshot.empty) {
+          box.innerHTML = "<p>No notifications yet.</p>";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          let n = doc.data();
+
+          let html = `
+            <div class='card'>
+          `;
+
+          // NEW POST for workers
+          if (n.type === "new_post") {
+            html += `
+              <p><b>📌 New Request in Your Area</b></p>
+              <p>Someone posted a new request nearby.</p>
+            `;
+          }
+
+          // ASSIGNED notification for customers
+          if (n.type === "assigned") {
+            html += `
+              <p><b>🛠 Worker Accepted Your Request</b></p>
+              <p>Your post has been accepted by a worker.</p>
+            `;
+          }
+
+          html += `
+              <p class='meta'>${new Date(n.timestamp?.toDate()).toLocaleString()}</p>
+              <button onclick="openPost('${n.postId}')">View Post</button>
+            </div>
+          `;
+
+          box.innerHTML += html;
+        });
+      });
+  }
+
+  // ---------------------------------------------
+  // OPEN POST DETAILS
+  // ---------------------------------------------
+  function openPost(id) {
+    window.location.href = "post_details.html?postId=" + id;
+  }
+
+</script>
+
+</body>
+</html>
