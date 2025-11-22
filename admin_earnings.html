@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin Earnings Dashboard – Seva</title>
+<title>Admin Earnings – Seva</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- Firebase v8 -->
@@ -13,138 +13,103 @@
 <style>
     body {
         font-family: Arial;
-        background: #f4f6ff;
-        padding: 20px;
-        max-width: 1100px;
+        margin: 0;
+        background: #eef2ff;
+        color: #111827;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+        max-width: 1000px;
         margin: auto;
+        padding: 20px;
     }
 
     h1 {
         text-align: center;
-        color: #4a90e2;
+        color: #2563eb;
+        margin-bottom: 10px;
     }
 
-    .summary {
+    .cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
-        gap: 15px;
-        margin-top: 25px;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 18px;
+        margin-top: 20px;
     }
 
     .card {
         background: white;
-        padding: 18px;
         border-radius: 14px;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-        border: 1px solid #e3e3e3;
-        text-align: center;
+        padding: 20px;
+        box-shadow: 0px 6px 20px rgba(0,0,0,0.06);
     }
 
     .title {
-        font-size: 15px;
-        color: #6b7280;
+        font-weight: bold;
+        color: #4b5563;
+        font-size: 14px;
+        margin-bottom: 4px;
     }
 
     .value {
-        font-size: 26px;
-        font-weight: bold;
-        margin-top: 6px;
+        font-size: 32px;
+        font-weight: 700;
+        color: #111827;
     }
 
     .list {
         margin-top: 30px;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
+    .entry {
         background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 12px;
+        box-shadow: 0px 6px 14px rgba(0,0,0,0.05);
     }
 
-    th, td {
-        padding: 12px;
-        border-bottom: 1px solid #eee;
-        text-align: center;
+    .entry b {
+        color: #111827;
     }
 
-    th {
-        background: #4a90e2;
-        color: white;
+    .muted {
+        color: #6b7280;
+        font-size: 13px;
     }
-
-    .filter {
-        margin: 20px 0;
-        text-align: center;
-    }
-
-    select {
-        padding: 8px 12px;
-        font-size: 16px;
-        border-radius: 8px;
-    }
-
 </style>
 </head>
 
 <body>
+<div class="wrap">
 
 <h1>Admin Earnings Dashboard</h1>
 
-<div class="filter">
-    <label><b>Filter:</b></label>
-    <select id="dateFilter" onchange="loadEarnings()">
-        <option value="all">All Time</option>
-        <option value="today">Today</option>
-        <option value="week">This Week</option>
-        <option value="month">This Month</option>
-    </select>
-</div>
-
-<div class="summary">
+<div class="cards">
     <div class="card">
         <div class="title">Total Platform Earnings</div>
         <div class="value" id="platformTotal">₹0</div>
     </div>
-
     <div class="card">
         <div class="title">Total Worker Earnings</div>
         <div class="value" id="workerTotal">₹0</div>
     </div>
-
     <div class="card">
-        <div class="title">Total Customer Payments</div>
-        <div class="value" id="customerTotal">₹0</div>
-    </div>
-
-    <div class="card">
-        <div class="title">Completed Tasks</div>
+        <div class="title">Total Completed Tasks</div>
         <div class="value" id="taskCount">0</div>
     </div>
 </div>
 
-<div class="list">
-    <h2>Completed Tasks List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Task</th>
-                <th>Price</th>
-                <th>Platform Fee</th>
-                <th>Worker Earning</th>
-                <th>Customer</th>
-                <th>Worker</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody id="taskTable"></tbody>
-    </table>
+<h2 style="margin-top:30px; color:#1d4ed8;">All Transactions</h2>
+<div id="earnList" class="list">Loading...</div>
+
 </div>
 
 <script>
-    // FIREBASE CONFIG
+    // -----------------------------------------------
+    // 🔥 YOUR REAL FIREBASE CONFIG
+    // -----------------------------------------------
     const firebaseConfig = {
         apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
         authDomain: "seva-6f191.firebaseapp.com",
@@ -156,78 +121,52 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-
     const db = firebase.firestore();
 
-    function loadEarnings() {
-        const filter = document.getElementById("dateFilter").value;
+    // -----------------------------------------------
+    // LOAD EARNINGS
+    // -----------------------------------------------
+    db.collection("earnings")
+      .orderBy("timestamp", "desc")
+      .onSnapshot(snapshot => {
 
-        let query = db.collection("posts").where("status", "==", "completed");
+        let totalPlatform = 0;
+        let totalWorker = 0;
+        let count = 0;
 
-        let now = new Date();
+        let container = document.getElementById("earnList");
+        container.innerHTML = "";
 
-        if (filter === "today") {
-            let start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            query = query.where("completedAt", ">=", start);
-        }
+        snapshot.forEach(doc => {
+            let d = doc.data();
 
-        if (filter === "week") {
-            let start = new Date();
-            start.setDate(now.getDate() - 7);
-            query = query.where("completedAt", ">=", start);
-        }
+            totalPlatform += d.platformEarn;
+            totalWorker += d.workerEarn;
+            count++;
 
-        if (filter === "month") {
-            let start = new Date(now.getFullYear(), now.getMonth(), 1);
-            query = query.where("completedAt", ">=", start);
-        }
+            container.innerHTML += `
+              <div class="entry">
+                <b>Post ID:</b> ${doc.id}<br>
+                <b>Worker:</b> ${d.workerId}<br>
+                <b>Customer:</b> ${d.customerId}<br><br>
 
-        query.onSnapshot(snapshot => {
-            let platformTotal = 0;
-            let workerTotal = 0;
-            let customerTotal = 0;
-            let count = 0;
+                <b>Worker Earned:</b> ₹${d.workerEarn}<br>
+                <b>Platform Earned:</b> ₹${d.platformEarn}<br>
+                <b>Total Amount:</b> ₹${d.totalAmount}<br>
 
-            let tableHTML = "";
-
-            snapshot.forEach(doc => {
-                let d = doc.data();
-
-                if (!d.customerPrice) return;
-
-                let price = d.customerPrice;
-                let platformFee = 50;
-                let workerEarn = price - platformFee;
-
-                platformTotal += platformFee;
-                workerTotal += workerEarn;
-                customerTotal += price;
-                count++;
-
-                tableHTML += `
-                    <tr>
-                        <td>${d.text || "Voice Request"}</td>
-                        <td>₹${price}</td>
-                        <td>₹50</td>
-                        <td>₹${workerEarn}</td>
-                        <td>${d.userId}</td>
-                        <td>${d.acceptedBy}</td>
-                        <td>${new Date(d.completedAt?.toDate()).toLocaleString()}</td>
-                    </tr>
-                `;
-            });
-
-            document.getElementById("platformTotal").innerText = "₹" + platformTotal;
-            document.getElementById("workerTotal").innerText = "₹" + workerTotal;
-            document.getElementById("customerTotal").innerText = "₹" + customerTotal;
-            document.getElementById("taskCount").innerText = count;
-
-            document.getElementById("taskTable").innerHTML = tableHTML;
+                <div class="muted">Date: ${
+                    d.timestamp ? d.timestamp.toDate().toLocaleString() : "N/A"
+                }</div>
+              </div>
+            `;
         });
-    }
 
-    loadEarnings();
+        document.getElementById("platformTotal").innerText = "₹" + totalPlatform;
+        document.getElementById("workerTotal").innerText = "₹" + totalWorker;
+        document.getElementById("taskCount").innerText = count;
+      });
+
 </script>
 
 </body>
-  </html>
+</html>
