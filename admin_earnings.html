@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Admin Earnings – Seva</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin — Earnings Dashboard</title>
 
 <!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -11,162 +11,571 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <style>
-    body {
-        font-family: Arial;
-        margin: 0;
-        background: #eef2ff;
-        color: #111827;
-        -webkit-font-smoothing: antialiased;
-    }
+  :root{
+    --primary:#1f6feb;
+    --muted:#6b7280;
+    --bg:#f6f9ff;
+    --card:#ffffff;
+    --success:#16a34a;
+    --danger:#ef4444;
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  body{ margin:0; background:var(--bg); color:#0f172a; }
+  .wrap{ max-width:1200px; margin:28px auto; padding:20px; }
+  header{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  h1{ margin:0; font-size:20px; }
+  .sub { color:var(--muted); font-size:13px; margin-top:4px; }
 
-    .wrap {
-        max-width: 1000px;
-        margin: auto;
-        padding: 20px;
-    }
+  .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
 
-    h1 {
-        text-align: center;
-        color: #2563eb;
-        margin-bottom: 10px;
-    }
+  .btn{ background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+  .btn.secondary{ background:white; color:var(--primary); border:1px solid rgba(31,111,235,0.12); }
+  .btn.warn{ background:var(--danger); }
+  .card{ background:var(--card); border-radius:12px; padding:14px; box-shadow:0 8px 22px rgba(17,24,39,0.06); margin-top:18px; }
 
-    .cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 18px;
-        margin-top: 20px;
-    }
+  .stats{ display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; }
+  .stat{ background:linear-gradient(180deg,white,#fbfdff); padding:12px 16px; border-radius:10px; min-width:180px; box-shadow:0 6px 16px rgba(31,111,235,0.04); }
+  .stat h3{ margin:0; font-size:14px; color:var(--muted); }
+  .stat p{ font-size:18px; margin:6px 0 0; font-weight:700; }
 
-    .card {
-        background: white;
-        border-radius: 14px;
-        padding: 20px;
-        box-shadow: 0px 6px 20px rgba(0,0,0,0.06);
-    }
+  .filters{ display:flex; gap:8px; margin-top:12px; align-items:center; flex-wrap:wrap; }
+  input[type="date"], input[type="text"], input[type="number"]{ padding:8px; border-radius:8px; border:1px solid #e6eef8; }
 
-    .title {
-        font-weight: bold;
-        color: #4b5563;
-        font-size: 14px;
-        margin-bottom: 4px;
-    }
+  table{ width:100%; border-collapse:collapse; margin-top:14px; font-size:14px; }
+  th, td{ padding:10px 8px; border-bottom:1px solid #eef3fb; text-align:left; vertical-align:middle; }
+  th{ background:transparent; color:var(--muted); font-size:13px; }
+  .muted{ color:var(--muted); font-size:13px; }
 
-    .value {
-        font-size: 32px;
-        font-weight: 700;
-        color: #111827;
-    }
+  .action-btn{ padding:6px 10px; border-radius:8px; cursor:pointer; border:none; }
+  .action-edit{ background:#f3f4f6; }
+  .action-save{ background:#16a34a; color:white; }
+  .action-danger{ background:#ef4444; color:white; }
 
-    .list {
-        margin-top: 30px;
-    }
+  .small { font-size:13px; color:var(--muted); }
 
-    .entry {
-        background: white;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 12px;
-        box-shadow: 0px 6px 14px rgba(0,0,0,0.05);
-    }
+  .inline { display:inline-flex; gap:6px; align-items:center; }
+  .center { text-align:center; }
 
-    .entry b {
-        color: #111827;
-    }
+  #message { margin-top:12px; color:var(--muted); font-size:13px; }
 
-    .muted {
-        color: #6b7280;
-        font-size: 13px;
-    }
+  @media (max-width:900px){
+    .stats{ flex-direction:column; }
+    .controls{ flex-direction:column; align-items:flex-start; }
+    table{ font-size:13px; }
+  }
 </style>
 </head>
-
 <body>
-<div class="wrap">
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Admin — Earnings Dashboard</h1>
+        <div class="sub">View & adjust worker earnings, platform fees, and transactions (Option A2: admin adjustment enabled).</div>
+      </div>
 
-<h1>Admin Earnings Dashboard</h1>
+      <div class="controls">
+        <button class="btn secondary" onclick="gotoAdminHome()">Admin Home</button>
+        <button class="btn" onclick="refreshData()">Refresh</button>
+        <button class="btn" onclick="exportCSV()">Export CSV</button>
+      </div>
+    </header>
 
-<div class="cards">
     <div class="card">
-        <div class="title">Total Platform Earnings</div>
-        <div class="value" id="platformTotal">₹0</div>
-    </div>
-    <div class="card">
-        <div class="title">Total Worker Earnings</div>
-        <div class="value" id="workerTotal">₹0</div>
-    </div>
-    <div class="card">
-        <div class="title">Total Completed Tasks</div>
-        <div class="value" id="taskCount">0</div>
-    </div>
-</div>
+      <div class="stats">
+        <div class="stat">
+          <h3>Total Gross</h3>
+          <p id="totalGross">₹0</p>
+          <div class="small">Sum of all transaction amounts</div>
+        </div>
 
-<h2 style="margin-top:30px; color:#1d4ed8;">All Transactions</h2>
-<div id="earnList" class="list">Loading...</div>
+        <div class="stat">
+          <h3>Total Platform Fees</h3>
+          <p id="totalPlatform">₹0</p>
+          <div class="small">Sum of all platform fees</div>
+        </div>
 
-</div>
+        <div class="stat">
+          <h3>Total Worker Payout</h3>
+          <p id="totalWorker">₹0</p>
+          <div class="small">Payouts to workers</div>
+        </div>
+
+        <div class="stat">
+          <h3>Total Transactions</h3>
+          <p id="totalCount">0</p>
+          <div class="small">Transactions / derived posts</div>
+        </div>
+      </div>
+
+      <div class="filters">
+        <label class="small">From: <input type="date" id="fromDate"></label>
+        <label class="small">To: <input type="date" id="toDate"></label>
+
+        <label class="small">Search: <input type="text" id="q" placeholder="postId, customer email, worker uid..."></label>
+
+        <label class="small">Platform fee default: <input type="number" id="defaultPlatformFee" value="50" style="width:88px;"></label>
+
+        <button class="btn" onclick="applyFilters()">Apply</button>
+        <button class="btn secondary" onclick="clearFilters()">Clear</button>
+
+        <div style="flex:1"></div>
+
+        <button class="btn" onclick="openAddManual()">+ Add Manual Transaction</button>
+      </div>
+
+      <div id="message"></div>
+
+      <div style="overflow:auto; margin-top:12px;">
+        <table id="txnTable">
+          <thead>
+            <tr>
+              <th>Post / Txn ID</th>
+              <th>Customer</th>
+              <th>Worker</th>
+              <th>Price (₹)</th>
+              <th>Platform Fee (₹)</th>
+              <th>Worker Share (₹)</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th class="center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="txnBody">
+            <!-- Rows injected here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Manual add / edit modal (simple inline prompt style) -->
+    <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.5); align-items:center; justify-content:center;">
+      <div style="background:white; padding:18px; border-radius:10px; width:520px; max-width:92%;">
+        <h3 id="modalTitle">Add Transaction</h3>
+
+        <div style="display:flex; gap:8px; flex-direction:column; margin-top:8px;">
+          <label>Post ID (optional): <input id="m_postId" type="text" placeholder="post id or leave blank"></label>
+          <label>Customer UID or Email: <input id="m_customer" type="text" placeholder="customer uid or email"></label>
+          <label>Worker UID: <input id="m_worker" type="text" placeholder="worker uid"></label>
+          <label>Price (₹): <input id="m_price" type="number" value="250"></label>
+          <label>Platform Fee (₹): <input id="m_platform" type="number" value="50"></label>
+          <label>Status: 
+            <select id="m_status">
+              <option value="pending">pending</option>
+              <option value="paid">paid</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+          <button class="btn secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn" onclick="saveManual()">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 
 <script>
-    // -----------------------------------------------
-    // 🔥 YOUR REAL FIREBASE CONFIG
-    // -----------------------------------------------
-    const firebaseConfig = {
-        apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
-        authDomain: "seva-6f191.firebaseapp.com",
-        projectId: "seva-6f191",
-        storageBucket: "seva-6f191.firebasestorage.app",
-        messagingSenderId: "826093348416",
-        appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
-        measurementId: "G-78H32SRPCD"
-    };
+  // ---------------------------
+  // YOUR REAL FIREBASE CONFIG (v8)
+  // ---------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  // runtime data
+  let transactions = []; // aggregated transactions view
+  let filtered = [];
+  let currentUser = null;
 
-    // -----------------------------------------------
-    // LOAD EARNINGS
-    // -----------------------------------------------
-    db.collection("earnings")
-      .orderBy("timestamp", "desc")
-      .onSnapshot(snapshot => {
+  // require admin access
+  auth.onAuthStateChanged(async user => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+    currentUser = user;
+    // check users collection for isAdmin flag
+    try {
+      const ud = await db.collection("users").doc(user.uid).get();
+      if (!ud.exists || !ud.data().isAdmin) {
+        alert("Access denied: you are not an admin.");
+        window.location.href = "customer_home.html";
+        return;
+      }
+      // load data
+      loadAllData();
+    } catch (e) {
+      console.error(e);
+      document.getElementById('message').innerText = "Error checking admin: " + e;
+    }
+  });
 
-        let totalPlatform = 0;
-        let totalWorker = 0;
-        let count = 0;
-
-        let container = document.getElementById("earnList");
-        container.innerHTML = "";
-
-        snapshot.forEach(doc => {
-            let d = doc.data();
-
-            totalPlatform += d.platformEarn;
-            totalWorker += d.workerEarn;
-            count++;
-
-            container.innerHTML += `
-              <div class="entry">
-                <b>Post ID:</b> ${doc.id}<br>
-                <b>Worker:</b> ${d.workerId}<br>
-                <b>Customer:</b> ${d.customerId}<br><br>
-
-                <b>Worker Earned:</b> ₹${d.workerEarn}<br>
-                <b>Platform Earned:</b> ₹${d.platformEarn}<br>
-                <b>Total Amount:</b> ₹${d.totalAmount}<br>
-
-                <div class="muted">Date: ${
-                    d.timestamp ? d.timestamp.toDate().toLocaleString() : "N/A"
-                }</div>
-              </div>
-            `;
+  // Fetch & aggregate transactions
+  async function loadAllData(){
+    document.getElementById('message').innerText = "Loading data...";
+    transactions = [];
+    // Approach:
+    // 1) Try to load explicit 'transactions' collection (recommended)
+    // 2) If empty or missing, derive from 'posts' collection
+    try {
+      const txSnap = await db.collection("transactions").orderBy("timestamp","desc").get();
+      if (!txSnap.empty) {
+        txSnap.forEach(doc => {
+          const d = doc.data();
+          transactions.push(transformTx(doc.id, d));
         });
+      } else {
+        // derive from 'posts' (status assigned/completed)
+        const postsSnap = await db.collection("posts")
+                                  .where("status", "in", ["assigned","completed"])
+                                  .orderBy("timestamp","desc")
+                                  .get();
+        postsSnap.forEach(doc => {
+          const p = doc.data();
+          // derive price/platform fields (admin can edit later)
+          let price = p.price || null; // may be null if not set
+          let platformFee = p.platformFee || null;
+          // default logic: if price missing, we will leave null so admin can set
+          const derived = {
+            postId: doc.id,
+            customer: p.userId || p.userEmail || null,
+            worker: p.acceptedBy || null,
+            price: price,
+            platformFee: platformFee,
+            status: p.status || "assigned",
+            timestamp: p.timestamp || null,
+            source: "post"
+          };
+          transactions.push(transformTx(doc.id, derived));
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      document.getElementById('message').innerText = "Error loading transactions: " + err;
+    }
 
-        document.getElementById("platformTotal").innerText = "₹" + totalPlatform;
-        document.getElementById("workerTotal").innerText = "₹" + totalWorker;
-        document.getElementById("taskCount").innerText = count;
+    // sort by date desc
+    transactions.sort((a,b) => (b.dateTS||0) - (a.dateTS||0));
+    filtered = transactions.slice();
+    renderTable();
+    computeTotals();
+    document.getElementById('message').innerText = "";
+  }
+
+  function transformTx(id, d){
+    const dateTS = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate().getTime() : (d.timestamp instanceof Date ? d.timestamp.getTime() : (Date.now()));
+    const price = (d.price == null || d.price === undefined) ? null : Number(d.price);
+    const platformFee = (d.platformFee == null || d.platformFee === undefined) ? null : Number(d.platformFee);
+    const workerShare = (price != null && platformFee != null) ? (price - platformFee) : null;
+    return {
+      id,
+      postId: d.postId || d.postId === undefined ? (d.postId || id) : id,
+      customer: d.customer || d.userId || d.userEmail || null,
+      worker: d.worker || d.acceptedBy || d.accepted_by || null,
+      price,
+      platformFee,
+      workerShare,
+      status: d.status || "pending",
+      dateTS,
+      dateStr: new Date(dateTS).toLocaleString(),
+      source: d.source || (d.source === undefined ? (d.postId ? "transaction" : "post") : d.source),
+      raw: d
+    };
+  }
+
+  // render table
+  function renderTable(){
+    const body = document.getElementById('txnBody');
+    body.innerHTML = "";
+    const defaultPlatform = Number(document.getElementById('defaultPlatformFee').value || 50);
+
+    filtered.forEach(tx => {
+      const tr = document.createElement('tr');
+
+      // id / post link
+      const tdId = document.createElement('td');
+      tdId.innerHTML = `<div style="font-weight:700">${tx.postId}</div><div class="small">${tx.source}</div>`;
+      tr.appendChild(tdId);
+
+      // customer
+      const tdCust = document.createElement('td');
+      tdCust.innerHTML = `<div>${tx.customer || '-'}</div><div class="small">uid/email</div>`;
+      tr.appendChild(tdCust);
+
+      // worker
+      const tdWorker = document.createElement('td');
+      tdWorker.innerHTML = `<div>${tx.worker || '-'}</div><div class="small">uid</div>`;
+      tr.appendChild(tdWorker);
+
+      // price (editable)
+      const tdPrice = document.createElement('td');
+      const priceVal = tx.price != null ? tx.price : '';
+      tdPrice.innerHTML = `<input style="width:100px;padding:6px;border-radius:6px;border:1px solid #eef3fb" value="${priceVal}" id="price-${tx.id}">`;
+      tr.appendChild(tdPrice);
+
+      // platform fee
+      const tdPlatform = document.createElement('td');
+      const pf = tx.platformFee != null ? tx.platformFee : defaultPlatform;
+      tdPlatform.innerHTML = `<input style="width:80px;padding:6px;border-radius:6px;border:1px solid #eef3fb" value="${pf}" id="pf-${tx.id}">`;
+      tr.appendChild(tdPlatform);
+
+      // worker share (read-only)
+      const tdShare = document.createElement('td');
+      const ws = (tx.price != null && tx.platformFee != null) ? (tx.price - tx.platformFee) : ( (priceVal !== '' && pf !== '') ? (Number(priceVal||0) - Number(pf||0)) : '' );
+      tdShare.innerHTML = `<div id="ws-${tx.id}">${ws !== '' ? '₹' + (ws) : '-'}</div>`;
+      tr.appendChild(tdShare);
+
+      // status
+      const tdStatus = document.createElement('td');
+      tdStatus.innerHTML = `<div id="status-${tx.id}">${tx.status}</div>`;
+      tr.appendChild(tdStatus);
+
+      // date
+      const tdDate = document.createElement('td');
+      tdDate.innerText = tx.dateStr || '-';
+      tr.appendChild(tdDate);
+
+      // actions
+      const tdActions = document.createElement('td');
+      tdActions.className = "center";
+      tdActions.style.minWidth = "220px";
+
+      // Save button
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'action-btn action-save';
+      saveBtn.innerText = 'Save';
+      saveBtn.onclick = () => saveTxEdits(tx.id, tx);
+      tdActions.appendChild(saveBtn);
+
+      // Mark paid/unpaid toggle
+      const payBtn = document.createElement('button');
+      payBtn.className = 'action-btn';
+      payBtn.style.marginLeft = '8px';
+      payBtn.style.background = tx.status === 'paid' ? '#f3f4f6' : '#10B981';
+      payBtn.style.color = tx.status === 'paid' ? '#111827' : 'white';
+      payBtn.innerText = tx.status === 'paid' ? 'Mark Unpaid' : 'Mark Paid';
+      payBtn.onclick = () => togglePaid(tx.id, tx);
+      tdActions.appendChild(payBtn);
+
+      // Delete / remove (danger)
+      const delBtn = document.createElement('button');
+      delBtn.className = 'action-btn action-danger';
+      delBtn.style.marginLeft = '8px';
+      delBtn.innerText = 'Delete';
+      delBtn.onclick = () => deleteTx(tx.id);
+      tdActions.appendChild(delBtn);
+
+      tr.appendChild(tdActions);
+
+      body.appendChild(tr);
+
+      // recalc worker share on input change
+      document.getElementById('price-'+tx.id).addEventListener('input', () => {
+        const p = Number(document.getElementById('price-'+tx.id).value || 0);
+        const pfv = Number(document.getElementById('pf-'+tx.id).value || defaultPlatform);
+        const wsv = (!isNaN(p) && !isNaN(pfv)) ? (p - pfv) : '';
+        document.getElementById('ws-'+tx.id).innerText = wsv !== '' ? '₹' + wsv : '-';
+      });
+      document.getElementById('pf-'+tx.id).addEventListener('input', () => {
+        const p = Number(document.getElementById('price-'+tx.id).value || 0);
+        const pfv = Number(document.getElementById('pf-'+tx.id).value || defaultPlatform);
+        const wsv = (!isNaN(p) && !isNaN(pfv)) ? (p - pfv) : '';
+        document.getElementById('ws-'+tx.id).innerText = wsv !== '' ? '₹' + wsv : '-';
       });
 
+    });
+
+    computeTotals();
+  }
+
+  // save edits for a transaction (create or update in 'transactions' collection)
+  async function saveTxEdits(txId, tx){
+    try {
+      const priceV = Number(document.getElementById('price-'+txId).value || 0);
+      const pfV = Number(document.getElementById('pf-'+txId).value || document.getElementById('defaultPlatformFee').value || 50);
+      if (isNaN(priceV) || isNaN(pfV)) { alert('Invalid numbers'); return; }
+
+      const payload = {
+        postId: tx.postId || null,
+        customer: tx.customer || null,
+        worker: tx.worker || null,
+        price: priceV,
+        platformFee: pfV,
+        workerShare: priceV - pfV,
+        status: tx.status || 'pending',
+        timestamp: tx.raw && tx.raw.timestamp ? tx.raw.timestamp : firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      // write to transactions collection (id = tx.id if exists)
+      await db.collection('transactions').doc(txId).set(payload, { merge: true });
+
+      // if original source was post and post didn't have price/platformFee, update post too (safe)
+      if (tx.source === 'post') {
+        const postRef = db.collection('posts').doc(tx.postId);
+        await postRef.update({
+          price: priceV,
+          platformFee: pfV
+        }).catch(()=>{/* ignore if no rights */});
+      }
+
+      // refresh
+      await loadAllData();
+      alert('Saved');
+    } catch (e) {
+      console.error(e);
+      alert('Unable to save: ' + e);
+    }
+  }
+
+  // toggle paid/unpaid
+  async function togglePaid(txId, tx){
+    try {
+      const newStatus = tx.status === 'paid' ? 'pending' : 'paid';
+      await db.collection('transactions').doc(txId).set({ status: newStatus }, { merge: true });
+      // also update local tx if exists
+      await loadAllData();
+    } catch (e) {
+      console.error(e);
+      alert('Unable to update status: ' + e);
+    }
+  }
+
+  // delete tx (admin)
+  async function deleteTx(txId){
+    if (!confirm('Delete this transaction record? This cannot be undone.')) return;
+    try {
+      await db.collection('transactions').doc(txId).delete();
+      // if there was no real transactions collection and it was derived from post, we won't delete post
+      await loadAllData();
+    } catch (e) {
+      console.error(e);
+      alert('Unable to delete: ' + e);
+    }
+  }
+
+  // compute totals for filtered view
+  function computeTotals(){
+    const defaultPlatform = Number(document.getElementById('defaultPlatformFee').value || 50);
+    let totalGross = 0, totalPlatform = 0, totalWorker = 0, count = 0;
+    filtered.forEach(tx => {
+      const price = tx.price != null ? Number(tx.price) : 0;
+      const pf = tx.platformFee != null ? Number(tx.platformFee) : defaultPlatform;
+      const ws = (price - pf);
+      totalGross += price;
+      totalPlatform += pf;
+      totalWorker += ws;
+      count++;
+    });
+    document.getElementById('totalGross').innerText = '₹' + totalGross.toFixed(0);
+    document.getElementById('totalPlatform').innerText = '₹' + totalPlatform.toFixed(0);
+    document.getElementById('totalWorker').innerText = '₹' + totalWorker.toFixed(0);
+    document.getElementById('totalCount').innerText = count;
+  }
+
+  // filters
+  function applyFilters(){
+    const from = document.getElementById('fromDate').value;
+    const to = document.getElementById('toDate').value;
+    const q = (document.getElementById('q').value || '').toLowerCase();
+    const defaultPlatform = Number(document.getElementById('defaultPlatformFee').value || 50);
+
+    filtered = transactions.filter(tx => {
+      if (from){
+        const fTS = new Date(from).setHours(0,0,0,0);
+        if ((tx.dateTS || 0) < fTS) return false;
+      }
+      if (to){
+        const tTS = new Date(to).setHours(23,59,59,999);
+        if ((tx.dateTS || 0) > tTS) return false;
+      }
+      if (q){
+        if (!(tx.postId && tx.postId.toLowerCase().includes(q)) &&
+            !(tx.customer && tx.customer.toString().toLowerCase().includes(q)) &&
+            !(tx.worker && tx.worker.toString().toLowerCase().includes(q))) return false;
+      }
+      return true;
+    });
+
+    renderTable();
+  }
+
+  function clearFilters(){
+    document.getElementById('fromDate').value = "";
+    document.getElementById('toDate').value = "";
+    document.getElementById('q').value = "";
+    filtered = transactions.slice();
+    renderTable();
+  }
+
+  // modal
+  function openAddManual(){
+    document.getElementById('modalTitle').innerText = 'Add Manual Transaction';
+    document.getElementById('m_postId').value = '';
+    document.getElementById('m_customer').value = '';
+    document.getElementById('m_worker').value = '';
+    document.getElementById('m_price').value = 250;
+    document.getElementById('m_platform').value = Number(document.getElementById('defaultPlatformFee').value || 50);
+    document.getElementById('m_status').value = 'pending';
+    document.getElementById('modal').style.display = 'flex';
+  }
+  function closeModal(){ document.getElementById('modal').style.display = 'none'; }
+
+  async function saveManual(){
+    const payload = {
+      postId: document.getElementById('m_postId').value || null,
+      customer: document.getElementById('m_customer').value || null,
+      worker: document.getElementById('m_worker').value || null,
+      price: Number(document.getElementById('m_price').value || 0),
+      platformFee: Number(document.getElementById('m_platform').value || 0),
+      workerShare: Number(document.getElementById('m_price').value || 0) - Number(document.getElementById('m_platform').value || 0),
+      status: document.getElementById('m_status').value || 'pending',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      source: 'manual'
+    };
+    try {
+      const docRef = await db.collection('transactions').add(payload);
+      closeModal();
+      await loadAllData();
+      alert('Manual transaction added: ' + docRef.id);
+    } catch (e) {
+      console.error(e);
+      alert('Unable to add: ' + e);
+    }
+  }
+
+  // export CSV of currently filtered
+  function exportCSV(){
+    const rows = [['txnId','postId','customer','worker','price','platformFee','workerShare','status','date']];
+    filtered.forEach(tx => {
+      rows.push([tx.id, tx.postId, tx.customer, tx.worker, tx.price, tx.platformFee, tx.workerShare, tx.status, tx.dateStr]);
+    });
+    const csv = rows.map(r => r.map(cell => `"${String(cell||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'admin_transactions.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // helper navigation
+  function gotoAdminHome(){ window.location.href = "admin_home.html"; }
+  function refreshData(){ loadAllData(); }
+
+  // initial small refresh
+  // loadAllData() is called after admin check in auth.onAuthStateChanged
 </script>
 
 </body>
-</html>
+                                         </html>
