@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Track Worker – Seva</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background: #f7f7ff;
+    }
+    h2 {
+      text-align: center;
+      color: #4a90e2;
+    }
+    .card {
+      background: white;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px 18px;
+      background: black;
+      color: white;
+      border-radius: 8px;
+      border: none;
+      margin-top: 12px;
+      display: block;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>🔍 Track Worker</h2>
+
+<div id="tracking">Loading assigned jobs...</div>
+
+<script>
+  // --------------------------------------
+  // YOUR REAL FIREBASE CONFIG
+  // --------------------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // --------------------------------------
+  // LOGIN CHECK
+  // --------------------------------------
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      document.getElementById("tracking").innerHTML = "<p>Please login first.</p>";
+      return;
+    }
+    loadAssignedJobs(user.uid);
+  });
+
+  // --------------------------------------
+  // LOAD ASSIGNED POSTS FOR THIS CUSTOMER
+  // --------------------------------------
+  function loadAssignedJobs(uid) {
+    db.collection("posts")
+      .where("userId", "==", uid)
+      .where("status", "==", "assigned")
+      .orderBy("assignedAt", "desc")
+      .onSnapshot(snapshot => {
+        const box = document.getElementById("tracking");
+        box.innerHTML = "";
+
+        if (snapshot.empty) {
+          box.innerHTML = "<p>No active or assigned workers right now.</p>";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const d = doc.data();
+
+          let html = `
+            <div class="card">
+              <h3>🛠 Your Request</h3>
+              <p><b>Message:</b> ${d.text || "<i>Voice-only request</i>"}</p>
+              <p><b>Status:</b> ${d.status}</p>
+              <p><b>Assigned At:</b> ${new Date(d.assignedAt?.toDate()).toLocaleString()}</p>
+          `;
+
+          if (d.voiceUrl) {
+            html += `
+              <p><b>Voice Message:</b></p>
+              <audio controls src="${d.voiceUrl}" style="width:100%"></audio>
+            `;
+          }
+
+          html += `
+              <hr>
+              <h3>👷 Assigned Worker</h3>
+              <p><b>Worker UID:</b> ${d.acceptedBy}</p>
+          `;
+
+          html += `
+              <br>
+              <button onclick="openDetails('${doc.id}')">View Full Details</button>
+            </div>
+          `;
+
+          box.innerHTML += html;
+        });
+      });
+  }
+
+  // OPEN POST DETAILS PAGE
+  function openDetails(id) {
+    window.location.href = "post_details.html?postId=" + id;
+  }
+
+</script>
+
+</body>
+</html>
