@@ -1,171 +1,191 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Create Post — Seva</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Create Post – Seva</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Firebase SDK v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
   <style>
-    body{font-family: Arial, sans-serif; padding:16px; max-width:800px; margin:auto;}
-    textarea{width:100%;height:120px;padding:8px;font-size:16px}
-    button{padding:10px 16px;margin:6px 4px;font-size:16px}
-    .status{margin-top:12px;color:green}
+    body { 
+      font-family: Arial; 
+      padding: 20px; 
+      max-width: 800px; 
+      margin: auto; 
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 8px 4px;
+      font-size: 16px;
+    }
+    #status {
+      margin-top: 14px;
+      color: green;
+      font-weight: bold;
+    }
   </style>
 </head>
+
 <body>
-  <h2>Create Request (text + voice)</h2>
 
-  <label for="text">Describe what you need:</label>
-  <textarea id="text" placeholder="Need medicine from near medical store..."></textarea>
+  <h2>Create Request (Text + Voice)</h2>
 
-  <div>
-    <button id="startRec">Start Recording Voice</button>
-    <button id="stopRec" disabled>Stop Recording</button>
-    <span id="recStatus"></span>
-  </div>
+  <label><b>Your Request:</b></label>
+  <textarea id="text" placeholder="Write what you need... Example: I need medicine delivery"></textarea>
 
-  <div>
-    <button id="createPost">Create Post</button>
-  </div>
+  <br><br>
 
-  <div class="status" id="status"></div>
+  <!-- Voice Recording Controls -->
+  <button id="startRec">🎤 Start Voice</button>
+  <button id="stopRec" disabled>⏹ Stop</button>
+  <p id="recStatus"></p>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-storage-compat.js"></script>
+  <br>
+
+  <!-- Create post -->
+  <button id="createPost" style="background: black; color: white;">Post Request</button>
+
+  <p id="status"></p>
 
   <script>
-    // ---- PASTE YOUR firebaseConfig here or include your firebase.js ----
+    // -----------------------------------
+    // 🔥 YOUR REAL FIREBASE CONFIG
+    // -----------------------------------
     const firebaseConfig = {
-      apiKey: "PASTE_API_KEY",
-      authDomain: "PASTE_AUTH_DOMAIN",
-      projectId: "PASTE_PROJECT_ID",
-      storageBucket: "PASTE_STORAGE_BUCKET",
-      messagingSenderId: "PASTE_MSG_SENDER",
-      appId: "PASTE_APP_ID"
+      apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+      authDomain: "seva-6f191.firebaseapp.com",
+      projectId: "seva-6f191",
+      storageBucket: "seva-6f191.firebasestorage.app",
+      messagingSenderId: "826093348416",
+      appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+      measurementId: "G-78H32SRPCD"
     };
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    // Helper: ensure user is logged in
-    async function requireLogin() {
-      return new Promise((resolve) => {
-        auth.onAuthStateChanged(user => {
-          if (!user) {
-            // optionally redirect to login
-            document.getElementById('status').textContent = 'Please login first.';
-            resolve(null);
-          } else resolve(user);
-        });
-      });
-    }
+    // -----------------------------------
+    // Voice Recording Setup
+    // -----------------------------------
+    let mediaRecorder;
+    let audioChunks = [];
+    let finalVoiceBlob = null;
 
-    // --- Voice recording setup ---
-    let mediaRecorder, audioChunks = [];
-    let lastAudioBlob = null;
-    const startBtn = document.getElementById('startRec');
-    const stopBtn = document.getElementById('stopRec');
-    const recStatus = document.getElementById('recStatus');
+    const startBtn = document.getElementById("startRec");
+    const stopBtn = document.getElementById("stopRec");
+    const recStatus = document.getElementById("recStatus");
 
-    startBtn.addEventListener('click', async () => {
+    startBtn.onclick = async () => {
       audioChunks = [];
+      finalVoiceBlob = null;
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
         mediaRecorder.onstop = () => {
-          lastAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-          const sizeKB = Math.round(lastAudioBlob.size / 1024);
-          recStatus.textContent = `Recorded (${sizeKB} KB). Ready to upload.`;
+          finalVoiceBlob = new Blob(audioChunks, { type: "audio/webm" });
+          recStatus.innerHTML = "🎤 Voice Recorded (" + Math.round(finalVoiceBlob.size/1024) + " KB)";
         };
+
         mediaRecorder.start();
         startBtn.disabled = true;
         stopBtn.disabled = false;
-        recStatus.textContent = 'Recording…';
-      } catch (err) {
-        recStatus.textContent = 'Microphone access denied or unavailable.';
-        console.error(err);
+        recStatus.innerHTML = "Recording...";
+      } 
+      catch (err) {
+        recStatus.innerHTML = "Microphone blocked!";
       }
-    });
+    };
 
-    stopBtn.addEventListener('click', () => {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    stopBtn.onclick = () => {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+      }
       startBtn.disabled = false;
       stopBtn.disabled = true;
-    });
+    };
 
-    // --- Create Post ---
-    document.getElementById('createPost').addEventListener('click', async () => {
-      document.getElementById('status').textContent = 'Creating post...';
-      const user = await requireLogin();
-      if (!user) return;
-      const text = document.getElementById('text').value.trim();
-      // get location automatically
-      if (!navigator.geolocation) {
-        document.getElementById('status').textContent = 'Geolocation not supported.';
+    // -----------------------------------
+    // Create Post
+    // -----------------------------------
+    document.getElementById("createPost").onclick = async () => {
+      document.getElementById("status").innerHTML = "Posting...";
+
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Please login first");
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(async (pos) => {
+      const text = document.getElementById("text").value.trim();
+
+      // Get location
+      if (!navigator.geolocation) {
+        document.getElementById("status").innerHTML = "Location not supported";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async(pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
 
         try {
-          // create placeholder doc to get id
-          const docRef = await db.collection('posts').add({
+          // Step 1: Create Firestore post
+          const postRef = await db.collection("posts").add({
             userId: user.uid,
-            text: text || '',
-            voiceUrl: '',
-            lat, lng,
-            status: 'open',
+            text: text,
+            voiceUrl: "",
+            lat: lat,
+            lng: lng,
+            status: "open",
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             acceptedBy: null
           });
 
-          // if voice recorded upload and update
-          if (lastAudioBlob) {
-            const path = `voices/${docRef.id}.webm`;
-            const uploadTask = storage.ref(path).put(lastAudioBlob);
-            uploadTask.on('state_changed', null, (err) => {
-              console.error(err);
-            }, async () => {
+          // Step 2: Upload voice if exists
+          if (finalVoiceBlob) {
+            const path = "voices/" + postRef.id + ".webm";
+            const uploadTask = storage.ref(path).put(finalVoiceBlob);
+
+            uploadTask.on("state_changed", null, (e)=>{}, async () => {
               const url = await storage.ref(path).getDownloadURL();
-              await docRef.update({ voiceUrl: url });
-              document.getElementById('status').textContent = 'Post created with voice!';
-              // reset
-              document.getElementById('text').value = '';
-              lastAudioBlob = null;
-              recStatus.textContent = '';
+              await postRef.update({ voiceUrl: url });
             });
-          } else {
-            document.getElementById('status').textContent = 'Post created!';
-            document.getElementById('text').value = '';
           }
 
-          // create a notification doc for workers (optional)
-          await db.collection('notifications').add({
-            type: 'new_post',
-            postId: docRef.id,
-            lat, lng,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            seenBy: [] // array of uids who saw this notification
-          });
+          document.getElementById("status").innerHTML = "✔ Post Created Successfully!";
+          document.getElementById("text").value = "";
+          recStatus.innerHTML = "";
+          finalVoiceBlob = null;
 
-        } catch (err) {
-          console.error(err);
-          document.getElementById('status').textContent = 'Error creating post.';
+        } catch (error) {
+          console.log(error);
+          document.getElementById("status").innerHTML = "❌ Error creating post";
         }
 
-      }, (err) => {
-        console.error(err);
-        document.getElementById('status').textContent = 'Unable to get location.';
-      }, { enableHighAccuracy: true, timeout: 10000 });
+      }, () => {
+        document.getElementById("status").innerHTML = "Location permission denied!";
+      });
 
-    });
-
+    };
   </script>
+
 </body>
-    </html>
+</html>
