@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Create Post — Seva</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family: Arial, sans-serif; padding:16px; max-width:800px; margin:auto;}
+    textarea{width:100%;height:120px;padding:8px;font-size:16px}
+    button{padding:10px 16px;margin:6px 4px;font-size:16px}
+    .status{margin-top:12px;color:green}
+  </style>
+</head>
+<body>
+  <h2>Create Request (text + voice)</h2>
+
+  <label for="text">Describe what you need:</label>
+  <textarea id="text" placeholder="Need medicine from near medical store..."></textarea>
+
+  <div>
+    <button id="startRec">Start Recording Voice</button>
+    <button id="stopRec" disabled>Stop Recording</button>
+    <span id="recStatus"></span>
+  </div>
+
+  <div>
+    <button id="createPost">Create Post</button>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-storage-compat.js"></script>
+
+  <script>
+    // ---- PASTE YOUR firebaseConfig here or include your firebase.js ----
+    const firebaseConfig = {
+      apiKey: "PASTE_API_KEY",
+      authDomain: "PASTE_AUTH_DOMAIN",
+      projectId: "PASTE_PROJECT_ID",
+      storageBucket: "PASTE_STORAGE_BUCKET",
+      messagingSenderId: "PASTE_MSG_SENDER",
+      appId: "PASTE_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // Helper: ensure user is logged in
+    async function requireLogin() {
+      return new Promise((resolve) => {
+        auth.onAuthStateChanged(user => {
+          if (!user) {
+            // optionally redirect to login
+            document.getElementById('status').textContent = 'Please login first.';
+            resolve(null);
+          } else resolve(user);
+        });
+      });
+    }
+
+    // --- Voice recording setup ---
+    let mediaRecorder, audioChunks = [];
+    let lastAudioBlob = null;
+    const startBtn = document.getElementById('startRec');
+    const stopBtn = document.getElementById('stopRec');
+    const recStatus = document.getElementById('recStatus');
+
+    startBtn.addEventListener('click', async () => {
+      audioChunks = [];
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          lastAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const sizeKB = Math.round(lastAudioBlob.size / 1024);
+          recStatus.textContent = `Recorded (${sizeKB} KB). Ready to upload.`;
+        };
+        mediaRecorder.start();
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        recStatus.textContent = 'Recording…';
+      } catch (err) {
+        recStatus.textContent = 'Microphone access denied or unavailable.';
+        console.error(err);
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
+
+    // --- Create Post ---
+    document.getElementById('createPost').addEventListener('click', async () => {
+      document.getElementById('status').textContent = 'Creating post...';
+      const user = await requireLogin();
+      if (!user) return;
+      const text = document.getElementById('text').value.trim();
+      // get location automatically
+      if (!navigator.geolocation) {
+        document.getElementById('status').textContent = 'Geolocation not supported.';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        try {
+          // create placeholder doc to get id
+          const docRef = await db.collection('posts').add({
+            userId: user.uid,
+            text: text || '',
+            voiceUrl: '',
+            lat, lng,
+            status: 'open',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            acceptedBy: null
+          });
+
+          // if voice recorded upload and update
+          if (lastAudioBlob) {
+            const path = `voices/${docRef.id}.webm`;
+            const uploadTask = storage.ref(path).put(lastAudioBlob);
+            uploadTask.on('state_changed', null, (err) => {
+              console.error(err);
+            }, async () => {
+              const url = await storage.ref(path).getDownloadURL();
+              await docRef.update({ voiceUrl: url });
+              document.getElementById('status').textContent = 'Post created with voice!';
+              // reset
+              document.getElementById('text').value = '';
+              lastAudioBlob = null;
+              recStatus.textContent = '';
+            });
+          } else {
+            document.getElementById('status').textContent = 'Post created!';
+            document.getElementById('text').value = '';
+          }
+
+          // create a notification doc for workers (optional)
+          await db.collection('notifications').add({
+            type: 'new_post',
+            postId: docRef.id,
+            lat, lng,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            seenBy: [] // array of uids who saw this notification
+          });
+
+        } catch (err) {
+          console.error(err);
+          document.getElementById('status').textContent = 'Error creating post.';
+        }
+
+      }, (err) => {
+        console.error(err);
+        document.getElementById('status').textContent = 'Unable to get location.';
+      }, { enableHighAccuracy: true, timeout: 10000 });
+
+    });
+
+  </script>
+</body>
+    </html>
