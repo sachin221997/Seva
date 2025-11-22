@@ -2,118 +2,151 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Worker Earnings - Seva</title>
+<title>Worker Earnings – Seva</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <style>
-    body {
-        font-family: Arial;
-        background: #f1f5ff;
-        text-align: center;
-        padding: 20px;
-    }
-
-    h1 {
-        color: #4a90e2;
-    }
-
-    .card {
-        background: white;
-        width: 90%;
-        margin: 15px auto;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        text-align: left;
-    }
-
-    .amount {
-        font-size: 22px;
-        font-weight: bold;
-        color: green;
-    }
-
-    nav a {
-        margin: 10px;
-        text-decoration: none;
-        color: #4a90e2;
-        font-weight: bold;
-    }
+  body {
+    background:#f1f5ff;
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:20px;
+    max-width:900px;
+    margin:auto;
+  }
+  h1 {
+    text-align:center;
+    color:#4a90e2;
+    margin-bottom:10px;
+  }
+  .summary-box {
+    background:white;
+    padding:18px;
+    margin-top:20px;
+    border-radius:12px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.1);
+    text-align:center;
+  }
+  .amount {
+    font-size:30px;
+    font-weight:bold;
+    color:#16a34a;
+  }
+  .card {
+    background:white;
+    padding:16px;
+    margin-top:16px;
+    border-radius:10px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.1);
+  }
+  .meta {
+    color:#666;
+    font-size:13px;
+    margin-top:4px;
+  }
+  .earn-badge {
+    background:#10B981;
+    color:white;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:12px;
+    margin-left:10px;
+  }
 </style>
 </head>
 
 <body>
 
-<h1>💰 Your Earnings</h1>
+<h1>Worker Earnings</h1>
+<div class="summary-box">
+  <div>Total Earnings (Today)</div>
+  <div class="amount" id="todayEarn">₹0</div>
+</div>
 
-<nav>
-    <a href="worker_home.html">Home</a>
-    <a href="worker_earnings.html">Earnings</a>
-    <a href="contact.html">Contact</a>
-</nav>
+<div class="summary-box">
+  <div>Total Earnings (Lifetime)</div>
+  <div class="amount" id="lifeEarn">₹0</div>
+</div>
 
-<h2>Total Earned:</h2>
-<p class="amount" id="totalEarnings">Loading...</p>
-
-<h2>Earnings History</h2>
-<div id="earningsList">Loading history...</div>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
-<script src="auth.js"></script>
+<h2 style="color:#4a90e2;margin-top:30px;">All Completed Tasks</h2>
+<div id="tasks">Loading...</div>
 
 <script>
-// Load worker earnings
-auth.onAuthStateChanged(async user => {
+  // -----------------------------------
+  // YOUR FIREBASE CONFIG
+  // -----------------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // LOGIN CHECK
+  auth.onAuthStateChanged(user => {
     if (!user) {
-        alert("Please login first");
-        window.location.href = "login.html";
-        return;
+      document.getElementById("tasks").innerHTML = "<p>Please login first.</p>";
+      return;
     }
+    loadEarnings(user.uid);
+  });
 
-    const workerId = user.uid;
-
-    // Load worker profile for total earnings
-    const userRef = db.collection("users").doc(workerId);
-    const doc = await userRef.get();
-
-    if (doc.exists) {
-        const data = doc.data();
-        document.getElementById("totalEarnings").innerText =
-            "₹ " + (data.earnings || 0);
-    }
-
-    // Load detailed earning records
+  // LOAD EARNINGS (Option A)
+  function loadEarnings(workerId) {
     db.collection("earnings")
-        .where("workerId", "==", workerId)
-        .orderBy("timestamp", "desc")
-        .onSnapshot(snapshot => {
-            const list = document.getElementById("earningsList");
+      .where("workerId", "==", workerId)
+      .orderBy("timestamp", "desc")
+      .onSnapshot(snapshot => {
 
-            if (snapshot.empty) {
-                list.innerHTML = "<p>No earnings yet.</p>";
-                return;
-            }
+        let tasksBox = document.getElementById("tasks");
+        tasksBox.innerHTML = "";
 
-            list.innerHTML = "";
+        let todayTotal = 0;
+        let lifetimeTotal = 0;
 
-            snapshot.forEach(docItem => {
-                const e = docItem.data();
+        const todayDate = new Date().toDateString();
 
-                list.innerHTML += `
-                    <div class="card">
-                        <b>Amount: </b> ₹ ${e.amount} <br>
-                        <b>Service: </b> ${e.service || "Service"} <br>
-                        <b>Booking ID: </b> ${e.jobId} <br>
-                        <b>Date: </b> ${new Date(e.timestamp.seconds * 1000).toLocaleString()}
-                    </div>
-                `;
-            });
+        snapshot.forEach(doc => {
+          const e = doc.data();
+
+          // Add earnings
+          lifetimeTotal += e.workerEarning;
+
+          const taskDate = new Date(e.timestamp?.toDate()).toDateString();
+          if (taskDate === todayDate) {
+            todayTotal += e.workerEarning;
+          }
+
+          // Display each task
+          tasksBox.innerHTML += `
+            <div class="card">
+              <div><b>Work Type:</b> ${e.workType}</div>
+              <div><b>Customer Price:</b> ₹${e.customerPrice}</div>
+              <div><b>Platform Fee:</b> ₹${e.platformFee}</div>
+              <div><b>Worker Earned:</b> <span class="earn-badge">₹${e.workerEarning}</span></div>
+              <div class="meta">${new Date(e.timestamp?.toDate()).toLocaleString()}</div>
+            </div>
+          `;
         });
-});
+
+        document.getElementById("todayEarn").innerText = "₹" + todayTotal;
+        document.getElementById("lifeEarn").innerText = "₹" + lifetimeTotal;
+
+      });
+  }
 </script>
 
 </body>
-  </html>
+</html>
