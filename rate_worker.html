@@ -1,171 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Rate Worker - Seva Care</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rate Worker — Seva</title>
+
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <style>
-    body {
-        font-family: Arial;
-        background: #f1f5ff;
-        margin: 0;
-        text-align: center;
-        padding: 20px;
+    body{
+        background:#f4f7ff;
+        font-family: Arial, sans-serif;
+        padding:20px;
     }
-
-    h1 {
-        color: #4a90e2;
+    .wrap{
+        max-width:600px;
+        margin:auto;
     }
-
-    .card {
-        background: white;
-        width: 90%;
-        margin: 20px auto;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        text-align: left;
+    h2{
+        text-align:center;
+        color:#4a90e2;
     }
-
-    .btn {
-        background: #4a90e2;
-        color: white;
-        border: none;
-        padding: 12px 18px;
-        border-radius: 8px;
-        font-size: 18px;
-        margin-top: 15px;
-        width: 90%;
+    .card{
+        background:white;
+        padding:20px;
+        border-radius:12px;
+        box-shadow:0 6px 18px rgba(0,0,0,0.08);
+        margin-top:20px;
     }
-
-    select, textarea {
-        width: 90%;
-        padding: 10px;
-        margin-top: 10px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
+    label{
+        font-weight:bold;
+        color:#333;
+    }
+    select, textarea{
+        width:100%;
+        padding:12px;
+        margin-top:8px;
+        border-radius:10px;
+        border:1px solid #ccc;
+        font-size:15px;
+    }
+    textarea{
+        height:100px;
+        resize:none;
+    }
+    .btn{
+        width:100%;
+        padding:14px;
+        margin-top:20px;
+        background:#4a90e2;
+        color:white;
+        border:none;
+        border-radius:12px;
+        font-size:16px;
+        font-weight:bold;
+        cursor:pointer;
+    }
+    .worker-box{
+        display:flex;
+        gap:12px;
+        padding:10px 0;
+        align-items:center;
+    }
+    .avatar{
+        width:60px;
+        height:60px;
+        border-radius:12px;
+        background:#ff7a59;
+        color:white;
+        font-weight:bold;
+        font-size:20px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    .meta{
+        color:#777;
+        font-size:14px;
     }
 </style>
 </head>
 
 <body>
+<div class="wrap">
+    <h2>⭐ Rate Your Worker</h2>
 
-<h1>⭐ Rate Your Worker</h1>
+    <div id="loading">Loading...</div>
 
-<div id="loading">Loading booking info...</div>
+    <div class="card" id="rateBox" style="display:none;">
+        <h3 id="serviceTitle">Your Request</h3>
 
-<div id="rateBox" style="display:none;" class="card">
-    <h2 id="service"></h2>
+        <div class="worker-box">
+            <div class="avatar" id="workerAvatar">W</div>
+            <div>
+                <div><b id="workerName">Loading...</b></div>
+                <div class="meta" id="workerEmail">Worker email...</div>
+            </div>
+        </div>
 
-    <p><b>Worker:</b> <span id="workerName">Loading...</span></p>
+        <label>Select Rating (1-5 stars)</label>
+        <select id="rating">
+            <option value="5">⭐ 5 — Excellent</option>
+            <option value="4">⭐ 4 — Very Good</option>
+            <option value="3">⭐ 3 — Good</option>
+            <option value="2">⭐ 2 — Poor</option>
+            <option value="1">⭐ 1 — Bad</option>
+        </select>
 
-    <label><b>Select Rating (1–5 stars):</b></label><br>
-    <select id="rating">
-        <option value="5">⭐ 5 - Excellent</option>
-        <option value="4">⭐ 4 - Very Good</option>
-        <option value="3">⭐ 3 - Good</option>
-        <option value="2">⭐ 2 - Poor</option>
-        <option value="1">⭐ 1 - Very Bad</option>
-    </select><br><br>
+        <br><br>
 
-    <label><b>Write a Review:</b></label><br>
-    <textarea id="reviewText" rows="4" placeholder="Write your experience..."></textarea>
+        <label>Write a Review</label>
+        <textarea id="reviewText" placeholder="Describe your experience..."></textarea>
 
-    <button class="btn" onclick="submitReview()">Submit Review</button>
+        <button class="btn" onclick="submitReview()">Submit Review</button>
+    </div>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
-<script src="auth.js"></script>
-
 <script>
-// Extract booking ID from URL
-const urlParams = new URLSearchParams(window.location.search);
-const bookingId = urlParams.get("booking");
+/* -------------------------
+   Firebase Config
+------------------------- */
+const firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-if (!bookingId) {
-    document.body.innerHTML = "<h2>Invalid link. No booking ID provided.</h2>";
+/* -------------------------
+   Extract postId
+------------------------- */
+const params = new URLSearchParams(window.location.search);
+const postId = params.get("postId");
+if (!postId) {
+    document.body.innerHTML = "<h3>Invalid request. Missing post ID.</h3>";
 }
 
-// Load booking details
+/* -------------------------
+   Load post + worker details
+------------------------- */
 auth.onAuthStateChanged(async user => {
     if (!user) {
-        alert("Login required!");
         window.location.href = "login.html";
         return;
     }
 
-    const bookingRef = db.collection("bookings").doc(bookingId);
-    const bookingDoc = await bookingRef.get();
+    const postRef = db.collection("posts").doc(postId);
+    const postSnap = await postRef.get();
 
-    if (!bookingDoc.exists) {
-        document.getElementById("loading").innerHTML = "Booking not found!";
+    if (!postSnap.exists) {
+        document.getElementById("loading").innerHTML = "Post not found.";
         return;
     }
 
-    const b = bookingDoc.data();
+    const post = postSnap.data();
 
-    document.getElementById("service").innerText = b.service;
-    document.getElementById("loading").style.display = "none";
+    // Show service text
+    document.getElementById("serviceTitle").innerText = post.text || "Your Request";
 
-    // Load worker info
-    const workerRef = db.collection("users").doc(b.assignedWorkerId);
-    const workerDoc = await workerRef.get();
-
-    if (workerDoc.exists) {
-        const w = workerDoc.data();
-        document.getElementById("workerName").innerText = w.email;
+    // Worker UID
+    const workerId = post.acceptedBy;
+    if (!workerId) {
+        document.getElementById("loading").innerHTML = "This request has no assigned worker.";
+        return;
     }
 
+    // Show avatar initials
+    document.getElementById("workerAvatar").innerText = workerId.substring(0, 2).toUpperCase();
+
+    // Load worker info
+    const workerDoc = await db.collection("users").doc(workerId).get();
+    if (workerDoc.exists) {
+        const w = workerDoc.data();
+        document.getElementById("workerName").innerText = w.name || "Worker";
+        document.getElementById("workerEmail").innerText = w.email || "No email available";
+    }
+
+    document.getElementById("loading").style.display = "none";
     document.getElementById("rateBox").style.display = "block";
 });
 
-
-// ----------------------------
-// Submit Review
-// ----------------------------
+/* -------------------------
+   Submit Review
+------------------------- */
 async function submitReview() {
     const user = auth.currentUser;
-    if (!user) return alert("Login required!");
+    if (!user) return alert("Login required.");
 
-    const rating = Number(document.getElementById("rating").value);
-    const reviewText = document.getElementById("reviewText").value.trim();
+    const stars = Number(document.getElementById("rating").value);
+    const text = document.getElementById("reviewText").value.trim();
 
-    if (reviewText.length < 3) {
-        alert("Please write at least 3 characters.");
+    if (text.length < 3) {
+        alert("Please enter at least 3 characters.");
         return;
     }
 
-    const bookingRef = db.collection("bookings").doc(bookingId);
-    const bookingDoc = await bookingRef.get();
+    // Load post again to get worker
+    const postSnap = await db.collection("posts").doc(postId).get();
+    const post = postSnap.data();
+    const workerId = post.acceptedBy;
 
-    if (!bookingDoc.exists) return alert("Booking not found!");
-
-    const b = bookingDoc.data();
-
-    // Save review in reviews collection
-    await db.collection("reviews").add({
-        workerId: b.assignedWorkerId,
-        bookingId: bookingId,
+    // Save in ratings collection
+    await db.collection("ratings").add({
+        postId: postId,
+        workerId: workerId,
         userId: auth.currentUser.uid,
-        rating: rating,
-        reviewText: reviewText,
+        stars: stars,
+        review: text,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     // Update worker rating totals
-    await db.collection("users").doc(b.assignedWorkerId).update({
-        ratingTotal: firebase.firestore.FieldValue.increment(rating),
+    await db.collection("users").doc(workerId).update({
+        ratingTotal: firebase.firestore.FieldValue.increment(stars),
         ratingCount: firebase.firestore.FieldValue.increment(1)
     });
 
     alert("Thank you! Your review has been submitted.");
-    window.location.href = "my_bookings.html";
+    window.location.href = "my_tasks.html";
 }
 </script>
 
 </body>
-    </html>
+                                 </html>
