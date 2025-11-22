@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>My Tasks — Seva</title>
+
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+<style>
+  :root{
+    --primary:#4a90e2;
+    --accent:#ff7a59;
+    --muted:#6b7280;
+    --bg:#f4f7ff;
+    --card:#ffffff;
+    --success:#16a34a;
+    --danger:#ef4444;
+    --shadow: 0 6px 18px rgba(34,41,47,0.06);
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:#111827;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:1050px;
+    margin:28px auto;
+    padding:20px;
+  }
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:18px;
+  }
+  .brand {
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .logo {
+    width:52px;
+    height:52px;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--primary),#7b61ff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-weight:700;
+    box-shadow: var(--shadow);
+  }
+  h1{ font-size:20px; margin:0; }
+  .sub { color:var(--muted); font-size:13px; margin-top:4px; }
+
+  .controls{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .btn{
+    background:var(--primary);
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    box-shadow: 0 6px 16px rgba(74,144,226,0.12);
+    font-weight:600;
+  }
+  .btn.secondary{
+    background:white;
+    color:var(--primary);
+    border:1px solid rgba(74,144,226,0.12);
+    box-shadow:none;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill,minmax(320px,1fr));
+    gap:18px;
+    margin-top:18px;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:12px;
+    padding:16px;
+    box-shadow: var(--shadow);
+    border:1px solid rgba(15,23,42,0.03);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .task-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .task-title{
+    font-weight:700;
+    font-size:16px;
+    margin:0;
+  }
+  .meta { font-size:13px; color:var(--muted); }
+
+  .badge{
+    padding:6px 10px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:12px;
+    display:inline-block;
+  }
+  .badge.open{ background: rgba(72,131,255,0.12); color:var(--primary); }
+  .badge.assigned{ background: rgba(22,163,74,0.12); color:var(--success); }
+  .badge.completed{ background: rgba(0,0,0,0.06); color: #111827; }
+
+  .audio {
+    margin-top:8px;
+  }
+
+  .task-body{
+    color:#111827;
+    font-size:14px;
+    line-height:1.4;
+  }
+
+  .task-actions{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+    flex-wrap:wrap;
+  }
+  .muted { color:var(--muted); font-size:13px; }
+
+  .worker-info {
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-top:8px;
+  }
+  .avatar{
+    width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#f97316,#ff7a59);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;
+  }
+  .small { font-size:13px; color:var(--muted); }
+
+  .empty {
+    text-align:center;
+    padding:40px;
+    color:var(--muted);
+    background:linear-gradient(180deg,white, #fbfdff);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+  }
+
+  footer {
+    margin-top:20px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  @media (max-width:420px){
+    .brand h1{ font-size:18px; }
+    .logo{ width:44px;height:44px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">S</div>
+      <div>
+        <h1>My Tasks</h1>
+        <div class="sub">All your active & past requests — text or voice</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn secondary" onclick="goHome()">Home</button>
+      <button class="btn" onclick="goCreate()">Create Request</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="grid" class="grid">
+      <!-- task cards will be injected here -->
+    </div>
+
+    <div id="empty" class="empty" style="display:none">
+      <h3>No requests yet</h3>
+      <p>Create a request and nearby workers will see it — text or voice, any help.</p>
+      <div style="margin-top:12px">
+        <button class="btn" onclick="goCreate()">Create your first request</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span id="meinfo">Loading...</span>
+  </footer>
+</div>
+
+<script>
+  // ---------------------------
+  // Your Firebase config (v8)
+  // ---------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // helpers
+  function goCreate(){ window.location.href = "create_post.html"; }
+  function goHome(){ window.location.href = "customer_home.html"; }
+  function openDetails(id){ window.location.href = "post_details.html?postId=" + id; }
+
+  // show time nicely
+  function niceDate(ts){
+    try {
+      if(!ts) return "";
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleString();
+    } catch(e){ return ""; }
+  }
+
+  // load current user and then posts
+  auth.onAuthStateChanged(user => {
+    if(!user){
+      window.location.href = "login.html";
+      return;
+    }
+    document.getElementById("meinfo").innerText = "Signed in as: " + user.email;
+    loadMyTasks(user.uid);
+  });
+
+  // main loader
+  function loadMyTasks(uid){
+    // listen to posts created by this user
+    db.collection("posts")
+      .where("userId", "==", uid)
+      .orderBy("timestamp","desc")
+      .onSnapshot(snapshot => {
+        const grid = document.getElementById("grid");
+        const empty = document.getElementById("empty");
+        grid.innerHTML = "";
+
+        if(snapshot.empty){
+          empty.style.display = "block";
+          return;
+        }
+        empty.style.display = "none";
+
+        snapshot.forEach(doc => {
+          const p = doc.data();
+          const id = doc.id;
+
+          // create card
+          const card = document.createElement("div");
+          card.className = "card";
+
+          // header
+          const head = document.createElement("div");
+          head.className = "task-head";
+
+          const left = document.createElement("div");
+          const title = document.createElement("div");
+          title.className = "task-title";
+          title.innerText = p.text ? (p.text.length>80 ? p.text.slice(0,80) + "…" : p.text) : "Voice Request";
+
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.innerText = niceDate(p.timestamp) + " • " + (p.lat && p.lng ? "Location included" : "No location");
+
+          left.appendChild(title);
+          left.appendChild(meta);
+
+          const right = document.createElement("div");
+
+          // badge
+          const badge = document.createElement("span");
+          badge.className = "badge " + (p.status || "open");
+          badge.innerText = (p.status || "open").toUpperCase();
+          right.appendChild(badge);
+
+          head.appendChild(left);
+          head.appendChild(right);
+
+          card.appendChild(head);
+
+          // body
+          const body = document.createElement("div");
+          body.className = "task-body";
+
+          if(p.text){
+            const txt = document.createElement("div");
+            txt.innerText = p.text;
+            body.appendChild(txt);
+          }
+
+          // voice
+          if(p.voiceUrl){
+            const audWrap = document.createElement("div");
+            audWrap.className = "audio";
+            const audio = document.createElement("audio");
+            audio.controls = true;
+            audio.src = p.voiceUrl;
+            audio.style.width = "100%";
+            audWrap.appendChild(audio);
+            body.appendChild(audWrap);
+          }
+
+          // location link
+          if(p.lat && p.lng){
+            const loc = document.createElement("div");
+            loc.className = "muted";
+            const maps = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+            loc.innerHTML = `📍 <a href="${maps}" target="_blank">Open location in maps</a>`;
+            body.appendChild(loc);
+          }
+
+          card.appendChild(body);
+
+          // worker info area
+          const winfo = document.createElement("div");
+          winfo.className = "worker-info";
+
+          if(p.status === "assigned" && p.acceptedBy){
+            // show worker avatar and fetch worker details if available
+            const av = document.createElement("div");
+            av.className = "avatar";
+            av.innerText = (p.acceptedBy || "").slice(0,2).toUpperCase();
+
+            const winfoText = document.createElement("div");
+            winfoText.innerHTML = `<div style="font-weight:700">Assigned Worker</div>
+                                   <div class="small">UID: <span id="wk-${id}">${p.acceptedBy}</span></div>
+                                   <div class="small" id="wk-email-${id}">Loading worker info…</div>`;
+
+            winfo.appendChild(av);
+            winfo.appendChild(winfoText);
+            card.appendChild(winfo);
+
+            // try to fetch worker profile from 'users' collection by doc id = uid
+            db.collection("users").doc(p.acceptedBy).get().then(snap => {
+              if(snap.exists){
+                const w = snap.data();
+                const name = w.displayName || w.name || w.email || p.acceptedBy;
+                const email = w.email || "";
+                document.getElementById("wk-"+id).innerText = name;
+                if(email) document.getElementById("wk-email-"+id).innerHTML = `<a href="mailto:${email}">Contact: ${email}</a>`;
+                else document.getElementById("wk-email-"+id).innerText = "Contact not available";
+              } else {
+                // no user doc
+                document.getElementById("wk-email-"+id).innerText = "Contact not available";
+              }
+            }).catch(()=> {
+              document.getElementById("wk-email-"+id).innerText = "Contact not available";
+            });
+          }
+
+          // actions
+          const actions = document.createElement("div");
+          actions.className = "task-actions";
+
+          // view details button
+          const viewBtn = document.createElement("button");
+          viewBtn.className = "btn secondary";
+          viewBtn.innerText = "View Details";
+          viewBtn.onclick = () => openDetails(id);
+          actions.appendChild(viewBtn);
+
+          // contact worker button (if known)
+          if(p.status === "assigned" && p.acceptedBy){
+            const contactBtn = document.createElement("button");
+            contactBtn.className = "btn";
+            contactBtn.style.background = "#10B981"; // green
+            contactBtn.innerText = "Contact Worker";
+
+            contactBtn.onclick = async () => {
+              // try to get worker email
+              try {
+                const snap = await db.collection("users").doc(p.acceptedBy).get();
+                if(snap.exists && snap.data().email){
+                  window.location.href = `mailto:${snap.data().email}`;
+                } else {
+                  alert("Worker contact not available. You can view details to get UID.");
+                }
+              } catch(e){
+                alert("Worker contact not available.");
+              }
+            };
+            actions.appendChild(contactBtn);
+          }
+
+          // mark completed (only if assigned)
+          if(p.status === "assigned"){
+            const doneBtn = document.createElement("button");
+            doneBtn.className = "btn";
+            doneBtn.style.background = "#6B7280";
+            doneBtn.innerText = "Mark Completed";
+            doneBtn.onclick = async () => {
+              if(!confirm("Mark this job as completed? This will notify the worker.")) return;
+              try {
+                await db.collection("posts").doc(id).update({ status: "completed", completedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                // create notification for worker
+                await db.collection("notifications").add({
+                  type: "completed",
+                  postId: id,
+                  from: auth.currentUser.uid,
+                  to: p.acceptedBy,
+                  timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                  seen: false
+                });
+                alert("Marked completed. Worker notified.");
+              } catch(e){
+                alert("Unable to update status: " + e);
+              }
+            };
+            actions.appendChild(doneBtn);
+          }
+
+          // rate worker (if completed)
+          if(p.status === "completed"){
+            const rateBtn = document.createElement("button");
+            rateBtn.className = "btn";
+            rateBtn.style.background = "linear-gradient(90deg,#ff7a59,#ffb86b)";
+            rateBtn.innerText = "Rate Worker";
+            rateBtn.onclick = () => {
+              window.location.href = `rate_worker.html?postId=${id}`;
+            };
+            actions.appendChild(rateBtn);
+          }
+
+          card.appendChild(actions);
+
+          // append card to grid
+          grid.appendChild(card);
+        });
+      });
+  }
+</script>
+</body>
+          </html>
