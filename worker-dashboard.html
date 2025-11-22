@@ -9,48 +9,61 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-    <script src="worker.js"></script>
+    <script>
+    // --------------------------
+    // YOUR FIREBASE CONFIG
+    // --------------------------
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
 
-<script>
     // Protect Dashboard
     firebase.auth().onAuthStateChanged(user => {
         if (!user) {
             window.location.href = "worker-login.html";
         } else {
             loadBookings();
+            loadFeed(); // NEW FEATURE
         }
     });
 
-    // Load all pending bookings
+    // ------------------------------
+    // OLD FEATURE: LOAD BOOKINGS
+    -------------------------------
     function loadBookings() {
         firebase.firestore().collection("bookings")
-        .orderBy("time", "desc")
-        .get()
-        .then(snapshot => {
-            let container = document.getElementById("bookings");
-            container.innerHTML = "";
+            .orderBy("time", "desc")
+            .get()
+            .then(snapshot => {
+                let container = document.getElementById("bookings");
+                container.innerHTML = "";
 
-            snapshot.forEach(doc => {
-                let data = doc.data();
+                snapshot.forEach(doc => {
+                    let data = doc.data();
+                    container.innerHTML += `
+                        <div class="booking-card">
+                            <p><b>Service:</b> ${data.service}</p>
+                            <p><b>User Email:</b> ${data.userEmail}</p>
+                            <p><b>Time:</b> ${data.time}</p>
 
-                container.innerHTML += `
-                    <div class="booking-card">
-                        <p><b>Service:</b> ${data.service}</p>
-                        <p><b>User Email:</b> ${data.userEmail}</p>
-                        <p><b>Time:</b> ${data.time}</p>
-
-                        <button onclick="acceptJob('${doc.id}', '${data.service}', '${data.userEmail}')">
-                            Accept Job
-                        </button>
-                    </div>
-                    <hr>
-                `;
+                            <button onclick="acceptBooking('${doc.id}', '${data.service}', '${data.userEmail}')">
+                                Accept Job
+                            </button>
+                        </div>
+                        <hr>
+                    `;
+                });
             });
-        });
     }
 
-    // Accept Job Function
-    function acceptJob(id, service, userEmail) {
+    // Accept Job (old)
+    function acceptBooking(id, service, userEmail) {
         let workerEmail = firebase.auth().currentUser.email;
 
         let acceptedJob = {
@@ -73,29 +86,122 @@
         });
     }
 
-    // Logout
+    // -----------------------------------------
+    // NEW FEATURE: Nearby Feed (like Facebook)
+    // -----------------------------------------
+
+    // Distance calculation
+    function distanceKm(lat1, lon1, lat2, lon2){
+        const R = 6371;
+        const dLat = (lat2-lat1) * Math.PI/180;
+        const dLon = (lon2-lon1) * Math.PI/180;
+        const a =
+            Math.sin(dLat/2)*Math.sin(dLat/2) +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) *
+            Math.sin(dLon/2)*Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    // Load Nearby Requests
+    function loadFeed() {
+        navigator.geolocation.getCurrentPosition((pos) => {
+            let myLat = pos.coords.latitude;
+            let myLng = pos.coords.longitude;
+
+            let feedBox = document.getElementById("feed");
+
+            firebase.firestore()
+                .collection("posts")
+                .where("status", "==", "open")
+                .orderBy("timestamp", "desc")
+                .onSnapshot(snapshot => {
+
+                    feedBox.innerHTML = "";
+                    let count = 0;
+
+                    snapshot.forEach(doc => {
+                        let d = doc.data();
+                        if (!d.lat || !d.lng) return;
+
+                        let km = distanceKm(myLat, myLng, d.lat, d.lng);
+
+                        // Only show within 10 km
+                        if (km <= 10) {
+                            count++;
+
+                            let card = `
+                                <div style="border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:8px;">
+                                    <p><b>Message:</b> ${d.text || "<i>Voice request</i>"}</p>
+                                    <p><b>Distance:</b> ${km.toFixed(1)} km</p>
+                                    <p><b>Posted:</b> ${new Date(d.timestamp?.toDate()).toLocaleString()}</p>
+                            `;
+
+                            if (d.voiceUrl) {
+                                card += `
+                                    <audio controls src="${d.voiceUrl}" style="width:100%; margin-top:6px;"></audio>
+                                `;
+                            }
+
+                            card += `
+                                    <br>
+                                    <button onclick="openPost('${doc.id}')">View / Accept</button>
+                                </div>
+                            `;
+
+                            feedBox.innerHTML += card;
+                        }
+                    });
+
+                    // Notification bubble
+                    let notif = document.getElementById("notif");
+                    if (count > 0) {
+                        notif.style.display = "block";
+                        notif.innerText = count + " nearby";
+                        setTimeout(() => notif.style.display="none", 4000);
+                    }
+                });
+        });
+    }
+
+    function openPost(id){
+        window.location.href = "post_details.html?postId=" + id;
+    }
+
+    // Logout function
     function workerLogout() {
         firebase.auth().signOut().then(() => {
             window.location.href = "worker-login.html";
         });
     }
-</script>
-
+    </script>
 </head>
 
 <body>
 
-<h1>👨‍🔧 Worker Dashboard</h1>
+<h1>👷 Worker Dashboard</h1>
 
-<!-- Bookings -->
+<!-- Old System -->
+<h2>📦 Bookings</h2>
 <div id="bookings">
     <p>Loading bookings...</p>
 </div>
 
-<br>
+<br><hr><br>
+
+<!-- New System -->
+<h2>📌 Nearby Requests (New Feature)</h2>
+<div id="feed">Loading nearby requests...</div>
+
+<div id="notif" 
+     style="display:none; background:#ff3b30;color:white;padding:6px 12px;
+     border-radius:20px; position:fixed; top:20px; right:20px;">
+</div>
+
+<br><hr><br>
 
 <button onclick="workerLogout()">Logout</button>
 
 </body>
-</html>
+    </html>
 
