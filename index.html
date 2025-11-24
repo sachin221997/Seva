@@ -6,6 +6,20 @@
 <title>Seva App - Work. Help. Earn.</title>
 
 <style>
+.auth-btn {
+    margin-left: 20px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: white;
+    color: var(--accent-dark);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-btn:hover {
+    opacity: 0.85;
+}
 :root {
     --bg:#F0FDF4;
     --card:#ffffff;
@@ -206,7 +220,13 @@ footer {
         <a href="jobs.html">Jobs</a>
         <a href="help.html">Help</a>
         <a href="about.html">About</a>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+
+        <!-- Visible when NOT logged in -->
+        <a id="loginBtn" class="auth-btn" href="login.html">Login</a>
+        <a id="signupBtn" class="auth-btn" href="signup.html">Signup</a>
+
+        <!-- Visible when LOGGED IN -->
+        <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display:none;">Logout</button>
     </div>
 </nav>
 
@@ -277,10 +297,16 @@ footer {
 
 <script src="auth.js"></script>
 <script>
+<script>
 firebase.auth().onAuthStateChanged((user) => {
-    if (!user) {
-        // If user is NOT logged in → go to login page
-        window.location.href = "login.html";
+    if (user) {
+        document.getElementById("logoutBtn").style.display = "inline-block";
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("signupBtn").style.display = "none";
+    } else {
+        document.getElementById("logoutBtn").style.display = "none";
+        document.getElementById("loginBtn").style.display = "inline-block";
+        document.getElementById("signupBtn").style.display = "inline-block";
     }
 });
 </script>
