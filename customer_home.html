@@ -1,152 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Customer Dashboard – Seva Care</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Post a Job - Seva</title>
 <style>
-    body {
-        font-family: Arial;
-        background: #f1f5ff;
-        text-align: center;
-        padding: 20px;
-    }
-    h1 { color: #4a90e2; }
-
-    .card {
-        background: white;
-        width: 85%;
-        margin: 15px auto;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
-    }
-
-    button {
-        background: #4a90e2;
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 10px;
-        margin-top: 10px;
-        width: 80%;
-        font-size: 18px;
-    }
-
-    #logoutBtn {
-        background: #d9534f;
-    }
+  body { margin:0; font-family:Inter, Arial; background:#f0fff4; color:#0b3a2d; }
+  .top { background:#15803d; color:white; padding:18px 20px; font-size:20px; font-weight:700; text-align:center; }
+  .container { max-width:760px; margin:26px auto; background:white; padding:20px; border-radius:12px; box-shadow:0 6px 24px rgba(0,0,0,0.08); }
+  h2 { color:#156e3a; margin-top:0; }
+  label { display:block; margin:12px 0 6px; font-weight:600; }
+  input[type="text"], input[type="number"], textarea, select {
+    width:100%; padding:12px; border:1px solid #cbd5c6; border-radius:8px; font-size:15px;
+  }
+  textarea { min-height:110px; resize:vertical; }
+  .row { display:flex; gap:12px; }
+  .col { flex:1; }
+  .note { font-size:13px; color:#4b5563; margin-top:6px; }
+  .btn { background:#15803d; color:white; border:none; padding:12px 16px; border-radius:10px; cursor:pointer; font-weight:700; font-size:16px; }
+  .btn:disabled { opacity:0.6; cursor:not-allowed; }
+  .small { font-size:13px; color:#4b5563; }
+  .footer { text-align:center; margin-top:20px; color:#256029; }
 </style>
 </head>
-
 <body>
 
-<h1>Customer Dashboard</h1>
-<p id="customerEmail">Loading...</p>
+<div class="top">Seva • Post a Job</div>
 
-<!-- SERVICE LIST -->
-<div class="card">
-    <h2>Available Services</h2>
+<div class="container">
+  <h2>Post a Job</h2>
 
-    <button onclick="bookService('Home Cleaning')">Home Cleaning</button><br><br>
+  <p class="small">Fill details. Platform fee ₹50 will be deducted from worker's earning for every job.</p>
 
-    <button onclick="bookService('Massage Service')">Massage Service</button><br><br>
+  <label for="jobType">Job Type</label>
+  <select id="jobType">
+    <option value="massage">Massage (1 hour, ₹250 total)</option>
+    <option value="delivery">Delivery / Normal Help (min ₹200)</option>
+    <option value="hardwork">Hardwork / Labour (customer sets price)</option>
+    <option value="other">Other</option>
+  </select>
 
-    <button onclick="bookService('Electrician')">Electrician</button><br><br>
+  <label for="title">Job Title</label>
+  <input id="title" type="text" placeholder="Short title, e.g. Home massage at 5pm" />
 
-    <button onclick="bookService('Plumber')">Plumber</button><br><br>
+  <label for="description">Job Description</label>
+  <textarea id="description" placeholder="Describe what you need (e.g. head+leg+hand massage, 1 hour). Add any special instructions."></textarea>
 
-    <button onclick="bookService('Carpenter')">Carpenter</button><br><br>
+  <div class="row">
+    <div class="col">
+      <label for="hours">Hours / Duration</label>
+      <input id="hours" type="text" placeholder="e.g. 1 hour, 2 hours — for delivery put N/A" />
+    </div>
 
-    <button onclick="bookService('Cooking Help')">Cooking Help</button><br><br>
+    <div class="col">
+      <label for="amount">Amount (₹)</label>
+      <input id="amount" type="number" placeholder="Enter amount customer will pay" />
+      <div id="amountNote" class="note">For massage amount will be set automatically to ₹250.</div>
+    </div>
+  </div>
+
+  <label for="location">Location</label>
+  <input id="location" type="text" placeholder="Address or area, e.g. Model Town, Delhi" />
+
+  <label for="voice">Optional: Voice Note (mp3/m4a) — describe job</label>
+  <input id="voice" type="file" accept="audio/*" />
+
+  <p class="note">Tip: For massage use the 'massage' job type so price and duration auto apply.</p>
+
+  <div style="margin-top:16px;">
+    <button id="postBtn" class="btn" onclick="postJob()">Post Job</button>
+  </div>
+
+  <p id="statusMsg" class="small" style="margin-top:12px;"></p>
 </div>
 
-<!-- NEW FEATURES -->
-<div class="card">
-    <h2>New Features</h2>
-
-    <button onclick="goCreatePost()">Create Request (Text + Voice)</button><br><br>
-
-    <button onclick="goMyRequests()">My Requests</button><br><br>
-
-    <button onclick="goTrackWorker()">Track Worker</button>
-</div>
-
-<button id="logoutBtn" onclick="logout()">Logout</button>
+<div class="footer">© 2025 Seva • Platform fee ₹50 per job</div>
 
 <!-- Firebase v8 SDK -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
 <script>
-    // FIREBASE CONFIG
-    const firebaseConfig = {
-      apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
-      authDomain: "seva-6f191.firebaseapp.com",
-      projectId: "seva-6f191",
-      storageBucket: "seva-6f191.firebasestorage.app",
-      messagingSenderId: "826093348416",
-      appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
-      measurementId: "G-78H32SRPCD"
-    };
+  // ====== CONFIG (use this exact v8 config in all pages) ======
+  var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  // Elements
+  const jobTypeEl = document.getElementById('jobType');
+  const titleEl = document.getElementById('title');
+  const descEl = document.getElementById('description');
+  const hoursEl = document.getElementById('hours');
+  const amountEl = document.getElementById('amount');
+  const locationEl = document.getElementById('location');
+  const voiceEl = document.getElementById('voice');
+  const postBtn = document.getElementById('postBtn');
+  const statusMsg = document.getElementById('statusMsg');
+  const amountNote = document.getElementById('amountNote');
 
-    // PROTECT PAGE
-    auth.onAuthStateChanged(user => {
-        if (!user) {
-            window.location.href = "login.html";
-        } else {
-            document.getElementById("customerEmail").innerText = "Logged in as: " + user.email;
-        }
-    });
+  // Platform fee constant
+  const PLATFORM_FEE = 50;
 
-    // BOOK SERVICE
-    function bookService(serviceName) {
-        let user = auth.currentUser;
+  // Ensure user logged in
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      alert("Please login to post a job.");
+      window.location.href = "login.html";
+      return;
+    }
+    // Optionally prefill default values
+    // If jobType is massage -> lock amount and hours
+    applyJobTypeRules();
+  });
 
-        if (!user) {
-            alert("Please login");
-            return;
-        }
+  // Apply job type rules when selector changes
+  jobTypeEl.addEventListener('change', applyJobTypeRules);
 
-        db.collection("bookings").add({
-            email: user.email,
-            userEmail: user.email,
-            service: serviceName,
-            time: new Date().toISOString(),
-            status: "pending"
-        })
-        .then(() => {
-            alert("Service booked successfully!");
-        });
+  function applyJobTypeRules(){
+    const type = jobTypeEl.value;
+    if(type === 'massage'){
+      amountEl.value = 250;
+      amountEl.disabled = true;
+      hoursEl.value = "1 hour";
+      hoursEl.disabled = true;
+      amountNote.innerText = "Massage is fixed: ₹250 (₹200 worker + ₹50 platform fee).";
+    } else if(type === 'delivery'){
+      amountEl.disabled = false;
+      if(!amountEl.value) amountEl.value = 200;
+      hoursEl.disabled = false;
+      amountNote.innerText = "Delivery / Normal help minimum ₹200. Platform fee ₹50.";
+    } else if(type === 'hardwork'){
+      amountEl.disabled = false;
+      amountEl.value = "";
+      hoursEl.disabled = false;
+      amountNote.innerText = "Hardwork: customer may set any amount. Platform fee ₹50 will be deducted.";
+    } else {
+      // other
+      amountEl.disabled = false;
+      hoursEl.disabled = false;
+      amountNote.innerText = "Customer sets the amount. Platform fee ₹50 applies.";
+    }
+  }
+
+  // Post job function
+  async function postJob(){
+    const user = auth.currentUser;
+    if(!user) {
+      alert("Please login first.");
+      window.location.href = "login.html";
+      return;
     }
 
-    // NEW PAGE LINKS
-    function goCreatePost() {
-        window.location.href = "create_post.html";
+    // Read values
+    const type = jobTypeEl.value;
+    const title = (titleEl.value || '').trim();
+    const description = (descEl.value || '').trim();
+    let hours = (hoursEl.value || '').trim();
+    let amount = Number(amountEl.value || 0);
+    const location = (locationEl.value || '').trim();
+
+    // Basic validation
+    if(!title){
+      alert("Please add a short title for the job.");
+      return;
+    }
+    if(!description){
+      alert("Please describe the job.");
+      return;
+    }
+    if(!location){
+      alert("Please enter a location.");
+      return;
     }
 
-    function goMyRequests() {
-        window.location.href = "my_requests.html";
+    // Enforce job rules
+    if(type === 'massage'){
+      amount = 250;
+      hours = "1 hour";
+    } else if(type === 'delivery'){
+      if(!amount || amount < 200){
+        alert("Delivery / Normal help requires minimum ₹200.");
+        return;
+      }
+    } else if(type === 'hardwork'){
+      if(!amount || amount <= PLATFORM_FEE){
+        alert("Please set an amount greater than platform fee (₹50).");
+        return;
+      }
+    } else {
+      if(!amount || amount <= PLATFORM_FEE){
+        alert("Please set an amount greater than platform fee (₹50).");
+        return;
+      }
     }
 
-    function goTrackWorker() {
-        window.location.href = "track_worker.html";
-    }
+    // Prepare job object
+    const platformFee = PLATFORM_FEE;
+    const workerMoney = amount - platformFee;
 
-    // LOGOUT
-    function logout() {
-        auth.signOut().then(() => {
-            window.location.href = "login.html";
-        });
+    // Disable UI
+    postBtn.disabled = true;
+    statusMsg.innerText = "Uploading job...";
+
+    try {
+      // If voice file present -> upload to storage first
+      let voiceUrl = null;
+      const file = voiceEl.files[0];
+      if(file){
+        statusMsg.innerText = "Uploading voice note...";
+        const ext = file.name.split('.').pop();
+        const fname = `voice_notes/${user.uid}_${Date.now()}.${ext}`;
+        const ref = storage.ref().child(fname);
+        const snapshot = await ref.put(file);
+        voiceUrl = await snapshot.ref.getDownloadURL();
+      }
+
+      // Save job in Firestore
+      const jobDoc = {
+        title,
+        description,
+        type,
+        amount,
+        location,
+        hours: hours || null,
+        customerId: user.uid,
+        customerEmail: user.email || null,
+        workerId: null,
+        platformFee,
+        workerMoney,
+        status: "pending",
+        voiceUrl: voiceUrl || null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      const docRef = await db.collection('jobs').add(jobDoc);
+
+      statusMsg.innerText = "Job posted successfully!";
+      alert("Job posted! Workers will see and can accept it.");
+
+      // Redirect to customer_home or clear form
+      window.location.href = "customer_home.html";
+    } catch (err){
+      console.error(err);
+      alert("Error posting job: " + err.message);
+      statusMsg.innerText = "Error: " + err.message;
+    } finally {
+      postBtn.disabled = false;
     }
+  }
 </script>
 
 </body>
-</html>
-                                                                  </html>
+        </html>
