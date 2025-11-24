@@ -1,205 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Profile - Seva Care</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seva - My Profile</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #f1f5ff;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 { color: #4a90e2; }
+<style>
+body {
+  margin:0;
+  font-family: Inter, Arial;
+  background:#e8f5e9;
+}
 
-    .card {
-      background: white;
-      width: 90%;
-      margin: 15px auto;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: left;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
+.top {
+  background:#15803d;
+  color:white;
+  padding:20px;
+  font-size:24px;
+  font-weight:700;
+  text-align:center;
+}
 
-    input, select {
-      width: 95%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
+.container {
+  max-width:400px;
+  margin:20px auto;
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.15);
+  text-align:center;
+}
 
-    .btn {
-      background: #4a90e2;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      width: 90%;
-      margin-top: 15px;
-      font-size: 16px;
-    }
+.profile-img {
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  object-fit:cover;
+  border:4px solid #15803d;
+  margin-bottom:12px;
+}
 
-    #logoutBtn {
-      background: #d9534f;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      margin-bottom: 20px;
-      border-radius: 8px;
-    }
+.upload-btn {
+  margin-top:10px;
+  padding:10px 14px;
+  background:#15803d;
+  color:white;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+}
 
-    .onlineBtn { background: green; }
-    .offlineBtn { background: #d9534f; }
-  </style>
+.logout-btn{
+  margin-top:20px;
+  padding:10px 14px;
+  background:#d32f2f;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+}
+</style>
 </head>
 
 <body>
 
-<button id="logoutBtn">Logout</button>
+<div class="top">My Profile</div>
 
-<h1>My Profile</h1>
-<p id="email">Loading...</p>
+<div class="container" id="profileBox">
 
-<div class="card">
-  <h2>Personal Info</h2>
+  <img id="profilePic" class="profile-img" src="https://via.placeholder.com/140" />
 
-  <label>Name:</label>
-  <input id="name" placeholder="Enter your name">
+  <br>
 
-  <label>Phone:</label>
-  <input id="phone" placeholder="Enter phone number">
+  <input type="file" id="fileInput" accept="image/*">
 
-  <label>Gender:</label>
-  <select id="gender">
-    <option value="">Select</option>
-    <option value="Male">Male</option>
-    <option value="Female">Female</option>
-    <option value="Other">Other</option>
-  </select>
+  <button class="upload-btn" onclick="uploadPhoto()">Upload Photo</button>
 
-  <label>Address:</label>
-  <input id="address" placeholder="Enter address">
+  <h3 id="userEmail"></h3>
 
-  <button class="btn" onclick="saveProfile()">Save Profile</button>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
 </div>
 
-<!-- WORKER SECTION -->
-<div id="workerSection" class="card" style="display:none;">
-  <h2>Worker Info</h2>
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
-  <p><b>Your Rating:</b> <span id="rating">Loading...</span></p>
-  <p><b>Your Earnings:</b> ₹ <span id="workerEarnings">0</span></p>
-
-  <h3>Availability</h3>
-  <button class="btn onlineBtn" onclick="setOnline()">Go Online</button>
-  <button class="btn offlineBtn" onclick="setOffline()">Go Offline</button>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { 
-    getAuth, 
-    onAuthStateChanged, 
-    signOut 
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { 
-    getFirestore, 
-    doc, 
-    getDoc, 
-    updateDoc 
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-  // Firebase Config
-  const firebaseConfig = {
+<script>
+// Firebase Config
+var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
     projectId: "seva-6f191",
     storageBucket: "seva-6f191.firebasestorage.app",
     messagingSenderId: "826093348416",
-    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
-  };
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+};
+firebase.initializeApp(firebaseConfig);
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-  // 🚨 Redirect to login if NOT logged in
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = "login.html";
-      return;
+const profilePic = document.getElementById("profilePic");
+const fileInput = document.getElementById("fileInput");
+const userEmail = document.getElementById("userEmail");
+
+
+// Load user data
+auth.onAuthStateChanged(async user=>{
+    if(!user){
+        window.location.href = "login.html";
+        return;
     }
 
-    // Display email
-    document.getElementById("email").innerText = "Logged in as: " + user.email;
+    userEmail.innerText = user.email;
 
-    // Load user data
-    const userRef = doc(db, "users", user.uid);
-    const snap = await getDoc(userRef);
-
-    if (!snap.exists()) return;
-
-    const data = snap.data();
-
-    // Fill profile
-    document.getElementById("name").value = data.name || "";
-    document.getElementById("phone").value = data.phone || "";
-    document.getElementById("gender").value = data.gender || "";
-    document.getElementById("address").value = data.address || "";
-
-    // If worker, show worker section
-    if (data.role === "worker") {
-      document.getElementById("workerSection").style.display = "block";
-      document.getElementById("workerEarnings").innerText = data.earnings || 0;
-
-      let ratingText = "No Ratings Yet";
-      if (data.ratingCount > 0) {
-        ratingText = (data.ratingTotal / data.ratingCount).toFixed(1) + " ⭐";
-      }
-      document.getElementById("rating").innerText = ratingText;
+    // Load profile photo from Firestore
+    const doc = await db.collection("users").doc(user.uid).get();
+    if(doc.exists){
+        const data = doc.data();
+        if(data.photoURL){
+            profilePic.src = data.photoURL;
+        }
     }
-  });
+});
 
-  // ⭐ Save Profile
-  window.saveProfile = async function() {
+
+// Upload Profile Photo
+async function uploadPhoto(){
     const user = auth.currentUser;
-    if (!user) return;
+    if(!user){
+        alert("Please login.");
+        return;
+    }
 
-    await updateDoc(doc(db, "users", user.uid), {
-      name: document.getElementById("name").value,
-      phone: document.getElementById("phone").value,
-      gender: document.getElementById("gender").value,
-      address: document.getElementById("address").value
+    const file = fileInput.files[0];
+    if(!file){
+        alert("Select a photo first");
+        return;
+    }
+
+    const ext = file.name.split('.').pop();
+    const path = `profile_photos/${user.uid}.${ext}`;
+    const ref = storage.ref().child(path);
+
+    try{
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+
+        // Save link in Firestore
+        await db.collection("users").doc(user.uid).update({
+            photoURL: url
+        });
+
+        profilePic.src = url;
+
+        alert("Profile photo updated successfully!");
+
+    } catch(err){
+        alert("Error uploading photo: " + err.message);
+    }
+}
+
+
+// Logout
+function logout(){
+    auth.signOut().then(()=>{
+        window.location.href = "login.html";
     });
-
-    alert("Profile Updated Successfully!");
-  }
-
-  // ⭐ Worker Online
-  window.setOnline = async function() {
-    const user = auth.currentUser;
-    await updateDoc(doc(db, "users", user.uid), { available: true });
-    alert("You are now ONLINE");
-  }
-
-  // ⭐ Worker Offline
-  window.setOffline = async function() {
-    const user = auth.currentUser;
-    await updateDoc(doc(db, "users", user.uid), { available: false });
-    alert("You are now OFFLINE");
-  }
-
-  // ⭐ Logout
-  logoutBtn.addEventListener("click", () => {
-    signOut(auth).then(() => {
-      alert("Logged out!");
-      window.location.href = "login.html";
-    });
-  });
+}
 </script>
 
 </body>
-    </html> 
+</html>
