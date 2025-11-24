@@ -4,233 +4,379 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Post a Need</title>
+
   <style>
     :root{
-      --bg:#f7f7fb; --card:#ffffff; --accent:#ff6b35; --muted:#666;
-      --radius:12px; --gap:14px; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --bg:#F0FDF4;           /* Option C Background */
+      --card:#ffffff;
+      --accent:#22C55E;       /* Primary Green */
+      --accent-dark:#15803D;  /* Dark Green */
+      --muted:#666;
+      --radius:12px;
+      font-family: Inter, system-ui, Arial;
     }
-    html,body{height:100%; margin:0; background:var(--bg); color:#111;}
-    .container{max-width:880px; margin:28px auto; padding:20px;}
-    header{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
-    p.lead{margin:6px 0 0;color:var(--muted);}
-    .card{background:var(--card); border-radius:var(--radius); padding:18px; box-shadow:0 6px 18px rgba(20,20,50,0.06);}
-    form{display:grid; gap:12px;}
-    .row{display:grid;grid-template-columns:1fr 180px;gap:12px;}
-    label{display:block;font-weight:600;margin-bottom:6px;font-size:13px;}
-    input[type="text"], input[type="number"], textarea, select{
-      width:100%; padding:10px 12px; border:1px solid #e6e9ef; border-radius:10px; font-size:14px;
-      background:#fff; box-sizing:border-box;
+
+    html,body{
+      margin:0;
+      background:var(--bg);
+      color:#111;
     }
-    textarea{min-height:120px; resize:vertical;}
+
+    /* =======================
+          TOP NAVIGATION
+       ======================= */
+
+    .topnav {
+      background: var(--accent);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .topnav .logo {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .topnav .links a {
+      margin-left: 20px;
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .topnav .links a:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 700px) {
+      .topnav {
+        flex-direction: column;
+        text-align: center;
+      }
+      .topnav .links {
+        margin-top: 8px;
+      }
+      .topnav .links a {
+        display: inline-block;
+        margin: 6px 10px;
+      }
+    }
+
+    /* =======================
+          MAIN DESIGN
+       ======================= */
+
+    .container{
+      max-width:880px;
+      margin:20px auto;
+      padding:20px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:20px;
+      box-shadow:0 6px 18px rgba(20,20,50,0.06);
+      margin-bottom:20px;
+    }
+
+    h2{
+      margin:0 0 14px;
+    }
+
+    form{display:grid; gap:14px;}
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 180px;
+      gap:14px;
+    }
+
+    label{
+      font-weight:600;
+      margin-bottom:6px;
+      display:block;
+    }
+
+    input[type="text"], input[type="number"], textarea, select {
+      width:100%;
+      padding:10px 12px;
+      border:1px solid #e6e9ef;
+      border-radius:10px;
+      font-size:15px;
+      background:white;
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
     .small{font-size:13px;color:var(--muted);}
-    .actions{display:flex; gap:10px; align-items:center;}
-    button{background:var(--accent); color:white; border:none; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer;}
-    button.ghost{background:transparent;color:var(--accent); border:1px solid #ffd8cc;}
-    .preview{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;padding:10px;border-radius:10px;border:1px dashed #eee;background:#fff;}
-    .thumb{width:160px;height:120px;object-fit:cover;border-radius:8px;border:1px solid #eee;background:#fafafa;}
-    ul.needs{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:12px;}
-    li.need{display:flex;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfbfd);align-items:flex-start;box-shadow:0 4px 12px rgba(15,15,50,0.03);}
-    .need .meta{flex:1}
-    .need h3{margin:0 0 6px;font-size:16px}
-    .tags{display:flex;gap:8px;flex-wrap:wrap}
-    .tag{font-size:12px;padding:6px 8px;border-radius:999px;background:#f2f6ff;color:#1747ff}
-    .muted{color:var(--muted);font-size:13px}
-    .right{width:160px;text-align:right}
-    @media (max-width:720px){
-      .row{grid-template-columns:1fr;}
-      .right{text-align:left}
+
+    button{
+      background:var(--accent);
+      color:white;
+      border:none;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    button.ghost{
+      background:transparent;
+      color:var(--accent-dark);
+      border:1px solid var(--accent);
+    }
+
+    .preview{
+      border:1px dashed #ccc;
+      padding:10px;
+      border-radius:10px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    .thumb{
+      width:150px;
+      height:110px;
+      object-fit:cover;
+      border-radius:8px;
+      border:1px solid #ddd;
+      display:none;
+    }
+
+    ul.needs{
+      list-style:none;
+      padding:0;
+      display:grid;
+      gap:14px;
+    }
+
+    li.need{
+      padding:14px;
+      border-radius:12px;
+      background:white;
+      display:flex;
+      gap:14px;
+      box-shadow:0 4px 14px rgba(0,0,0,0.05);
+    }
+
+    .meta{flex:1;}
+    .tag{
+      background:#DCFCE7;
+      color:#15803D;
+      padding:6px 10px;
+      border-radius:20px;
+      font-size:12px;
+      margin-right:6px;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <div style="font-size:28px">🔥</div>
-      <div>
-        <p class="lead">Post a Need – fill details and save. Works offline with localStorage.</p>
-      </div>
-    </header>
 
-    <section class="card" aria-labelledby="form-title">
-      <h2 id="form-title" style="margin:0 0 12px">Post a Need</h2>
+  <!-- =======================
+          TOP NAV BAR
+       ======================= -->
+  <nav class="topnav">
+    <div class="logo">Seva</div>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="need.html">Post Need</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="help.html">Help</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+
+
+  <div class="container">
+
+    <section class="card">
+      <h2>Post a Need</h2>
 
       <form id="needForm" autocomplete="off" novalidate>
+
         <div>
           <label for="title">Title</label>
-          <input id="title" name="title" type="text" placeholder="e.g., Need a home tutor for class 8" required />
-          <div class="small muted">Short, clear title.</div>
+          <input id="title" name="title" type="text" placeholder="e.g., Need a home tutor" required>
         </div>
 
         <div>
           <label for="category">Category</label>
-          <select id="category" name="category">
-            <option value="Home Services">Home Services</option>
-            <option value="Tutoring">Tutoring</option>
-            <option value="Delivery">Delivery</option>
-            <option value="Cleaning">Cleaning</option>
-            <option value="Other">Other</option>
+          <select id="category">
+            <option>Home Services</option>
+            <option>Tutoring</option>
+            <option>Delivery</option>
+            <option>Cleaning</option>
+            <option>Other</option>
           </select>
         </div>
 
         <div class="row">
           <div>
-            <label for="description">Description</label>
-            <textarea id="description" name="description" placeholder="Describe your need..." required></textarea>
-            <div class="small muted">Add details to help workers respond.</div>
+            <label>Description</label>
+            <textarea id="description" placeholder="Describe your need..." required></textarea>
           </div>
 
           <div>
-            <label for="image">Image (optional)</label>
-            <div class="preview" id="imgPreviewBox">
-              <img src="" alt="preview" class="thumb" id="imgPreview" style="display:none"/>
-              <div class="small muted" id="noImgText">No image chosen</div>
-              <input id="image" name="image" type="file" accept="image/*" />
+            <label>Image (optional)</label>
+            <div class="preview">
+              <img id="imgPreview" class="thumb">
+              <div class="small" id="noImg">No image selected</div>
+              <input type="file" id="image" accept="image/*">
             </div>
           </div>
         </div>
 
         <div class="row">
           <div>
-            <label for="budget">Budget (optional)</label>
-            <input id="budget" name="budget" type="number" min="0" placeholder="e.g., 500" />
+            <label>Budget (optional)</label>
+            <input id="budget" type="number" placeholder="500">
           </div>
-
           <div>
-            <label for="location">Location</label>
-            <input id="location" name="location" type="text" placeholder="City / Area" required />
+            <label>Location</label>
+            <input id="location" type="text" placeholder="City / Area" required>
           </div>
         </div>
 
-        <div class="actions">
+        <div style="display:flex; gap:10px;">
           <button type="submit" id="saveBtn">Post Need</button>
-          <button type="button" class="ghost" id="clearBtn">Clear Form</button>
+          <button type="button" class="ghost" id="clearBtn">Clear</button>
         </div>
       </form>
     </section>
 
-    <section class="card" style="margin-top:16px;">
-      <h2 style="margin:0 0 8px">Posted Needs</h2>
-      <div class="small muted">These needs are saved on your device.</div>
-      <ul id="needsList" class="needs" aria-live="polite"></ul>
+    <section class="card">
+      <h2>Your Needs</h2>
+      <ul id="needsList" class="needs"></ul>
     </section>
+
   </div>
 
   <script type="module">
     class NeedApp {
-      constructor() {
-        this.form = document.getElementById('needForm');
-        this.needsList = document.getElementById('needsList');
-        this.previewImg = document.getElementById('imgPreview');
-        this.noImgText = document.getElementById('noImgText');
-        this.imageInput = document.getElementById('image');
+      constructor(){
+        this.form = document.getElementById("needForm");
+        this.needsList = document.getElementById("needsList");
+        this.preview = document.getElementById("imgPreview");
+        this.noImg = document.getElementById("noImg");
+        this.imageInput = document.getElementById("image");
 
-        this.storeKey = 'my_app_needs_v1';
-        this.needs = this.loadNeeds();
+        this.key = "my_app_needs_v1";
+        this.needs = this.load();
         this.bind();
-        this.renderList();
+        this.render();
       }
 
-      bind() {
-        this.form.addEventListener('submit', e => this.onSubmit(e));
-        document.getElementById('clearBtn').addEventListener('click', () => this.clearForm());
-        this.imageInput.addEventListener('change', e => this.onImageChange(e));
+      bind(){
+        this.form.addEventListener("submit", e => this.submit(e));
+        document.getElementById("clearBtn").addEventListener("click", () => this.clear());
+        this.imageInput.addEventListener("change", e => this.previewImg(e));
       }
 
-      loadNeeds(){
-        try {
-          const raw = localStorage.getItem(this.storeKey);
-          return raw ? JSON.parse(raw) : [];
-        } catch {
-          return [];
-        }
+      load(){
+        return JSON.parse(localStorage.getItem(this.key) || "[]");
       }
 
-      saveNeeds(){
-        localStorage.setItem(this.storeKey, JSON.stringify(this.needs));
+      save(){
+        localStorage.setItem(this.key, JSON.stringify(this.needs));
       }
 
-      async onSubmit(e){
+      async submit(e){
         e.preventDefault();
-        const title = this.form.title.value.trim();
-        const category = this.form.category.value;
-        const description = this.form.description.value.trim();
-        const location = this.form.location.value.trim();
-        const budget = this.form.budget.value ? Number(this.form.budget.value) : null;
 
-        if (!title || !description || !location) {
-          alert('Please fill title, description and location.');
+        const title = title.value.trim();
+        const desc = description.value.trim();
+        const loc = location.value.trim();
+        const cat = category.value;
+        const bud = budget.value;
+
+        if(!title || !desc || !loc){
+          alert("Please fill all required fields.");
           return;
         }
 
-        let imageData = null;
-        const imageFile = this.imageInput.files[0];
-        if (imageFile) imageData = await this.readFileAsDataURL(imageFile);
+        let img = null;
+        if(this.imageInput.files[0]){
+          img = await this.fileToBase64(this.imageInput.files[0]);
+        }
 
-        const need = {
-          id: Date.now()+"",
-          title, category, description, location, budget, image: imageData,
+        this.needs.unshift({
+          id: Date.now(),
+          title, description:desc, location:loc,
+          category:cat, budget:bud, image:img,
           createdAt: new Date().toISOString()
-        };
+        });
 
-        this.needs.unshift(need);
-        this.saveNeeds();
-        this.renderList();
-        this.clearForm();
+        this.save();
+        this.render();
+        this.clear();
       }
 
-      readFileAsDataURL(file){
-        return new Promise((res, rej) => {
+      fileToBase64(file){
+        return new Promise(res=>{
           const r = new FileReader();
-          r.onload = () => res(r.result);
-          r.onerror = rej;
+          r.onload=()=>res(r.result);
           r.readAsDataURL(file);
         });
       }
 
-      onImageChange(e){
-        const f = e.target.files[0];
-        if (!f) {
-          this.previewImg.style.display = 'none';
-          this.noImgText.style.display = 'block';
-          this.previewImg.src = '';
+      previewImg(e){
+        const file = e.target.files[0];
+        if(!file){
+          this.preview.style.display="none";
+          this.noImg.style.display="block";
           return;
         }
-        const url = URL.createObjectURL(f);
-        this.previewImg.src = url;
-        this.previewImg.style.display = 'block';
-        this.noImgText.style.display = 'none';
-        this.previewImg.onload = () => URL.revokeObjectURL(url);
+        const url = URL.createObjectURL(file);
+        this.preview.src = url;
+        this.preview.style.display="block";
+        this.noImg.style.display="none";
       }
 
-      clearForm(){
+      clear(){
         this.form.reset();
-        this.previewImg.style.display = 'none';
-        this.noImgText.style.display = 'block';
+        this.preview.style.display="none";
+        this.noImg.style.display="block";
       }
 
-      renderList(){
-        this.needsList.innerHTML = '';
-        if (this.needs.length === 0) {
-          this.needsList.innerHTML = '<li class="muted" style="padding:12px">No needs posted yet.</li>';
+      render(){
+        this.needsList.innerHTML = "";
+
+        if(this.needs.length===0){
+          this.needsList.innerHTML = "<li class='small'>No needs posted yet.</li>";
           return;
         }
 
-        this.needs.forEach(n => {
-          const li = document.createElement('li');
-          li.className = 'need';
+        this.needs.forEach(n=>{
+          const li=document.createElement("li");
+          li.className="need";
+
           li.innerHTML = `
             <div class="meta">
               <h3>${n.title}</h3>
-              <div class="muted">${n.category} • ${new Date(n.createdAt).toLocaleString()}</div>
-              <p style="margin:8px 0">${n.description}</p>
-              <div class="tags">
-                <div class="tag">${n.location}</div>
-                ${n.budget ? `<div class="tag">₹ ${n.budget}</div>` : ''}
-              </div>
+              <p>${n.description}</p>
+              <span class="tag">${n.location}</span>
+              ${n.budget ? `<span class="tag">₹${n.budget}</span>` : ""}
             </div>
-            <div class="right">
-              ${n.image ? `<img src="${n.image}" style="width:140px;height:100px;object-fit:cover;border-radius:8px;border:1px solid #eee">` : '<div class="muted">No image</div>'}
+            <div>
+              ${n.image ? `<img src="${n.image}" class="thumb" style="display:block;">`
+                        : `<div class="small">No image</div>`}
             </div>
           `;
           this.needsList.appendChild(li);
@@ -240,5 +386,6 @@
 
     new NeedApp();
   </script>
+
 </body>
   </html>
