@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Profile - Seva</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Inter, Arial;
+  background:#e8f5e9;
+}
+
+.top {
+  background:#15803d;
+  color:white;
+  padding:20px;
+  font-size:24px;
+  font-weight:700;
+  text-align:center;
+}
+
+.box {
+  max-width:450px;
+  margin:20px auto;
+  background:white;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.12);
+}
+
+.profile-img {
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #15803d;
+  display:block;
+  margin:auto;
+  margin-bottom:15px;
+}
+
+input, select, textarea {
+  width:100%;
+  padding:12px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  margin-top:8px;
+  margin-bottom:14px;
+  font-size:15px;
+}
+
+label {
+  font-weight:600;
+  font-size:15px;
+}
+
+textarea {
+  min-height:90px;
+  resize:vertical;
+}
+
+.save-btn {
+  width:100%;
+  padding:12px;
+  background:#15803d;
+  color:white;
+  border:none;
+  border-radius:10px;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.logout-btn{
+  margin-top:12px;
+  width:100%;
+  padding:10px;
+  border:none;
+  background:#d32f2f;
+  color:white;
+  border-radius:10px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="top">Edit Profile</div>
+
+<div class="box">
+
+  <img id="profilePic" class="profile-img" src="https://via.placeholder.com/120">
+
+  <label>Change Profile Photo</label>
+  <input type="file" id="photoFile" accept="image/*">
+
+  <label>Name</label>
+  <input id="name" type="text" placeholder="Your name">
+
+  <label>Age</label>
+  <input id="age" type="number" placeholder="Your age">
+
+  <label>Gender</label>
+  <select id="gender">
+    <option value="">Select gender</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+    <option value="other">Other</option>
+  </select>
+
+  <label>Address / Location</label>
+  <input id="address" type="text" placeholder="Your location">
+
+  <label>Bio</label>
+  <textarea id="bio" placeholder="Write something about you.."></textarea>
+
+  <label>Skills (Only for workers)</label>
+  <input id="skills" type="text" placeholder="e.g. massage, electrician, plumber">
+
+  <button class="save-btn" onclick="saveProfile()">Save Profile</button>
+
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
+</div>
+
+
+<!-- Firebase V8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+<script>
+// Firebase Config
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+const pic = document.getElementById("profilePic");
+const photoFile = document.getElementById("photoFile");
+
+const nameEl = document.getElementById("name");
+const ageEl = document.getElementById("age");
+const genderEl = document.getElementById("gender");
+const addressEl = document.getElementById("address");
+const bioEl = document.getElementById("bio");
+const skillsEl = document.getElementById("skills");
+
+
+// Load profile data
+auth.onAuthStateChanged(async (user)=>{
+    if(!user){
+        window.location.href = "login.html";
+        return;
+    }
+
+    const doc = await db.collection("users").doc(user.uid).get();
+    if(doc.exists){
+        const data = doc.data();
+
+        if(data.photoURL) pic.src = data.photoURL;
+        if(data.name) nameEl.value = data.name;
+        if(data.age) ageEl.value = data.age;
+        if(data.gender) genderEl.value = data.gender;
+        if(data.address) addressEl.value = data.address;
+        if(data.bio) bioEl.value = data.bio;
+        if(data.skills) skillsEl.value = data.skills;
+    }
+});
+
+
+// SAVE PROFILE
+async function saveProfile(){
+    const user = auth.currentUser;
+    if(!user) return alert("Please login");
+
+    let photoURL = null;
+
+    // If user selected new photo
+    if(photoFile.files.length > 0){
+        const file = photoFile.files[0];
+        const ext = file.name.split('.').pop();
+        const path = `profile_photos/${user.uid}.${ext}`;
+        const ref = storage.ref().child(path);
+        await ref.put(file);
+        photoURL = await ref.getDownloadURL();
+    }
+
+    // Update Firestore
+    await db.collection("users").doc(user.uid).set({
+        name: nameEl.value,
+        age: ageEl.value,
+        gender: genderEl.value,
+        address: addressEl.value,
+        bio: bioEl.value,
+        skills: skillsEl.value,
+        ...(photoURL ? { photoURL: photoURL } : {})
+    }, { merge:true });
+
+    alert("Profile updated!");
+    window.location.href = "profile.html"; // or customer_home.html
+}
+
+
+// LOGOUT
+function logout(){
+    auth.signOut().then(()=>{
+        window.location.href = "login.html";
+    });
+}
+</script>
+
+</body>
+  </html>
