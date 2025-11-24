@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <header>
@@ -13,8 +16,17 @@
 <section>
     <h2>Create Account</h2>
 
+    <input type="text" id="name" placeholder="Full Name" required><br><br>
+
     <input type="email" id="email" placeholder="Email" required><br><br>
+
     <input type="password" id="password" placeholder="Password" required><br><br>
+
+    <label>Select Account Type:</label><br>
+    <select id="role">
+        <option value="customer">Customer</option>
+        <option value="worker">Worker</option>
+    </select><br><br>
 
     <button onclick="createAccount()">Signup</button>
 </section>
@@ -23,14 +35,67 @@
     <p>© 2025 Seva – Spreading Care & Happiness ❤️</p>
 </footer>
 
+<!-- Firebase V8 SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-<!-- Firebase v10 SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<script>
+    // Your Firebase Config
+    var firebaseConfig = {
+        apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+        authDomain: "seva-6f191.firebaseapp.com",
+        projectId: "seva-6f191",
+        storageBucket: "seva-6f191.appspot.com",
+        messagingSenderId: "826093348416",
+        appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+        measurementId: "G-78H32SRPCD"
+    };
 
-<!-- Your JS -->
-<script src="auth.js"></script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // CREATE ACCOUNT FUNCTION
+    function createAccount() {
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const role = document.getElementById("role").value;
+
+        if (!name || !email || !password) {
+            alert("Please fill all fields");
+            return;
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .then((userCred) => {
+                const uid = userCred.user.uid;
+
+                // Save user info in Firestore
+                return db.collection("users").doc(uid).set({
+                    uid: uid,
+                    name: name,
+                    email: email,
+                    role: role,
+                    createdAt: new Date()
+                });
+            })
+            .then(() => {
+                alert("Signup Successful!");
+
+                if (role === "customer") {
+                    window.location.href = "customer_home.html";
+                } else {
+                    window.location.href = "worker_home.html";
+                }
+            })
+            .catch((error) => {
+                alert(error.message);
+            });
+    }
+</script>
 
 </body>
 </html>
