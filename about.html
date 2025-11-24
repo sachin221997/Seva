@@ -4,106 +4,218 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>About – Seva App</title>
+
   <style>
-    body {
-      margin: 0;
+    :root{
+      --bg:#F0FDF4;
+      --card:#ffffff;
+      --accent:#22C55E;
+      --accent-dark:#15803D;
+      --muted:#666;
+      --radius:12px;
       font-family: Inter, system-ui, Arial;
-      background: #f7f7fb;
-      color: #222;
     }
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 20px;
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:#111;
     }
-    .card {
-      background: #fff;
-      padding: 24px;
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+
+    /* =======================
+          TOP NAVIGATION
+       ======================= */
+
+    .topnav {
+      background: var(--accent);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
-    h1 {
-      margin-top: 0;
-      font-size: 28px;
+
+    .topnav .logo {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 1px;
     }
-    p {
-      line-height: 1.6;
+
+    .topnav .links a {
+      margin-left: 20px;
+      color: white;
       font-size: 16px;
-      margin: 14px 0;
+      font-weight: 500;
+      text-decoration: none;
+      transition: 0.2s;
     }
-    .highlight {
-      background: #ffecd7;
-      padding: 4px 8px;
-      border-radius: 6px;
+
+    .topnav .links a:hover {
+      opacity: 0.8;
     }
-    ul {
-      padding-left: 20px;
-      line-height: 1.7;
+
+    @media (max-width: 700px) {
+      .topnav {
+        flex-direction: column;
+        text-align: center;
+      }
+      .topnav .links {
+        margin-top: 8px;
+      }
+      .topnav .links a {
+        display: inline-block;
+        margin: 6px 10px;
+      }
     }
+
+    /* =======================
+         ABOUT PAGE STYLE
+       ======================= */
+
+    .container{
+      max-width:900px;
+      margin:20px auto;
+      padding:20px;
+    }
+
+    .card{
+      background:white;
+      padding:24px;
+      border-radius:var(--radius);
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+      margin-bottom:20px;
+    }
+
+    h1{
+      margin-top:0;
+      font-size:30px;
+      color:#15803D;
+    }
+
+    h2{
+      margin-top:20px;
+      font-size:22px;
+      color:#15803D;
+    }
+
+    p{
+      font-size:16px;
+      line-height:1.7;
+      margin:12px 0;
+    }
+
+    ul{
+      padding-left:20px;
+      line-height:1.7;
+      font-size:16px;
+    }
+
+    .highlight{
+      background:#DCFCE7;
+      padding:4px 8px;
+      border-radius:6px;
+      color:#15803D;
+    }
+
   </style>
 </head>
 
 <body>
+
+  <!-- =======================
+          TOP NAV BAR
+       ======================= -->
+  <nav class="topnav">
+    <div class="logo">Seva</div>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="need.html">Post Need</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="help.html">Help</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+
   <div class="container">
+
+    <!-- About Intro -->
     <div class="card">
-      <h1>About This App</h1>
-
+      <h1>About Seva App</h1>
       <p>
-        Welcome to <strong>Seva App</strong> — a simple and powerful platform where
-        <span class="highlight">anyone with skills can work, help others, and earn money daily</span>.
+        <strong>Seva App</strong> is a simple and powerful platform where
+        <span class="highlight">anyone with skills can work, help others, and earn money daily or per hour.</span>
       </p>
 
       <p>
-        Humne yeh app ek hi purpose ke liye banaya hai:  
-        <strong>“Work easily. Earn easily. Help easily.”</strong>
-      </p>
-
-      <h2>How It Works</h2>
-
-      <p>
-        ✔️ If you need any help — jaise cleaning, delivery, tuition, repair, shopping, etc.  
-        → Aap “Need” post kar sakte ho.
-      </p>
-
-      <p>
-        ✔️ Agar aapke paas koi skill hai — jaise cooking, driving, cleaning, teaching, electrician work, hairstyling, etc.  
-        → Aap doosron ki help karke <strong>daily earning</strong> ya <strong>per-hour earning</strong> kar sakte ho.
-      </p>
-
-      <h2>Why This App?</h2>
-
-      <ul>
-        <li>Earn money from your skills — no limits.</li>
-        <li>Work anytime, part-time or full-time.</li>
-        <li>Find nearby jobs instantly.</li>
-        <li>Safe, simple, and user-friendly interface.</li>
-        <li>Post your needs and get help quickly.</li>
-      </ul>
-
-      <h2>Our Vision</h2>
-      <p>
-        Har ek insaan ke paas koi na koi skill hoti hai.  
-        Hum chahte hain ke har skill ka value mile — aur har person easily paise kama sake without any difficulty.
-      </p>
-
-      <h2>Who Can Use This App?</h2>
-      <ul>
-        <li>Students — part-time earning</li>
-        <li>Workers — daily kaam</li>
-        <li>Skilled people — electrician, plumber, tutor, carpenter</li>
-        <li>Home makers — cooking, tiffin service, cleaning</li>
-        <li>Anyone who wants to help or get help</li>
-      </ul>
-
-      <p>
-        <strong>Seva App</strong> ek community hai — jahan log ek dusre ki madad karte hain  
-        aur saath hi saath apni <strong>income</strong> bhi grow karte hain.
-      </p>
-
-      <p style="margin-top: 20px; font-weight: 600;">
-        Thank you for being a part of our platform ❤️
+        Our mission is to make work accessible for everyone — students, workers, homemakers,
+        skilled professionals, and anyone who wants to earn through their talent.
       </p>
     </div>
+
+    <!-- How it works -->
+    <div class="card">
+      <h2>How Seva App Works</h2>
+      <p><strong>For People Who Need Help:</strong></p>
+      <ul>
+        <li>Post your need (cleaning, tuition, delivery, repair, cooking, etc.)</li>
+        <li>Nearby workers can view your job</li>
+        <li>They contact you & complete the work</li>
+      </ul>
+
+      <p><strong>For People Who Want to Earn:</strong></p>
+      <ul>
+        <li>Go to the Jobs page</li>
+        <li>Find available work near you</li>
+        <li>Use your skill → help others → earn money</li>
+      </ul>
+    </div>
+
+    <!-- Why this app exists -->
+    <div class="card">
+      <h2>Why We Created This App</h2>
+      <p>
+        India me har person ke paas koi na koi skill hoti hai —  
+        par sabko mauka nahi milta.  
+      </p>
+      <p>
+        Seva App ka goal hai:
+      </p>
+      <ul>
+        <li>Every skill should have value</li>
+        <li>Everyone should get work easily</li>
+        <li>People should earn daily without any struggle</li>
+        <li>Community help & trust build ho</li>
+      </ul>
+    </div>
+
+    <!-- Who can use -->
+    <div class="card">
+      <h2>Who Can Use This App?</h2>
+      <ul>
+        <li>Students</li>
+        <li>Skilled workers</li>
+        <li>Home makers</li>
+        <li>Tutors, electricians, plumbers</li>
+        <li>Delivery helpers</li>
+        <li>Anyone who wants to earn or get help</li>
+      </ul>
+    </div>
+
+    <!-- Thank you -->
+    <div class="card">
+      <h2>Thank You!</h2>
+      <p>
+        Thank you for being a part of the <strong>Seva community</strong>.  
+        Let's help each other and grow together. ❤️
+      </p>
+    </div>
+
   </div>
+
 </body>
-</html>
+  </html>
