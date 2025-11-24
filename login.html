@@ -1,88 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seva Care - Login</title>
 
+<style>
+body {
+    margin: 0;
+    font-family: Inter, Arial;
+    background: #e8f5e9;
+}
+
+.header {
+    background: #1b5e20;
+    padding: 25px;
+    text-align: center;
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.card {
+    width: 90%;
+    max-width: 380px;
+    margin: 40px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0px 4px 18px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.card h2 {
+    margin-bottom: 10px;
+    color: #1b5e20;
+}
+
+input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.btn {
+    width: 95%;
+    padding: 12px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.link {
+    margin-top: 10px;
+    display: block;
+    font-size: 15px;
+    color: #2e7d32;
+    text-decoration: none;
+}
+
+.footer {
+    text-align: center;
+    padding: 25px;
+    background: #1b5e20;
+    color: white;
+    margin-top: 40px;
+    font-size: 15px;
+}
+</style>
+</head>
 <body>
 
-<header>
-    <h1>❤️ Seva Care</h1>
-</header>
+<div class="header">❤️ Seva Care</div>
 
-<section>
+<div class="card">
     <h2>Login to Your Account</h2>
 
-    <input type="email" id="email" placeholder="Email" required><br><br>
+    <input type="email" id="username" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
 
-    <input type="password" id="password" placeholder="Password" required><br><br>
+    <button class="btn" onclick="login()">Login</button>
 
-    <button onclick="loginUser()">Login</button>
-</section>
+    <a class="link" href="forgot.html">Forgot Password?</a>
+    <a class="link" href="signup.html">Create Account</a>
+</div>
 
-<footer>
-    <p>© 2025 Seva – Spreading Care & Happiness ❤️</p>
-</footer>
+<div class="footer">
+© 2025 Seva – Spreading Care & Happiness ❤️
+</div>
 
-<!-- Firebase V8 SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-    // Firebase Config
-    var firebaseConfig = {
-        apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
-        authDomain: "seva-6f191.firebaseapp.com",
-        projectId: "seva-6f191",
-        storageBucket: "seva-6f191.appspot.com",
-        messagingSenderId: "826093348416",
-        appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
-        measurementId: "G-78H32SRPCD"
-    };
+// ---------------------------------------------------
+// Firebase Config (YOUR REAL CONFIG)
+// ---------------------------------------------------
+const firebaseConfig = {
+    apiKey: "AIzaSyObcsJLpaMSVcFo-XL6UFEtccoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.appspot.com",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:10f9fe4b39b7cba09b21a5",
+    measurementId: "G-7H8132SRPC"
+};
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-    // LOGIN FUNCTION
-    function loginUser() {
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
 
-        if (!email || !password) {
-            alert("Please enter email and password");
-            return;
-        }
+// ---------------------------------------------------
+// Login Function
+// ---------------------------------------------------
+function login() {
+    let email = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
 
-        auth.signInWithEmailAndPassword(email, password)
-            .then(async (userCred) => {
-                const uid = userCred.user.uid;
-
-                // Read user profile
-                const snap = await db.collection("users").doc(uid).get();
-                const user = snap.data();
-
-                if (!user) {
-                    alert("User data not found in database");
-                    return;
-                }
-
-                // Redirect by role
-                if (user.role === "customer") {
-                    window.location.href = "customer_home.html";
-                } else {
-                    window.location.href = "worker_home.html";
-                }
-            })
-            .catch((err) => {
-                alert(err.message);
-            });
-    }
+    auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+        alert("Login Successful!");
+        window.location.href = "role.html";
+    })
+    .catch(error => alert(error.message));
+}
 </script>
 
 </body>
