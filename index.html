@@ -1,268 +1,280 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Seva App – Work. Help. Earn.</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Seva App - Work. Help. Earn.</title>
 
-  <style>
-    :root {
-      --bg:#F0FDF4;
-      --card:#ffffff;
-      --accent:#22C55E;
-      --accent-dark:#15803D;
-      --muted:#666;
-      --radius:14px;
-      font-family: Inter, system-ui, Arial;
-    }
+<style>
+:root {
+    --bg:#F0FDF4;
+    --card:#ffffff;
+    --accent:#22C55E;
+    --accent-dark:#15803D;
+    --muted:#666;
+    --radius:14px;
+    font-family: Inter, system-ui, Arial;
+}
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: #111;
-    }
+body {
+    margin:0;
+    background:var(--bg);
+    color:#111;
+}
 
-    /* ==========================
-         TOP NAVIGATION
-       ========================== */
+/* ============================
+        TOP NAVIGATION
+============================= */
+.topnav {
+    background: var(--accent);
+    color:white;
+    padding: 14px 20px;
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.15);
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
 
-    .topnav {
-      background: var(--accent);
-      color: white;
-      padding: 14px 20px;
-      border-radius: 0 0 18px 18px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    .topnav .logo {
-      font-size: 26px;
-      font-weight: 700;
-    }
-    .topnav .links a {
-      margin-left: 20px;
-      color: white;
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: 500;
-      transition: 0.2s;
-    }
-    .topnav .links a:hover {opacity: 0.8;}
+.topnav .logo {
+    font-size:26px;
+    font-weight:700;
+}
 
-    @media (max-width:700px){
-      .topnav {flex-direction:column;text-align:center;}
-      .topnav .links {margin-top:8px;}
-      .topnav .links a {display:inline-block;margin:6px 10px;}
-    }
+.topnav .links a {
+    margin-left:20px;
+    color:white;
+    text-decoration:none;
+    font-size:16px;
+    font-weight:500;
+    transition:.2s;
+}
 
-    /* ==========================
-         HERO SECTION
-       ========================== */
+.topnav .links a:hover { opacity:0.8; }
 
-    .hero {
-      text-align: center;
-      padding: 60px 20px;
-    }
+/* Logout Button */
+.logout-btn {
+    padding:8px 14px;
+    background:white;
+    color:var(--accent-dark);
+    border-radius:8px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    border:none;
+}
 
-    .hero h1 {
-      font-size: 34px;
-      color: var(--accent-dark);
-      margin-bottom: 10px;
-    }
+@media (max-width:700px){
+    .topnav { flex-direction:column; text-align:center; }
+    .topnav .links { margin-top:8px; }
+    .topnav .links a { display:inline-block; margin:6px 10px; }
+}
 
-    .hero p {
-      font-size: 18px;
-      line-height: 1.6;
-      color: var(--muted);
-      max-width: 650px;
-      margin: auto;
-    }
 
-    .hero-buttons {
-      margin-top: 25px;
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
+/* ============================
+        HERO SECTION
+============================= */
+.hero {
+    text-align:center;
+    padding:60px 20px;
+}
 
-    .btn {
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-    }
+.hero h1 {
+    font-size:34px;
+    color:var(--accent-dark);
+   margin-bottom:10px;
+}
 
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-    }
+.hero p {
+    font-size:18px;
+    line-height:1.6;
+    color:var(--muted);
+    max-width:650px;
+    margin:auto;
+}
 
-    .btn-secondary {
-      background: white;
-      border: 2px solid var(--accent);
-      color: var(--accent-dark);
-    }
+.hero-buttons {
+    margin-top:25px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+}
 
-    /* ==========================
-         FEATURES SECTION
-       ========================== */
+.btn{
+    padding:12px 20px;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:600;
+    border:none;
+    cursor:pointer;
+    text-decoration:none;
+}
 
-    .section {
-      max-width: 950px;
-      margin: 40px auto;
-      padding: 20px;
-    }
+.btn-primary { background:var(--accent); color:white; }
+.btn-secondary { background:white; color:var(--accent-dark); }
 
-    .section h2 {
-      text-align: center;
-      color: var(--accent-dark);
-      font-size: 26px;
-      margin-bottom: 20px;
-    }
+/* ============================
+        FEATURES
+============================= */
+.section {
+    max-width:950px;
+    margin:40px auto;
+    padding:20px;
+}
 
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
-      gap: 18px;
-    }
+.section h2 {
+    text-align:center;
+    color:var(--accent-dark);
+    font-size:26px;
+    margin-bottom:20px;
+}
 
-    .card {
-      background: white;
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow:0 6px 20px rgba(0,0,0,0.07);
-      text-align:center;
-    }
+.features {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+    gap:18px;
+}
 
-    .card h3 {margin-top:10px;color:#15803D}
-    .card p {color:var(--muted);font-size:15px;line-height:1.6;}
+.card {
+    background:white;
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.07);
+    text-align:center;
+}
 
-    /* ==========================
-         CATEGORY GRID
-       ========================== */
+.card h3 {
+    margin-top:10px;
+    color:#15803D;
+    font-size:19px;
+}
 
-    .categories {
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap: 16px;
-      margin-top:20px;
-    }
+.card p {
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.6;
+}
 
-    .cat-box {
-      background:white;
-      border-radius: var(--radius);
-      padding: 16px;
-      text-align:center;
-      box-shadow:0 6px 20px rgba(0,0,0,0.06);
-      font-weight:600;
-      color:var(--accent-dark);
-      font-size:16px;
-    }
+/* ============================
+        CATEGORIES
+============================= */
+.categories {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+    gap:16px;
+    margin-top:20px;
+}
 
-    /* ==========================
-             FOOTER
-       ========================== */
+.cat-box {
+    background:white;
+    border-radius:var(--radius);
+    padding:16px;
+    text-align:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.06);
+    font-weight:600;
+    color:var(--accent-dark);
+    font-size:16px;
+}
 
-    footer {
-      margin-top:50px;
-      text-align:center;
-      padding:20px;
-      background:white;
-      color:#666;
-      border-top:2px solid #e5e5e5;
-    }
-
-  </style>
+/* ============================
+        FOOTER
+============================= */
+footer {
+    text-align:center;
+    padding:20px;
+    background:white;
+    color:#666;
+    border-top:2px solid #e5e5e5;
+}
+</style>
 </head>
-
 <body>
 
-  <!-- ==========================
-          TOP NAV
-       ========================== -->
-  <nav class="topnav">
+<!-- ============================
+        TOP NAV
+============================= -->
+<nav class="topnav">
     <div class="logo">Seva</div>
-    <div class="links">
-      <a href="index.html">Home</a>
-      <a href="need.html">Post Need</a>
-      <a href="jobs.html">Jobs</a>
-      <a href="help.html">Help</a>
-      <a href="about.html">About</a>
-    </div>
-  </nav>
 
-  <!-- ==========================
-          HERO SECTION
-       ========================== -->
-  <section class="hero">
+    <div class="links">
+        <a href="index.html">Home</a>
+        <a href="need.html">Post Need</a>
+        <a href="jobs.html">Jobs</a>
+        <a href="help.html">Help</a>
+        <a href="about.html">About</a>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</nav>
+
+<!-- ============================
+        HERO 
+============================= -->
+<section class="hero">
     <h1>Work. Help. Earn.</h1>
     <p>
-      Seva App is a simple platform where you can post your needs or use your skills
-      to find work and earn daily. Helping people has never been easier.
+        Seva App is a simple platform where you can post your needs or use your skills 
+        to find work and earn daily. Helping people has never been easier.
     </p>
 
     <div class="hero-buttons">
-      <a href="need.html" class="btn btn-primary">Post a Need</a>
-      <a href="jobs.html" class="btn btn-secondary">Find Jobs</a>
+        <a href="need.html" class="btn btn-primary">Post a Need</a>
+        <a href="jobs.html" class="btn btn-secondary">Find Jobs</a>
     </div>
-  </section>
+</section>
 
-  <!-- ==========================
-         FEATURES
-       ========================== -->
-  <section class="section">
-    <h2>Why Use Seva?</h2>
+<!-- ============================
+        FEATURES
+============================= -->
+<section class="section">
+<h2>Why Use Seva?</h2>
 
-    <div class="features">
-      <div class="card">
-        <h3>📌 Easy to Use</h3>
-        <p>Post needs or find work within seconds using our simple interface.</p>
-      </div>
+<div class="features">
+    <div class="card">
+        <h3>⚡ Easy to Use</h3>
+        <p>Post needs or find work instantly with our simple interface.</p>
+    </div>
 
-      <div class="card">
+    <div class="card">
         <h3>💰 Earn Daily</h3>
-        <p>Use your skills to help others and earn money daily or per hour.</p>
-      </div>
+        <p>Use your skills to help others and earn money daily.</p>
+    </div>
 
-      <div class="card">
+    <div class="card">
         <h3>🤝 Trusted Community</h3>
-        <p>People near you can get instant help and services safely.</p>
-      </div>
+        <p>Find or offer help within a safe and verified network.</p>
     </div>
-  </section>
+</div>
+</section>
 
-  <!-- ==========================
-         POPULAR CATEGORIES
-       ========================== -->
-  <section class="section">
-    <h2>Popular Categories</h2>
+<!-- ============================
+        POPULAR CATEGORIES
+============================= -->
+<section class="section">
+<h2>Popular Categories</h2>
 
-    <div class="categories">
-      <div class="cat-box">Home Services</div>
-      <div class="cat-box">Cleaning</div>
-      <div class="cat-box">Delivery</div>
-      <div class="cat-box">Tutoring</div>
-      <div class="cat-box">Cooking</div>
-      <div class="cat-box">Repair Work</div>
-      <div class="cat-box">Hair / Beauty</div>
-      <div class="cat-box">Other</div>
-    </div>
-  </section>
+<div class="categories">
+    <div class="cat-box">Home Services</div>
+    <div class="cat-box">Cleaning</div>
+    <div class="cat-box">Delivery</div>
+    <div class="cat-box">Tutoring</div>
+    <div class="cat-box">Cooking</div>
+    <div class="cat-box">Repair Work</div>
+    <div class="cat-box">Hair / Beauty</div>
+    <div class="cat-box">Other</div>
+</div>
+</section>
 
-  <!-- ==========================
-             FOOTER
-       ========================== -->
-  <footer>
-    © 2025 Seva App • Made with ❤️ to help people work & earn
-  </footer>
+<!-- ============================
+        FOOTER
+============================= -->
+<footer>
+© 2025 Seva App • Made with ❤️ to help people work & earn
+</footer>
 
+<script src="auth.js"></script>
 </body>
 </html>
