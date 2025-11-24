@@ -276,5 +276,13 @@ footer {
 </footer>
 
 <script src="auth.js"></script>
+<script>
+firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+        // If user is NOT logged in → go to login page
+        window.location.href = "login.html";
+    }
+});
+</script>
 </body>
 </html>
