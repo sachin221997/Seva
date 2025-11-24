@@ -1,128 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Worker Dashboard - Seva Care</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worker Dashboard - Seva</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #f1f5ff;
-            text-align: center;
-            padding: 20px;
-        }
-
-        h1 { color: #4a90e2; }
-
-        .card {
-            background: white;
-            width: 85%;
-            margin: 15px auto;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
-        }
-
-        button {
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            margin-top: 10px;
-            width: 80%;
-            font-size: 18px;
-        }
-
-        #logoutBtn { background: #d9534f; }
-    </style>
+<style>
+body{
+    margin:0;
+    font-family:Inter, Arial;
+    background:#f0fff4;
+}
+.top{
+    background:#15803d;
+    padding:22px;
+    color:white;
+    font-size:26px;
+    font-weight:700;
+    text-align:center;
+}
+.container{
+    max-width:900px;
+    margin:20px auto;
+    padding:12px;
+}
+.card{
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    margin-bottom:16px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.12);
+}
+.title{
+    font-size:22px;
+    font-weight:700;
+    color:#14532d;
+}
+.desc{ margin:8px 0; color:#444; }
+.info{ font-size:14px; margin-top:4px; }
+.money{ font-size:18px; font-weight:700; color:#0f5132; margin-top:8px; }
+.btn-start, .btn-finish{
+    padding:10px 16px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:12px;
+    font-size:16px;
+    font-weight:700;
+}
+.btn-start{ background:#2563eb; color:white; }
+.btn-finish{ background:#16a34a; color:white; }
+.voice-btn{
+    padding:8px 12px;
+    background:#374151;
+    color:white;
+    border:none;
+    border-radius:8px;
+    margin-top:10px;
+    cursor:pointer;
+}
+.no-jobs{
+    text-align:center;
+    font-size:20px;
+    margin-top:40px;
+    color:#166534;
+    font-weight:700;
+}
+.logout{
+    text-align:center;
+    margin-top:14px;
+}
+.logout button{
+    padding:8px 14px;
+    border-radius:10px;
+    border:2px solid #15803d;
+    background:white;
+    color:#15803d;
+    cursor:pointer;
+    font-weight:700;
+}
+</style>
 </head>
 
 <body>
 
-    <h1>Worker Dashboard</h1>
-    <p id="workerEmail">Loading...</p>
+<div class="top">Seva • Worker Active Jobs</div>
 
-    <!-- WORKER STATUS -->
-    <div class="card">
-        <h2>Your Status</h2>
-        <p>You are logged in as <b>Worker</b>.</p>
-    </div>
+<div class="logout">
+    <button onclick="logout()">Logout</button>
+</div>
 
-    <!-- UPCOMING JOBS -->
-    <div class="card">
-        <h2>Upcoming Jobs</h2>
-        <div id="jobsList">No jobs assigned yet.</div>
-    </div>
+<div class="container" id="activeJobs">
+    <p id="noJobs" class="no-jobs" style="display:none;">No active jobs right now</p>
+</div>
 
-    <!-- EARNINGS -->
-    <div class="card">
-        <h2>Your Earnings</h2>
-        <p id="earningAmount">₹0</p>
-    </div>
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-    <button id="logoutBtn" onclick="logout()">Logout</button>
+<script>
+// Firebase Config
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+};
+firebase.initializeApp(firebaseConfig);
 
-    <!-- Firebase v10 SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+const auth = firebase.auth();
+const db = firebase.firestore();
+const container = document.getElementById("activeJobs");
+const noJobs = document.getElementById("noJobs");
 
-    <!-- Your JS -->
-    <script src="auth.js"></script>
+auth.onAuthStateChanged(user=>{
+    if(!user){
+        alert("Please login first.");
+        window.location.href = "login.html";
+        return;
+    }
+    loadActiveJobs(user.uid);
+});
 
-    <script>
-        // Load Worker Data
-        auth.onAuthStateChanged(async (user) => {
-            if (!user) {
-                window.location.href = "login.html";
-                return;
-            }
-
-            document.getElementById("workerEmail").innerText = "Logged in as: " + user.email;
-
-            // Load JOBS assigned to worker
-            db.collection("bookings")
-                .where("assignedWorkerId", "==", user.uid)
-                .where("status", "in", ["assigned", "in_progress"])
-                .onSnapshot(async (snapshot) => {
-
-                    const jobsList = document.getElementById("jobsList");
-
-                    if (snapshot.empty) {
-                        jobsList.innerHTML = "No jobs assigned yet.";
-                        return;
-                    }
-
-                    jobsList.innerHTML = "";
-
-                    snapshot.forEach((doc) => {
-                        const d = doc.data();
-
-                        jobsList.innerHTML += `
-                            <div style="background:#fff;padding:15px;margin:10px;border-radius:12px;box-shadow:0px 0px 10px rgba(0,0,0,0.1);">
-                                <b>Service:</b> ${d.service}<br>
-                                <b>Customer Email:</b> ${d.userEmail}<br>
-                                <b>Status:</b> ${d.status}<br><br>
-
-                                ${
-                                    d.status === "assigned" 
-                                    ? `<button onclick="startJob('${doc.id}')">Start Job</button>`
-                                    : `<button onclick="completeJob('${doc.id}')">Complete Job</button>`
-                                }
-                            </div>
-                        `;
-                    });
-                });
-
-            // Load Earnings
-            const docRef = await db.collection("users").doc(user.uid).get();
-            if (docRef.exists) {
-                const data = docRef.data();
-                document.getElementById("earningAmount").innerText = "₹" + (data.earnings || 0);
-            }
+// LOAD ACTIVE JOBS
+function loadActiveJobs(workerId){
+    db.collection("jobs")
+      .where("workerId", "==", workerId)
+      .where("status", "==", "assigned")
+      .onSnapshot(snapshot=>{
+        
+        container.innerHTML = "";
+        if(snapshot.empty){
+            noJobs.style.display = "block";
+            return;
+        }
+        noJobs.style.display = "none";
+        
+        snapshot.forEach(doc=>{
+            renderJob(doc.id, doc.data());
         });
-    </script>
+      });
+}
+
+// RENDER JOB
+function renderJob(id, job){
+    let div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+        <div class="title">${job.title}</div>
+        <div class="desc">${job.description}</div>
+
+        <div class="info"><b>Location:</b> ${job.location}</div>
+        <div class="info"><b>Hours:</b> ${job.hours}</div>
+        <div class="info"><b>Customer Pays:</b> ₹${job.amount}</div>
+        <div class="money">You Will Earn: ₹${job.workerMoney}</div>
+
+        ${job.voiceUrl ? `<button class="voice-btn" onclick="playVoice('${job.voiceUrl}')">Play Voice Note</button>` : ""}
+
+        <button class="btn-start" onclick="startJob('${id}')">Start Job</button>
+        <button class="btn-finish" onclick="finishJob('${id}', ${job.workerMoney})">Complete Job</button>
+    `;
+
+    container.appendChild(div);
+}
+
+// PLAY VOICE
+function playVoice(url){
+    new Audio(url).play();
+}
+
+// START JOB
+async function startJob(jobId){
+    await db.collection("jobs").doc(jobId).update({
+        status: "in_progress",
+        startedAt: new Date()
+    });
+    alert("Job started!");
+}
+
+// COMPLETE JOB
+async function finishJob(jobId, workerEarn){
+    const user = auth.currentUser;
+    if(!user) return;
+
+    try {
+        // Update job
+        await db.collection("jobs").doc(jobId).update({
+            status: "completed",
+            completedAt: new Date()
+        });
+
+        // Add to earnings collection
+        await db.collection("earnings").add({
+            workerId: user.uid,
+            amount: workerEarn,
+            timestamp: new Date(),
+            jobId: jobId
+        });
+
+        // Update worker balance
+        await db.collection("users").doc(user.uid).update({
+            earnings: firebase.firestore.FieldValue.increment(workerEarn)
+        });
+
+        // Update admin/platform earnings
+        await db.collection("platform").doc("revenue").set({
+            total: firebase.firestore.FieldValue.increment(50)
+        }, { merge: true });
+
+        alert("Job completed! Earnings added.");
+        window.location.reload();
+
+    } catch(err){
+        alert("Error: " + err.message);
+    }
+}
+
+// LOGOUT
+function logout(){
+    auth.signOut().then(()=>{
+        window.location.href = "login.html";
+    });
+}
+</script>
 
 </body>
 </html>
