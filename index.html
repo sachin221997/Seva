@@ -3,23 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Seva App - Work. Help. Earn.</title>
+<title>Seva App - Home</title>
 
 <style>
-.auth-btn {
-    margin-left: 20px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    background: white;
-    color: var(--accent-dark);
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.auth-btn:hover {
-    opacity: 0.85;
-}
 :root {
     --bg:#F0FDF4;
     --card:#ffffff;
@@ -36,9 +22,7 @@ body {
     color:#111;
 }
 
-/* ============================
-        TOP NAVIGATION
-============================= */
+/* NAVBAR */
 .topnav {
     background: var(--accent);
     color:white;
@@ -64,60 +48,47 @@ body {
     text-decoration:none;
     font-size:16px;
     font-weight:500;
-    transition:.2s;
 }
 
-.topnav .links a:hover { opacity:0.8; }
+.auth-btn {
+    margin-left:20px;
+    padding:8px 14px;
+    border-radius:8px;
+    background:white;
+    color:var(--accent-dark);
+    font-size:14px;
+    font-weight:600;
+    text-decoration:none;
+}
 
-/* Logout Button */
 .logout-btn {
     padding:8px 14px;
     background:white;
     color:var(--accent-dark);
     border-radius:8px;
     font-size:14px;
+    border:none;
     font-weight:600;
     cursor:pointer;
-    border:none;
 }
 
-@media (max-width:700px){
-    .topnav { flex-direction:column; text-align:center; }
-    .topnav .links { margin-top:8px; }
-    .topnav .links a { display:inline-block; margin:6px 10px; }
-}
-
-
-/* ============================
-        HERO SECTION
-============================= */
+/* Hero */
 .hero {
     text-align:center;
     padding:60px 20px;
 }
-
 .hero h1 {
     font-size:34px;
     color:var(--accent-dark);
-   margin-bottom:10px;
 }
-
 .hero p {
     font-size:18px;
-    line-height:1.6;
     color:var(--muted);
     max-width:650px;
     margin:auto;
 }
 
-.hero-buttons {
-    margin-top:25px;
-    display:flex;
-    justify-content:center;
-    gap:14px;
-    flex-wrap:wrap;
-}
-
+/* Buttons */
 .btn{
     padding:12px 20px;
     border-radius:10px;
@@ -127,24 +98,18 @@ body {
     cursor:pointer;
     text-decoration:none;
 }
-
 .btn-primary { background:var(--accent); color:white; }
 .btn-secondary { background:white; color:var(--accent-dark); }
 
-/* ============================
-        FEATURES
-============================= */
 .section {
     max-width:950px;
     margin:40px auto;
     padding:20px;
 }
-
 .section h2 {
     text-align:center;
     color:var(--accent-dark);
     font-size:26px;
-    margin-bottom:20px;
 }
 
 .features {
@@ -152,65 +117,27 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
     gap:18px;
 }
-
 .card {
     background:white;
-    border-radius:var(--radius);
     padding:20px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.07);
-    text-align:center;
-}
-
-.card h3 {
-    margin-top:10px;
-    color:#15803D;
-    font-size:19px;
-}
-
-.card p {
-    color:var(--muted);
-    font-size:15px;
-    line-height:1.6;
-}
-
-/* ============================
-        CATEGORIES
-============================= */
-.categories {
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
-    gap:16px;
-    margin-top:20px;
-}
-
-.cat-box {
-    background:white;
     border-radius:var(--radius);
-    padding:16px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.1);
     text-align:center;
-    box-shadow:0 6px 20px rgba(0,0,0,0.06);
-    font-weight:600;
-    color:var(--accent-dark);
-    font-size:16px;
 }
+.card h3 { color:var(--accent-dark); }
 
-/* ============================
-        FOOTER
-============================= */
 footer {
     text-align:center;
     padding:20px;
     background:white;
     color:#666;
-    border-top:2px solid #e5e5e5;
+    margin-top:40px;
 }
 </style>
 </head>
 <body>
 
-<!-- ============================
-        TOP NAV
-============================= -->
+<!-- NAVBAR -->
 <nav class="topnav">
     <div class="logo">Seva</div>
 
@@ -221,85 +148,80 @@ footer {
         <a href="help.html">Help</a>
         <a href="about.html">About</a>
 
-        <!-- Visible when NOT logged in -->
+        <!-- Show when NOT logged in -->
         <a id="loginBtn" class="auth-btn" href="login.html">Login</a>
         <a id="signupBtn" class="auth-btn" href="signup.html">Signup</a>
 
-        <!-- Visible when LOGGED IN -->
+        <!-- Show when LOGGED IN -->
         <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display:none;">Logout</button>
     </div>
 </nav>
 
-<!-- ============================
-        HERO 
-============================= -->
+<!-- HERO -->
 <section class="hero">
     <h1>Work. Help. Earn.</h1>
-    <p>
-        Seva App is a simple platform where you can post your needs or use your skills 
-        to find work and earn daily. Helping people has never been easier.
-    </p>
+    <p>Seva App helps you find work or get help easily in your area.</p>
 
-    <div class="hero-buttons">
+    <div>
         <a href="need.html" class="btn btn-primary">Post a Need</a>
         <a href="jobs.html" class="btn btn-secondary">Find Jobs</a>
     </div>
 </section>
 
-<!-- ============================
-        FEATURES
-============================= -->
+<!-- FEATURES -->
 <section class="section">
 <h2>Why Use Seva?</h2>
 
 <div class="features">
     <div class="card">
-        <h3>⚡ Easy to Use</h3>
-        <p>Post needs or find work instantly with our simple interface.</p>
+        <h3>⚡ Fast</h3>
+        <p>Post jobs instantly and hire quickly.</p>
     </div>
 
     <div class="card">
         <h3>💰 Earn Daily</h3>
-        <p>Use your skills to help others and earn money daily.</p>
+        <p>Workers can earn every day easily.</p>
     </div>
 
     <div class="card">
-        <h3>🤝 Trusted Community</h3>
-        <p>Find or offer help within a safe and verified network.</p>
+        <h3>🤝 Trusted</h3>
+        <p>Secure verified system for all users.</p>
     </div>
 </div>
 </section>
 
-<!-- ============================
-        POPULAR CATEGORIES
-============================= -->
-<section class="section">
-<h2>Popular Categories</h2>
-
-<div class="categories">
-    <div class="cat-box">Home Services</div>
-    <div class="cat-box">Cleaning</div>
-    <div class="cat-box">Delivery</div>
-    <div class="cat-box">Tutoring</div>
-    <div class="cat-box">Cooking</div>
-    <div class="cat-box">Repair Work</div>
-    <div class="cat-box">Hair / Beauty</div>
-    <div class="cat-box">Other</div>
-</div>
-</section>
-
-<!-- ============================
-        FOOTER
-============================= -->
 <footer>
-© 2025 Seva App • Made with ❤️ to help people work & earn
+© 2025 Seva App • Helping People Daily ❤️
 </footer>
 
-<script src="auth.js"></script>
+<!-- FIREBASE SCRIPTS -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
 <script>
-<script>
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
+// Firebase Config (YOUR FINAL CORRECT CONFIG)
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+};
+firebase.initializeApp(firebaseConfig);
+
+// Logout
+function logout(){
+    firebase.auth().signOut().then(()=>{
+        alert("Logged Out!");
+        window.location.href = "login.html";
+    });
+}
+
+// Show / Hide Navbar buttons
+firebase.auth().onAuthStateChanged((user)=>{
+    if(user){
         document.getElementById("logoutBtn").style.display = "inline-block";
         document.getElementById("loginBtn").style.display = "none";
         document.getElementById("signupBtn").style.display = "none";
@@ -310,5 +232,6 @@ firebase.auth().onAuthStateChanged((user) => {
     }
 });
 </script>
+
 </body>
 </html>
