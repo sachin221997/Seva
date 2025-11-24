@@ -1,13 +1,14 @@
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Firebase Config
+// ---------------------------------------------------
 const firebaseConfig = {
-  apiKey: "AIzaSyB0csJLpaNSVcFo-XL6UFtEtcoyxRFzik",
-  authDomain: "seva-6f191.firebaseapp.com",
-  projectId: "seva-6f191",
-  storageBucket: "seva-6f191.appspot.com",
-  messagingSenderId: "826093348416",
-  appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
-  measurementId: "G-78H32SRPCD"
+    apiKey: "AIzaSyObcsJLpaMSVcFo-XL6UFEtccoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.appspot.com",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:10f9fe4b39b7cba09b21a5",
+    measurementId: "G-7H8132SRPC"
 };
 
 // Initialize Firebase
@@ -16,63 +17,63 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Signup (Create Account)
-// ------------------------------------------------------
+// ---------------------------------------------------
 function createAccount() {
     let email = document.getElementById("email").value;
     let password = document.getElementById("password").value;
 
     auth.createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            let user = userCredential.user;
+    .then(userCredential => {
+        let user = userCredential.user;
 
-            // Save user data
-            db.collection("users").doc(user.uid).set({
-                email,
-                role: "customer",
-                earnings: 0,
-                available: true,
-                createdAt: new Date()
-            });
+        // Save user data
+        db.collection("users").doc(user.uid).set({
+            email,
+            role: "customer",
+            earnings: 0,
+            available: true,
+            createdAt: new Date()
+        });
 
-            alert("Account Created Successfully!");
-            window.location.href = "login.html";
-        })
-        .catch(error => alert(error.message));
+        alert("Account Created Successfully!");
+        window.location.href = "login.html";
+    })
+    .catch(error => alert(error.message));
 }
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Login
-// ------------------------------------------------------
+// ---------------------------------------------------
 function login() {
     let email = document.getElementById("username").value;
     let password = document.getElementById("password").value;
 
     auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-            alert("Login Successful!");
-            window.location.href = "role.html";
-        })
-        .catch(error => alert(error.message));
+    .then(() => {
+        alert("Login Successful!");
+        window.location.href = "role.html";
+    })
+    .catch(error => alert(error.message));
 }
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Logout
-// ------------------------------------------------------
+// ---------------------------------------------------
 function logout() {
     auth.signOut().then(() => {
-        alert("You have logged out.");
+        alert("You have logged out!");
         window.location.href = "login.html";
     });
 }
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Role Switching
-// ------------------------------------------------------
+// ---------------------------------------------------
 function setCustomer() {
     let user = auth.currentUser;
 
@@ -92,9 +93,9 @@ function setWorker() {
 }
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Price Table
-// ------------------------------------------------------
+// ---------------------------------------------------
 const SERVICE_PRICES = {
     "Home Cleaning": 250,
     "Massage Service": 250,
@@ -107,9 +108,9 @@ const SERVICE_PRICES = {
 const PLATFORM_FEE = 50;
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Book Service (Customer)
-// ------------------------------------------------------
+// ---------------------------------------------------
 async function bookService(serviceName) {
     let user = auth.currentUser;
     if (!user) {
@@ -121,7 +122,7 @@ async function bookService(serviceName) {
     const price = SERVICE_PRICES[serviceName] || 250;
     const platformFee = PLATFORM_FEE;
 
-    let bookingRef = await db.collection("bookings").add({
+    const bookingRef = await db.collection("bookings").add({
         customerId: user.uid,
         userEmail: user.email,
         service: serviceName,
@@ -144,9 +145,9 @@ async function bookService(serviceName) {
 }
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Auto Worker Assignment
-// ------------------------------------------------------
+// ---------------------------------------------------
 async function assignWorkerForBooking(bookingId) {
     const bookingDoc = await db.collection("bookings").doc(bookingId).get();
     if (!bookingDoc.exists) return;
@@ -176,9 +177,9 @@ async function assignWorkerForBooking(bookingId) {
 }
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Select Worker With Least Jobs
-// ------------------------------------------------------
+// ---------------------------------------------------
 async function getLeastBusyWorker(workersSnap) {
     let leastJobs = Infinity;
     let bestWorker = null;
@@ -201,12 +202,12 @@ async function getLeastBusyWorker(workersSnap) {
 }
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Worker: Start Job
-// ------------------------------------------------------
+// ---------------------------------------------------
 async function startJob(bookingId) {
     const user = auth.currentUser;
-    if (!user) { alert("Login required"); return; }
+    if (!user) return alert("Login required!");
 
     const ref = db.collection("bookings").doc(bookingId);
     const doc = await ref.get();
@@ -224,12 +225,12 @@ async function startJob(bookingId) {
 }
 
 
-// ------------------------------------------------------
+// ---------------------------------------------------
 // Worker: Complete Job
-// ------------------------------------------------------
+// ---------------------------------------------------
 async function completeJob(bookingId) {
     const user = auth.currentUser;
-    if (!user) { alert("Login required"); return; }
+    if (!user) return alert("Login required");
 
     const ref = db.collection("bookings").doc(bookingId);
     const doc = await ref.get();
@@ -242,7 +243,6 @@ async function completeJob(bookingId) {
     const platformFee = typeof b.platformFee === "number" ? b.platformFee : PLATFORM_FEE;
     const workerShare = price - platformFee;
 
-    // Update booking
     await ref.update({
         status: "completed",
         completedAt: new Date().toISOString()
@@ -270,4 +270,4 @@ async function completeJob(bookingId) {
     }, { merge: true });
 
     alert("Job completed. Earnings recorded.");
-      }
+  }
