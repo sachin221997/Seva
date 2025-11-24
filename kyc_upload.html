@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KYC Verification - Seva</title>
+
+<style>
+body {
+    margin:0;
+    font-family: Inter, Arial;
+    background:#e8f5e9;
+}
+
+.top {
+    background:#15803d;
+    color:white;
+    padding:20px;
+    font-size:24px;
+    font-weight:700;
+    text-align:center;
+}
+
+.box {
+    max-width:450px;
+    margin:20px auto;
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.12);
+}
+
+label {
+    font-weight:600;
+    display:block;
+    margin-top:10px;
+}
+
+input, select {
+    width:100%;
+    padding:12px;
+    margin-top:6px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    font-size:15px;
+}
+
+.btn {
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    background:#15803d;
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-size:18px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.status {
+    text-align:center;
+    margin-top:12px;
+    font-size:14px;
+    color:#333;
+    font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">KYC Verification</div>
+
+<div class="box">
+
+    <h3>Upload Your ID Document</h3>
+    <p style="color:#444;font-size:14px;">
+        Upload Aadhaar, PAN card, Voter ID, Driving License etc.  
+        Admin will review and verify your identity.
+    </p>
+
+    <label>ID Type</label>
+    <select id="idType">
+        <option value="aadhaar">Aadhaar Card</option>
+        <option value="pan">PAN Card</option>
+        <option value="voter">Voter ID</option>
+        <option value="dl">Driving License</option>
+        <option value="other">Other</option>
+    </select>
+
+    <label>Upload ID Photo</label>
+    <input type="file" id="idFile" accept="image/*">
+
+    <button class="btn" onclick="uploadKYC()">Submit KYC</button>
+
+    <p id="kycStatus" class="status"></p>
+
+</div>
+
+
+<!-- Firebase V8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+<script>
+// Firebase Config
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+const kycStatusText = document.getElementById("kycStatus");
+
+// Check user login
+auth.onAuthStateChanged(async user => {
+    if (!user) {
+        alert("Login required");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const doc = await db.collection("users").doc(user.uid).get();
+    if (doc.exists) {
+        const d = doc.data();
+        if (d.kycStatus) {
+            kycStatusText.innerText = "Current Status: " + d.kycStatus.toUpperCase();
+        }
+    }
+});
+
+// Upload KYC
+async function uploadKYC(){
+    const user = auth.currentUser;
+    if(!user) return alert("Please login");
+
+    const idType = document.getElementById("idType").value;
+    const file = document.getElementById("idFile").files[0];
+
+    if(!file){
+        alert("Please select an ID image.");
+        return;
+    }
+
+    kycStatusText.innerText = "Uploading...";
+
+    try {
+        const ext = file.name.split('.').pop();
+        const path = `kyc_docs/${user.uid}_${idType}.${ext}`;
+
+        const ref = storage.ref().child(path);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+
+        // Save in Firestore
+        await db.collection("users").doc(user.uid).set({
+            kycStatus: "pending",
+            kycDocURL: url,
+            kycType: idType,
+            kycUploadedAt: new Date()
+        }, { merge:true });
+
+        kycStatusText.innerText = "KYC Submitted — Pending Approval";
+        alert("KYC uploaded successfully!");
+
+    } catch(err){
+        alert("Upload failed: " + err.message);
+        kycStatusText.innerText = "Error: " + err.message;
+    }
+}
+
+// Logout function
+function logout(){
+    auth.signOut().then(()=>{
+        window.location.href = "login.html";
+    });
+}
+</script>
+
+</body>
+      </html>
