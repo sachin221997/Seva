@@ -1,277 +1,249 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jobs – Seva App</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Available Jobs - Seva Worker</title>
 
-  <style>
-    :root{
-      --bg:#F0FDF4;
-      --card:#ffffff;
-      --accent:#22C55E;
-      --accent-dark:#15803D;
-      --muted:#666;
-      --radius:12px;
-      font-family: Inter, system-ui, Arial;
-    }
-
-    body{
-      margin:0;
-      background:var(--bg);
-      color:#111;
-    }
-
-    /* =======================
-          TOP NAVIGATION
-       ======================= */
-
-    .topnav {
-      background: var(--accent);
-      color: white;
-      padding: 14px 20px;
-      border-radius: 0 0 18px 18px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .topnav .logo {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-
-    .topnav .links a {
-      margin-left: 20px;
-      color: white;
-      font-size: 16px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: 0.2s;
-    }
-
-    .topnav .links a:hover {
-      opacity: 0.8;
-    }
-
-    @media (max-width: 700px) {
-      .topnav {
-        flex-direction: column;
-        text-align: center;
-      }
-      .topnav .links {
-        margin-top: 8px;
-      }
-      .topnav .links a {
-        display: inline-block;
-        margin: 6px 10px;
-      }
-    }
-
-    /* =======================
-          JOBS PAGE UI
-       ======================= */
-
-    .container{
-      max-width:900px;
-      margin:20px auto;
-      padding:20px;
-    }
-
-    .card{
-      background:white;
-      padding:20px;
-      border-radius:var(--radius);
-      box-shadow:0 6px 18px rgba(0,0,0,0.06);
-      margin-bottom:20px;
-    }
-
-    h1, h2{
-      margin-top:0;
-    }
-
-    .search-box{
-      display:flex;
-      gap:10px;
-      margin-top:12px;
-    }
-
-    input, select{
-      width:100%;
-      padding:12px;
-      border-radius:10px;
-      border:1px solid #ddd;
-      font-size:15px;
-    }
-
-    ul.jobs{
-      list-style:none;
-      padding:0;
-      display:grid;
-      gap:14px;
-    }
-
-    li.job{
-      background:white;
-      padding:16px;
-      border-radius:12px;
-      box-shadow:0 4px 14px rgba(0,0,0,0.05);
-      display:flex;
-      gap:14px;
-    }
-
-    .meta{flex:1;}
-
-    .meta h3{margin:0 0 6px;}
-
-    .muted{color:#777;font-size:14px;}
-
-    .tag{
-      background:#DCFCE7;
-      color:#15803D;
-      padding:6px 10px;
-      border-radius:18px;
-      font-size:12px;
-      margin-right:6px;
-    }
-
-    .thumb{
-      width:130px;
-      height:95px;
-      border-radius:10px;
-      object-fit:cover;
-      border:1px solid #ddd;
-    }
-  </style>
+<style>
+body{
+    margin:0;
+    font-family:Inter, Arial;
+    background:#ecfdf5;
+}
+.top{
+    background:#15803d;
+    padding:20px;
+    color:white;
+    text-align:center;
+    font-size:26px;
+    font-weight:700;
+}
+.container{
+    max-width:900px;
+    margin:20px auto;
+    padding:12px;
+}
+.job-card{
+    background:white;
+    padding:18px;
+    border-radius:14px;
+    margin-bottom:16px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.1);
+}
+.title{
+    font-size:20px;
+    color:#166534;
+    font-weight:700;
+}
+.desc{
+    margin:8px 0;
+    color:#444;
+}
+.info{
+    font-size:14px;
+    margin-top:4px;
+}
+.money{
+    font-size:17px;
+    font-weight:700;
+    color:#0f5132;
+}
+.accept-btn{
+    margin-top:12px;
+    padding:10px 16px;
+    background:#15803d;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+    font-weight:600;
+}
+.voice-btn{
+    margin-top:8px;
+    padding:8px 12px;
+    background:#374151;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+}
+.logout{
+    text-align:center;
+    margin-top:18px;
+}
+.logout button{
+    background:white;
+    color:#15803d;
+    border:2px solid #15803d;
+    padding:8px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+}
+.no-jobs{
+    text-align:center;
+    font-weight:700;
+    font-size:20px;
+    color:#14532d;
+    margin-top:40px;
+}
+</style>
 </head>
 
 <body>
 
-  <!-- =======================
-          TOP NAV BAR
-       ======================= -->
-  <nav class="topnav">
-    <div class="logo">Seva</div>
-    <div class="links">
-      <a href="index.html">Home</a>
-      <a href="need.html">Post Need</a>
-      <a href="jobs.html">Jobs</a>
-      <a href="help.html">Help</a>
-      <a href="about.html">About</a>
-    </div>
-  </nav>
+<div class="top">Seva • Worker Jobs</div>
 
+<div class="logout">
+    <button onclick="logout()">Logout</button>
+</div>
 
-  <div class="container">
+<div class="container" id="jobList">
+    <p class="no-jobs" id="noJobsMsg" style="display:none;">No jobs available right now</p>
+</div>
 
-    <div class="card">
-      <h1>Available Jobs</h1>
-      <p class="muted">Find work posted by people near you and earn daily or per hour.</p>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search title, location, category...">
-        <select id="categoryFilter">
-          <option value="">All</option>
-          <option value="Home Services">Home Services</option>
-          <option value="Tutoring">Tutoring</option>
-          <option value="Delivery">Delivery</option>
-          <option value="Cleaning">Cleaning</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-    </div>
+<script>
+// ---------------------
+// Firebase Config
+// ---------------------
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+};
+firebase.initializeApp(firebaseConfig);
 
-    <div class="card">
-      <h2>Job Listings</h2>
-      <ul id="jobsList" class="jobs"></ul>
-    </div>
+const auth = firebase.auth();
+const db = firebase.firestore();
+const jobList = document.getElementById("jobList");
+const noJobsMsg = document.getElementById("noJobsMsg");
 
-  </div>
-
-
-  <script type="module">
-    class JobsPage {
-      constructor(){
-        this.key = "my_app_needs_v1";
-        this.list = document.getElementById("jobsList");
-        this.searchInput = document.getElementById("searchInput");
-        this.categoryFilter = document.getElementById("categoryFilter");
-
-        this.needs = this.load();
-        this.bind();
-        this.render();
-      }
-
-      bind(){
-        this.searchInput.addEventListener("input", () => this.render());
-        this.categoryFilter.addEventListener("change", () => this.render());
-      }
-
-      load(){
-        return JSON.parse(localStorage.getItem(this.key) || "[]");
-      }
-
-      render(){
-        let jobs = [...this.needs];
-
-        const q = this.searchInput.value.toLowerCase();
-        const cat = this.categoryFilter.value;
-
-        if(q){
-          jobs = jobs.filter(j =>
-            j.title.toLowerCase().includes(q) ||
-            j.description.toLowerCase().includes(q) ||
-            j.location.toLowerCase().includes(q)
-          );
-        }
-
-        if(cat){
-          jobs = jobs.filter(j => j.category === cat);
-        }
-
-        this.list.innerHTML = "";
-
-        if(jobs.length === 0){
-          this.list.innerHTML = `<li class='muted'>No jobs found.</li>`;
-          return;
-        }
-
-        jobs.forEach(n => {
-          const li = document.createElement("li");
-          li.className = "job";
-
-          li.innerHTML = `
-            <div class="meta">
-              <h3>${n.title}</h3>
-              <div class="muted">${n.category} • ${new Date(n.createdAt).toLocaleString()}</div>
-              <p>${n.description}</p>
-              <div>
-                <span class="tag">${n.location}</span>
-                ${n.budget ? `<span class="tag">₹${n.budget}</span>` : ""}
-              </div>
-            </div>
-
-            <div>
-              ${
-                n.image
-                  ? `<img src="${n.image}" class="thumb">`
-                  : `<div class="muted" style="width:130px;text-align:center;padding-top:30px;">No Image</div>`
-              }
-            </div>
-          `;
-
-          this.list.appendChild(li);
-        });
-      }
+// ---------------------
+// Check if worker logged in
+// ---------------------
+auth.onAuthStateChanged(user => {
+    if (!user) {
+        alert("Please login as worker.");
+        window.location.href = "login.html";
+        return;
     }
 
-    new JobsPage();
-  </script>
+    loadJobs();
+});
+
+
+// ---------------------
+// Load available jobs
+// ---------------------
+function loadJobs(){
+    db.collection("jobs")
+      .where("status", "==", "pending")
+      .orderBy("createdAt", "desc")
+      .onSnapshot(snapshot => {
+
+        jobList.innerHTML = "";
+
+        if(snapshot.empty){
+            noJobsMsg.style.display = "block";
+            return;
+        }
+
+        noJobsMsg.style.display = "none";
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            renderJob(doc.id, data);
+        });
+    });
+}
+
+
+// ---------------------
+// Render job card
+// ---------------------
+function renderJob(id, job){
+    const div = document.createElement("div");
+    div.className = "job-card";
+
+    div.innerHTML = `
+        <div class="title">${job.title}</div>
+        <div class="desc">${job.description}</div>
+
+        <div class="info"><b>Type:</b> ${job.type}</div>
+        <div class="info"><b>Location:</b> ${job.location}</div>
+        <div class="info"><b>Hours:</b> ${job.hours}</div>
+
+        <div class="money">Customer Pays: ₹${job.amount}</div>
+        <div class="money">Worker Earns: ₹${job.workerMoney}</div>
+        <div class="info">Platform Fee: ₹${job.platformFee}</div>
+        
+        ${job.voiceUrl ? `<button class="voice-btn" onclick="playVoice('${job.voiceUrl}')">Play Voice Note</button>` : ""}
+
+        <button class="accept-btn" onclick="acceptJob('${id}')">Accept Job</button>
+    `;
+
+    jobList.appendChild(div);
+}
+
+
+// ---------------------
+// Play Voice Note
+// ---------------------
+function playVoice(url){
+    const audio = new Audio(url);
+    audio.play();
+}
+
+
+// ---------------------
+// Accept Job
+// ---------------------
+async function acceptJob(jobId){
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("Please login first.");
+        return;
+    }
+
+    try {
+        // Lock job → assign worker
+        await db.collection("jobs").doc(jobId).update({
+            workerId: user.uid,
+            status: "assigned",
+            assignedAt: new Date()
+        });
+
+        alert("Job accepted! Check your active jobs.");
+        window.location.href = "worker_home.html";
+
+    } catch (err){
+        alert("Error: " + err.message);
+    }
+}
+
+
+// ---------------------
+// Logout
+// ---------------------
+function logout(){
+    auth.signOut().then(()=>{
+        window.location.href = "login.html";
+    });
+}
+</script>
 
 </body>
 </html>
