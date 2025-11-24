@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Workers - Admin</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f0fdf4;
+}
+.top{
+    background:#14532d;
+    padding:20px;
+    color:white;
+    text-align:center;
+    font-size:26px;
+    font-weight:700;
+}
+.table-box{
+    max-width:1000px;
+    margin:20px auto;
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.15);
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+th,td{
+    padding:12px;
+    border-bottom:1px solid #ddd;
+    text-align:left;
+}
+button{
+    padding:6px 12px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    color:white;
+}
+.block-btn{
+    background:#d32f2f;
+}
+.unblock-btn{
+    background:#388e3c;
+}
+</style>
+
+</head>
+<body>
+
+<div class="top">Manage Workers (Block / Unblock)</div>
+
+<div class="table-box">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="workerTable"></tbody>
+    </table>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+// Firebase Config
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+
+// Only Admin Allowed
+auth.onAuthStateChanged(async user=>{
+    if(!user){ window.location.href = "login.html"; return; }
+
+    const adminDoc = await db.collection("admins").doc(user.uid).get();
+    if(!adminDoc.exists){
+        alert("Access Denied. You are not an admin.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    loadWorkers();
+});
+
+
+// Load all workers
+function loadWorkers(){
+    db.collection("users").where("role","==","worker").onSnapshot(snapshot=>{
+        let html = "";
+
+        snapshot.forEach(doc=>{
+            const u = doc.data();
+
+            html += `
+            <tr>
+                <td>${u.name || "No Name"}</td>
+                <td>${u.email}</td>
+                <td>${u.blocked ? "<b style='color:red'>Blocked</b>" : "<b style='color:green'>Active</b>"}</td>
+                <td>
+                    ${
+                        u.blocked
+                        ? `<button class="unblock-btn" onclick="unblock('${doc.id}')">Unblock</button>`
+                        : `<button class="block-btn" onclick="block('${doc.id}')">Block</button>`
+                    }
+                </td>
+            </tr>
+            `;
+        });
+
+        document.getElementById("workerTable").innerHTML = html;
+    });
+}
+
+
+// Block Function
+function block(uid){
+    db.collection("users").doc(uid).update({
+        blocked: true
+    }).then(()=>{
+        alert("Worker Blocked");
+    });
+}
+
+// Unblock Function
+function unblock(uid){
+    db.collection("users").doc(uid).update({
+        blocked: false
+    }).then(()=>{
+        alert("Worker Unblocked");
+    });
+}
+
+</script>
+
+</body>
+    </html>
