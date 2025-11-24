@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jobs – Seva App</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, Arial;
+      background: #f7f7fb;
+      color: #222;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+    }
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+    ul.jobs {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 14px;
+    }
+    li.job {
+      padding: 14px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+      display: flex;
+      gap: 14px;
+    }
+    .meta {
+      flex: 1;
+    }
+    .meta h3 {
+      margin: 0 0 6px;
+    }
+    .muted {
+      color: #777;
+      font-size: 14px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 5px 8px;
+      background: #eef3ff;
+      color: #3b5bff;
+      font-size: 12px;
+      border-radius: 20px;
+      margin-right: 6px;
+    }
+    .thumb {
+      width: 120px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="card">
+      <h1>Available Jobs</h1>
+      <p class="muted">Find work posted by people near you. Earn daily or per hour based on your skills.</p>
+
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search by title, location, or category...">
+        <select id="categoryFilter">
+          <option value="">All</option>
+          <option value="Home Services">Home Services</option>
+          <option value="Tutoring">Tutoring</option>
+          <option value="Delivery">Delivery</option>
+          <option value="Cleaning">Cleaning</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Job Listings</h2>
+      <ul id="jobsList" class="jobs"></ul>
+    </div>
+
+  </div>
+
+  <script type="module">
+    class JobsPage {
+      constructor() {
+        this.storeKey = "my_app_needs_v1";
+        this.jobsList = document.getElementById("jobsList");
+        this.searchInput = document.getElementById("searchInput");
+        this.categoryFilter = document.getElementById("categoryFilter");
+
+        this.needs = this.loadNeeds();
+        this.bind();
+        this.render();
+      }
+
+      bind() {
+        this.searchInput.addEventListener("input", () => this.render());
+        this.categoryFilter.addEventListener("change", () => this.render());
+      }
+
+      loadNeeds() {
+        const raw = localStorage.getItem(this.storeKey);
+        return raw ? JSON.parse(raw) : [];
+      }
+
+      render() {
+        let list = [...this.needs];
+
+        const search = this.searchInput.value.toLowerCase().trim();
+        const category = this.categoryFilter.value;
+
+        if (search) {
+          list = list.filter(n =>
+            n.title.toLowerCase().includes(search) ||
+            n.description.toLowerCase().includes(search) ||
+            n.location.toLowerCase().includes(search)
+          );
+        }
+
+        if (category) {
+          list = list.filter(n => n.category === category);
+        }
+
+        this.jobsList.innerHTML = "";
+
+        if (list.length === 0) {
+          this.jobsList.innerHTML = `<li class="muted" style="padding:12px;">No jobs found.</li>`;
+          return;
+        }
+
+        list.forEach(n => {
+          const li = document.createElement("li");
+          li.className = "job";
+
+          li.innerHTML = `
+            <div class="meta">
+              <h3>${n.title}</h3>
+              <div class="muted">${n.category} • ${new Date(n.createdAt).toLocaleString()}</div>
+              <p>${n.description}</p>
+              <div>
+                <span class="tag">${n.location}</span>
+                ${n.budget ? `<span class="tag">₹ ${n.budget}</span>` : ""}
+              </div>
+            </div>
+
+            <div>
+              ${
+                n.image
+                  ? `<img src="${n.image}" class="thumb">`
+                  : `<div class="muted" style="width:120px;text-align:center;padding-top:30px;">No<br>Image</div>`
+              }
+            </div>
+          `;
+
+          this.jobsList.appendChild(li);
+        });
+      }
+    }
+
+    new JobsPage();
+  </script>
+
+</body>
+          </html>
