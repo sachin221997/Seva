@@ -1,100 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seva Care - Signup</title>
 
+<style>
+body {
+    margin: 0;
+    font-family: Inter, Arial;
+    background: #e8f5e9;
+}
+
+.header {
+    background: #1b5e20;
+    padding: 25px;
+    text-align: center;
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.card {
+    width: 90%;
+    max-width: 380px;
+    margin: 40px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0px 4px 18px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.card h2 {
+    margin-bottom: 10px;
+    color: #1b5e20;
+}
+
+input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #aaa;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.btn {
+    width: 95%;
+    padding: 12px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.link {
+    margin-top: 10px;
+    display: block;
+    font-size: 15px;
+    color: #2e7d32;
+    text-decoration: none;
+}
+
+.footer {
+    text-align: center;
+    padding: 25px;
+    background: #1b5e20;
+    color: white;
+    margin-top: 40px;
+    font-size: 15px;
+}
+</style>
+</head>
 <body>
 
-<header>
-    <h1>❤️ Seva Care</h1>
-</header>
+<div class="header">❤️ Seva Care</div>
 
-<section>
-    <h2>Create Account</h2>
+<div class="card">
+    <h2>Create Your Account</h2>
 
-    <input type="text" id="name" placeholder="Full Name" required><br><br>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
 
-    <input type="email" id="email" placeholder="Email" required><br><br>
+    <button class="btn" onclick="signup()">Create Account</button>
 
-    <input type="password" id="password" placeholder="Password" required><br><br>
+    <a class="link" href="login.html">Already have an account? Login</a>
+</div>
 
-    <label>Select Account Type:</label><br>
-    <select id="role">
-        <option value="customer">Customer</option>
-        <option value="worker">Worker</option>
-    </select><br><br>
+<div class="footer">
+© 2025 Seva – Spreading Care & Happiness ❤️
+</div>
 
-    <button onclick="createAccount()">Signup</button>
-</section>
-
-<footer>
-    <p>© 2025 Seva – Spreading Care & Happiness ❤️</p>
-</footer>
-
-<!-- Firebase V8 SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-    // Your Firebase Config
-    var firebaseConfig = {
-        apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
-        authDomain: "seva-6f191.firebaseapp.com",
-        projectId: "seva-6f191",
-        storageBucket: "seva-6f191.appspot.com",
-        messagingSenderId: "826093348416",
-        appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
-        measurementId: "G-78H32SRPCD"
-    };
+// ---------------------------------------------------
+// Firebase Config (YOUR REAL CONFIG)
+// ---------------------------------------------------
+const firebaseConfig = {
+    apiKey: "AIzaSyObcsJLpaMSVcFo-XL6UFEtccoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.appspot.com",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:10f9fe4b39b7cba09b21a5",
+    measurementId: "G-7H8132SRPC"
+};
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-    // CREATE ACCOUNT FUNCTION
-    function createAccount() {
-        const name = document.getElementById("name").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const role = document.getElementById("role").value;
 
-        if (!name || !email || !password) {
-            alert("Please fill all fields");
-            return;
-        }
+// ---------------------------------------------------
+// Signup Function
+// ---------------------------------------------------
+function signup() {
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .then((userCred) => {
-                const uid = userCred.user.uid;
+    auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        let user = userCredential.user;
 
-                // Save user info in Firestore
-                return db.collection("users").doc(uid).set({
-                    uid: uid,
-                    name: name,
-                    email: email,
-                    role: role,
-                    createdAt: new Date()
-                });
-            })
-            .then(() => {
-                alert("Signup Successful!");
+        // Save user data in Firestore
+        db.collection("users").doc(user.uid).set({
+            email: email,
+            role: "customer",
+            earnings: 0,
+            available: true,
+            createdAt: new Date()
+        });
 
-                if (role === "customer") {
-                    window.location.href = "customer_home.html";
-                } else {
-                    window.location.href = "worker_home.html";
-                }
-            })
-            .catch((error) => {
-                alert(error.message);
-            });
-    }
+        alert("Account Created Successfully!");
+        window.location.href = "login.html";
+    })
+    .catch(error => alert(error.message));
+}
 </script>
 
 </body>
