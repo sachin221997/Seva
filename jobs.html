@@ -6,93 +6,175 @@
   <title>Jobs – Seva App</title>
 
   <style>
-    body {
-      margin: 0;
+    :root{
+      --bg:#F0FDF4;
+      --card:#ffffff;
+      --accent:#22C55E;
+      --accent-dark:#15803D;
+      --muted:#666;
+      --radius:12px;
       font-family: Inter, system-ui, Arial;
-      background: #f7f7fb;
-      color: #222;
     }
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 20px;
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:#111;
     }
-    .card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 14px;
-      margin-bottom: 18px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-    }
-    h1 {
-      margin: 0 0 10px;
-      font-size: 28px;
-    }
-    .search-box {
+
+    /* =======================
+          TOP NAVIGATION
+       ======================= */
+
+    .topnav {
+      background: var(--accent);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
       display: flex;
-      gap: 10px;
-      margin-top: 14px;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 15px;
+
+    .topnav .logo {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 1px;
     }
-    ul.jobs {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      gap: 14px;
+
+    .topnav .links a {
+      margin-left: 20px;
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: 0.2s;
     }
-    li.job {
-      padding: 14px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
-      display: flex;
-      gap: 14px;
+
+    .topnav .links a:hover {
+      opacity: 0.8;
     }
-    .meta {
-      flex: 1;
+
+    @media (max-width: 700px) {
+      .topnav {
+        flex-direction: column;
+        text-align: center;
+      }
+      .topnav .links {
+        margin-top: 8px;
+      }
+      .topnav .links a {
+        display: inline-block;
+        margin: 6px 10px;
+      }
     }
-    .meta h3 {
-      margin: 0 0 6px;
+
+    /* =======================
+          JOBS PAGE UI
+       ======================= */
+
+    .container{
+      max-width:900px;
+      margin:20px auto;
+      padding:20px;
     }
-    .muted {
-      color: #777;
-      font-size: 14px;
+
+    .card{
+      background:white;
+      padding:20px;
+      border-radius:var(--radius);
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+      margin-bottom:20px;
     }
-    .tag {
-      display: inline-block;
-      padding: 5px 8px;
-      background: #eef3ff;
-      color: #3b5bff;
-      font-size: 12px;
-      border-radius: 20px;
-      margin-right: 6px;
+
+    h1, h2{
+      margin-top:0;
     }
-    .thumb {
-      width: 120px;
-      height: 90px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #eee;
+
+    .search-box{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    input, select{
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #ddd;
+      font-size:15px;
+    }
+
+    ul.jobs{
+      list-style:none;
+      padding:0;
+      display:grid;
+      gap:14px;
+    }
+
+    li.job{
+      background:white;
+      padding:16px;
+      border-radius:12px;
+      box-shadow:0 4px 14px rgba(0,0,0,0.05);
+      display:flex;
+      gap:14px;
+    }
+
+    .meta{flex:1;}
+
+    .meta h3{margin:0 0 6px;}
+
+    .muted{color:#777;font-size:14px;}
+
+    .tag{
+      background:#DCFCE7;
+      color:#15803D;
+      padding:6px 10px;
+      border-radius:18px;
+      font-size:12px;
+      margin-right:6px;
+    }
+
+    .thumb{
+      width:130px;
+      height:95px;
+      border-radius:10px;
+      object-fit:cover;
+      border:1px solid #ddd;
     }
   </style>
 </head>
 
 <body>
+
+  <!-- =======================
+          TOP NAV BAR
+       ======================= -->
+  <nav class="topnav">
+    <div class="logo">Seva</div>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="need.html">Post Need</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="help.html">Help</a>
+      <a href="about.html">About</a>
+    </div>
+  </nav>
+
+
   <div class="container">
 
     <div class="card">
       <h1>Available Jobs</h1>
-      <p class="muted">Find work posted by people near you. Earn daily or per hour based on your skills.</p>
+      <p class="muted">Find work posted by people near you and earn daily or per hour.</p>
 
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search by title, location, or category...">
+        <input type="text" id="searchInput" placeholder="Search title, location, category...">
         <select id="categoryFilter">
           <option value="">All</option>
           <option value="Home Services">Home Services</option>
@@ -105,61 +187,61 @@
     </div>
 
     <div class="card">
-      <h2 style="margin-top:0;">Job Listings</h2>
+      <h2>Job Listings</h2>
       <ul id="jobsList" class="jobs"></ul>
     </div>
 
   </div>
 
+
   <script type="module">
     class JobsPage {
-      constructor() {
-        this.storeKey = "my_app_needs_v1";
-        this.jobsList = document.getElementById("jobsList");
+      constructor(){
+        this.key = "my_app_needs_v1";
+        this.list = document.getElementById("jobsList");
         this.searchInput = document.getElementById("searchInput");
         this.categoryFilter = document.getElementById("categoryFilter");
 
-        this.needs = this.loadNeeds();
+        this.needs = this.load();
         this.bind();
         this.render();
       }
 
-      bind() {
+      bind(){
         this.searchInput.addEventListener("input", () => this.render());
         this.categoryFilter.addEventListener("change", () => this.render());
       }
 
-      loadNeeds() {
-        const raw = localStorage.getItem(this.storeKey);
-        return raw ? JSON.parse(raw) : [];
+      load(){
+        return JSON.parse(localStorage.getItem(this.key) || "[]");
       }
 
-      render() {
-        let list = [...this.needs];
+      render(){
+        let jobs = [...this.needs];
 
-        const search = this.searchInput.value.toLowerCase().trim();
-        const category = this.categoryFilter.value;
+        const q = this.searchInput.value.toLowerCase();
+        const cat = this.categoryFilter.value;
 
-        if (search) {
-          list = list.filter(n =>
-            n.title.toLowerCase().includes(search) ||
-            n.description.toLowerCase().includes(search) ||
-            n.location.toLowerCase().includes(search)
+        if(q){
+          jobs = jobs.filter(j =>
+            j.title.toLowerCase().includes(q) ||
+            j.description.toLowerCase().includes(q) ||
+            j.location.toLowerCase().includes(q)
           );
         }
 
-        if (category) {
-          list = list.filter(n => n.category === category);
+        if(cat){
+          jobs = jobs.filter(j => j.category === cat);
         }
 
-        this.jobsList.innerHTML = "";
+        this.list.innerHTML = "";
 
-        if (list.length === 0) {
-          this.jobsList.innerHTML = `<li class="muted" style="padding:12px;">No jobs found.</li>`;
+        if(jobs.length === 0){
+          this.list.innerHTML = `<li class='muted'>No jobs found.</li>`;
           return;
         }
 
-        list.forEach(n => {
+        jobs.forEach(n => {
           const li = document.createElement("li");
           li.className = "job";
 
@@ -170,7 +252,7 @@
               <p>${n.description}</p>
               <div>
                 <span class="tag">${n.location}</span>
-                ${n.budget ? `<span class="tag">₹ ${n.budget}</span>` : ""}
+                ${n.budget ? `<span class="tag">₹${n.budget}</span>` : ""}
               </div>
             </div>
 
@@ -178,12 +260,12 @@
               ${
                 n.image
                   ? `<img src="${n.image}" class="thumb">`
-                  : `<div class="muted" style="width:120px;text-align:center;padding-top:30px;">No<br>Image</div>`
+                  : `<div class="muted" style="width:130px;text-align:center;padding-top:30px;">No Image</div>`
               }
             </div>
           `;
 
-          this.jobsList.appendChild(li);
+          this.list.appendChild(li);
         });
       }
     }
@@ -192,4 +274,4 @@
   </script>
 
 </body>
-          </html>
+</html>
