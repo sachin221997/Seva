@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - KYC Verification</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Inter, Arial;
+    background:#eefcf3;
+}
+.top{
+    background:#14532d;
+    padding:20px;
+    color:white;
+    font-size:26px;
+    font-weight:700;
+    text-align:center;
+}
+.container{
+    max-width:1000px;
+    margin:20px auto;
+    padding:10px;
+}
+.card{
+    background:white;
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.12);
+    margin-bottom:20px;
+}
+.card img{
+    width:220px;
+    border-radius:12px;
+    margin-top:12px;
+    border:3px solid #15803d;
+}
+.btn-approve{
+    background:#15803d;
+    color:white;
+    padding:10px 16px;
+    border:none;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    margin-right:10px;
+}
+.btn-reject{
+    background:#d32f2f;
+    color:white;
+    padding:10px 16px;
+    border:none;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+}
+.logout{
+    text-align:center;
+    margin-top:15px;
+}
+.logout button{
+    background:white;
+    border:2px solid #14532d;
+    padding:8px 14px;
+    border-radius:10px;
+    color:#14532d;
+    cursor:pointer;
+    font-weight:700;
+}
+.user-info{
+    font-size:15px;
+    margin-top:5px;
+    color:#1f2937;
+}
+.status{
+    font-size:15px;
+    font-weight:600;
+    color:#824;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">Admin • KYC Verification</div>
+
+<div class="logout">
+    <button onclick="logout()">Logout</button>
+</div>
+
+<div class="container" id="kycList">
+    <p style="text-align:center;font-size:18px;color:#166534;">Loading pending KYC requests...</p>
+</div>
+
+
+<!-- FIREBASE V8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+<script>
+// Firebase Config
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const kycList = document.getElementById("kycList");
+
+
+// 🔥 CHECK ADMIN LOGIN
+auth.onAuthStateChanged(async user=>{
+    if(!user){
+        window.location.href = "login.html";
+        return;
+    }
+
+    const doc = await db.collection("admins").doc(user.uid).get();
+    if(!doc.exists){
+        alert("Access Denied. You are not an admin.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    loadPendingKYC();
+});
+
+
+// 🔥 LOAD PENDING KYC USERS
+function loadPendingKYC(){
+    db.collection("users")
+      .where("kycStatus", "==", "pending")
+      .onSnapshot(snap=>{
+          kycList.innerHTML = "";
+
+          if(snap.empty){
+              kycList.innerHTML = `<p style="text-align:center;font-size:20px;font-weight:bold;color:#14532d;">No Pending KYC</p>`;
+              return;
+          }
+
+          snap.forEach(doc=>{
+              const u = doc.data();
+              const id = doc.id;
+
+              const div = document.createElement("div");
+              div.className = "card";
+
+              div.innerHTML = `
+                  <h2 style="color:#14532d;">${u.name || "Unnamed User"}</h2>
+                  <div class="user-info"><b>Email:</b> ${u.email || "N/A"}</div>
+                  <div class="user-info"><b>Gender:</b> ${u.gender || "N/A"}</div>
+                  <div class="user-info"><b>Age:</b> ${u.age || "N/A"}</div>
+                  <div class="user-info"><b>ID Type:</b> ${u.kycType?.toUpperCase() || "N/A"}</div>
+                  <div class="user-info"><b>Status:</b> ${u.kycStatus}</div>
+                  
+                  <img src="${u.kycDocURL}" alt="KYC Document" />
+
+                  <br><br>
+                  <button class="btn-approve" onclick="approveKYC('${id}')">Approve</button>
+                  <button class="btn-reject" onclick="rejectKYC('${id}')">Reject</button>
+              `;
+
+              kycList.appendChild(div);
+          });
+      });
+}
+
+
+// 🔥 APPROVE KYC
+async function approveKYC(uid){
+    await db.collection("users").doc(uid).update({
+        kycStatus: "approved",
+        kycApprovedAt: new Date()
+    });
+    alert("KYC Approved!");
+}
+
+
+// 🔥 REJECT KYC
+async function rejectKYC(uid){
+    await db.collection("users").doc(uid).update({
+        kycStatus: "rejected",
+        kycRejectedAt: new Date()
+    });
+    alert("KYC Rejected!");
+}
+
+
+// LOGOUT
+function logout(){
+    auth.signOut().then(()=>{
+        window.location.href = "login.html";
+    });
+}
+</script>
+
+</body>
+</html>
