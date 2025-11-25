@@ -3,177 +3,166 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seva - My Profile</title>
-
-<style>
-body {
-  margin:0;
-  font-family: Inter, Arial;
-  background:#e8f5e9;
-}
-
-.top {
-  background:#15803d;
-  color:white;
-  padding:20px;
-  font-size:24px;
-  font-weight:700;
-  text-align:center;
-}
-
-.container {
-  max-width:400px;
-  margin:20px auto;
-  background:white;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 4px 14px rgba(0,0,0,0.15);
-  text-align:center;
-}
-
-.profile-img {
-  width:140px;
-  height:140px;
-  border-radius:50%;
-  object-fit:cover;
-  border:4px solid #15803d;
-  margin-bottom:12px;
-}
-
-.upload-btn {
-  margin-top:10px;
-  padding:10px 14px;
-  background:#15803d;
-  color:white;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.logout-btn{
-  margin-top:20px;
-  padding:10px 14px;
-  background:#d32f2f;
-  color:white;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:700;
-}
-</style>
-</head>
-
-<body>
-
-<div class="top">My Profile</div>
-
-<div class="container" id="profileBox">
-
-  <img id="profilePic" class="profile-img" src="https://via.placeholder.com/140" />
-
-  <br>
-
-  <input type="file" id="fileInput" accept="image/*">
-
-  <button class="upload-btn" onclick="uploadPhoto()">Upload Photo</button>
-
-  <h3 id="userEmail"></h3>
-
-  <button class="logout-btn" onclick="logout()">Logout</button>
-
-</div>
+<title>My Profile</title>
 
 <!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
+<style>
+    body {
+        margin: 0;
+        background-color: #e9f6e9;
+        font-family: Arial, sans-serif;
+    }
+
+    .box {
+        width: 90%;
+        margin: 20px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .profile-pic {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        border: 4px solid #166d33;
+        object-fit: cover;
+    }
+
+    input, textarea {
+        width: 90%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: 1px solid gray;
+        font-size: 15px;
+    }
+
+    button {
+        width: 90%;
+        padding: 12px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 8px;
+        background: #166d33;
+        color: white;
+        font-size: 17px;
+        cursor: pointer;
+    }
+
+    button:hover { opacity: 0.9; }
+
+    .logout {
+        background: #d33;
+        margin-top: 20px;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="box">
+    <h2>My Profile</h2>
+
+    <img id="profilePic" class="profile-pic" src="">
+
+    <input type="file" id="photoInput">
+
+    <button onclick="uploadPhoto()">Upload Photo</button>
+
+    <h3 id="email"></h3>
+
+    <textarea id="description" placeholder="Write something about yourself..."></textarea>
+    <input id="experience" placeholder="Experience (e.g., 2 years in cleaning)">
+    <input id="location" placeholder="Your City / Area">
+    <input id="post" placeholder="Your Job Title / What you offer">
+
+    <button onclick="saveDetails()">Save Details</button>
+
+    <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+
 <script>
-// Firebase Config
+// Firebase config
 var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
     projectId: "seva-6f191",
     storageBucket: "seva-6f191.firebasestorage.app",
     messagingSenderId: "826093348416",
-    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
-    measurementId: "G-78H32SRPCD"
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
 };
 firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+// Show user email + load profile
+firebase.auth().onAuthStateChanged(user => {
+    if (!user) return location.href = "login.html";
 
-const profilePic = document.getElementById("profilePic");
-const fileInput = document.getElementById("fileInput");
-const userEmail = document.getElementById("userEmail");
+    document.getElementById("email").innerText = user.email;
 
+    firebase.database().ref("users/" + user.uid).once("value", snap => {
+        let data = snap.val() || {};
 
-// Load user data
-auth.onAuthStateChanged(async user=>{
-    if(!user){
-        window.location.href = "login.html";
-        return;
-    }
-
-    userEmail.innerText = user.email;
-
-    // Load profile photo from Firestore
-    const doc = await db.collection("users").doc(user.uid).get();
-    if(doc.exists){
-        const data = doc.data();
-        if(data.photoURL){
-            profilePic.src = data.photoURL;
-        }
-    }
+        document.getElementById("description").value = data.description || "";
+        document.getElementById("experience").value = data.experience || "";
+        document.getElementById("location").value = data.location || "";
+        document.getElementById("post").value = data.post || "";
+        document.getElementById("profilePic").src = data.photoURL || "";
+    });
 });
 
 
-// Upload Profile Photo
-async function uploadPhoto(){
-    const user = auth.currentUser;
-    if(!user){
-        alert("Please login.");
-        return;
-    }
+// SAVE DETAILS
+function saveDetails() {
+    var user = firebase.auth().currentUser;
 
-    const file = fileInput.files[0];
-    if(!file){
-        alert("Select a photo first");
-        return;
-    }
-
-    const ext = file.name.split('.').pop();
-    const path = `profile_photos/${user.uid}.${ext}`;
-    const ref = storage.ref().child(path);
-
-    try{
-        await ref.put(file);
-        const url = await ref.getDownloadURL();
-
-        // Save link in Firestore
-        await db.collection("users").doc(user.uid).update({
-            photoURL: url
-        });
-
-        profilePic.src = url;
-
-        alert("Profile photo updated successfully!");
-
-    } catch(err){
-        alert("Error uploading photo: " + err.message);
-    }
+    firebase.database().ref("users/" + user.uid).update({
+        description: document.getElementById("description").value,
+        experience: document.getElementById("experience").value,
+        location: document.getElementById("location").value,
+        post: document.getElementById("post").value
+    }).then(() => {
+        alert("Profile Saved Successfully!");
+    });
 }
 
 
-// Logout
-function logout(){
-    auth.signOut().then(()=>{
-        window.location.href = "login.html";
+// PHOTO UPLOAD
+function uploadPhoto() {
+    var file = document.getElementById("photoInput").files[0];
+    var user = firebase.auth().currentUser;
+
+    if (!file) return alert("Please choose a photo first.");
+
+    var storageRef = firebase.storage().ref("profilePics/" + user.uid);
+
+    storageRef.put(file).then(() => {
+        storageRef.getDownloadURL().then(url => {
+
+            firebase.database().ref("users/" + user.uid).update({
+                photoURL: url
+            });
+
+            document.getElementById("profilePic").src = url;
+
+            alert("Photo Uploaded Successfully!");
+        });
+    });
+}
+
+
+// LOGOUT
+function logout() {
+    firebase.auth().signOut().then(() => {
+        location.href = "login.html";
     });
 }
 </script>
