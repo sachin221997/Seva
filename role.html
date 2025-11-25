@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Select Role - Seva App</title>
+<title>Seva App - Home</title>
 
 <!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -63,8 +63,52 @@
     .cusBtn { background-color: #166d33; }
     .workBtn { background-color: #0b63c9; }
 
-    button:hover {
-        opacity: 0.9;
+    /* Quick Actions */
+    .quick-box {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 25px;
+    }
+
+    .quick-card {
+        background: #ffffff;
+        width: 28%;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 0 6px rgba(0,0,0,0.1);
+        font-size: 14px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .quick-card:hover {
+        background: #eef7ee;
+        transition: 0.3s;
+    }
+
+    /* Categories */
+    .category-title {
+        margin-top: 25px;
+        font-size: 17px;
+        font-weight: bold;
+    }
+
+    .category-scroll {
+        display: flex;
+        overflow-x: auto;
+        margin-top: 15px;
+        padding-bottom: 10px;
+    }
+
+    .cat {
+        min-width: 90px;
+        background: white;
+        padding: 10px;
+        margin-right: 10px;
+        text-align: center;
+        border-radius: 15px;
+        box-shadow: 0px 0px 6px rgba(0,0,0,0.1);
+        font-size: 13px;
     }
 
     /* Footer */
@@ -86,13 +130,14 @@
     .social-icons img:hover {
         transform: scale(1.1);
     }
+
 </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <div class="navbar">
-    <div onclick="go('home.html')">🏠<br>Home</div>
+    <div onclick="go('role.html')">🏠<br>Home</div>
     <div onclick="go('need.html')">🤝<br>Need</div>
     <div onclick="go('help.html')">🛠️<br>Help</div>
     <div onclick="go('profile.html')">👤<br>Profile</div>
@@ -100,14 +145,41 @@
     <div onclick="go('about.html')">ℹ️<br>About</div>
 </div>
 
-<!-- Role Box -->
+<!-- Home + Role Box -->
 <div class="box">
+
+    <!-- ⭐ Emotional Line Added Here -->
+    <p style="font-size:15px; color:#444; margin-bottom:18px;">
+        Share your feelings, spend quality time with trusted helpers.<br>
+        Book a worker who listens, supports, and stays with you — at parties or wherever you need.
+    </p>
+
     <h2>Select Your Role</h2>
 
     <button class="cusBtn" onclick="saveRole('customer')">Continue as Customer</button>
     <button class="workBtn" onclick="saveRole('worker')">Continue as Worker</button>
 
-    <p style="margin-top:15px; color:#166d33; cursor:pointer;" onclick="logout()">Logout</p>
+    <p onclick="logout()" style="color:#166d33; cursor:pointer;">Logout</p>
+
+    <!-- Quick Actions -->
+    <div class="quick-box">
+        <div class="quick-card">📌 Book Service</div>
+        <div class="quick-card">🛠️ Become Worker</div>
+        <div class="quick-card">📍 Nearby Help</div>
+    </div>
+
+    <!-- Categories -->
+    <div class="category-title">Popular Services</div>
+    <div class="category-scroll">
+        <div class="cat">💇 Haircut</div>
+        <div class="cat">🧹 Cleaning</div>
+        <div class="cat">🛠️ Repair</div>
+        <div class="cat">🚗 Car Wash</div>
+        <div class="cat">💆 Massage</div>
+        <div class="cat">🥣 Cooking</div>
+        <div class="cat">📦 Shifting</div>
+    </div>
+
 </div>
 
 <!-- Footer -->
@@ -120,58 +192,51 @@
     <p>© 2025 Seva – Helping People Daily ❤️</p>
 </div>
 
+
 <script>
-// ------------------ Firebase Config ------------------
+// Firebase Config
 var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
     projectId: "seva-6f191",
     storageBucket: "seva-6f191.firebasestorage.app",
     messagingSenderId: "826093348416",
-    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
-    measurementId: "G-78H32SRPCD"
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
 };
 firebase.initializeApp(firebaseConfig);
-// -----------------------------------------------------
 
-// Page redirect helper
-function go(page) { window.location.href = page; }
+// Page Redirect
+function go(page) {
+    window.location.href = page;
+}
 
-// Save role into Firebase
+// Save Role
 function saveRole(roleName) {
     var user = firebase.auth().currentUser;
 
-    if (!user) {
-        alert("Please login again!");
-        window.location.href = "login.html";
-        return;
-    }
-
     firebase.database().ref("users/" + user.uid).update({
         role: roleName
-    }).then(() => {
-        if (roleName === "customer") {
-            window.location.href = "customer_home.html";
-        } else {
-            window.location.href = "worker_home.html";
-        }
     });
+
+    if (roleName === "customer") {
+        go("customer_home.html");
+    } else {
+        go("worker_home.html");
+    }
 }
 
 // Logout
 function logout() {
     firebase.auth().signOut().then(() => {
-        window.location.href = "login.html";
+        go("login.html");
     });
 }
 
-// If user not logged in → redirect back
+// If not logged in → back to login
 firebase.auth().onAuthStateChanged(user => {
-    if (!user) {
-        window.location.href = "login.html";
-    }
+    if (!user) go("login.html");
 });
 </script>
 
 </body>
-            </html>
+    </html>
