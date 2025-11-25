@@ -5,95 +5,123 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Select Role - Seva App</title>
 
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
 <style>
-body {
-    margin: 0;
-    font-family: Inter, Arial;
-    background: #e8f5e9;
-}
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #e9f6e9;
+    }
 
-.header {
-    background: #1b5e20;
-    padding: 25px;
-    color: white;
-    font-size: 30px;
-    text-align: center;
-    font-weight: 700;
-}
+    /* Navbar */
+    .navbar {
+        background-color: #166d33;
+        padding: 12px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        color: white;
+        font-weight: bold;
+        flex-wrap: wrap;
+    }
+    .navbar div {
+        text-align: center;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    .navbar div:hover {
+        opacity: 0.8;
+        transition: 0.2s;
+    }
 
-.box {
-    width: 90%;
-    max-width: 380px;
-    margin: 40px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 14px;
-    box-shadow: 0px 4px 18px rgba(0,0,0,0.15);
-    text-align: center;
-}
+    /* Main Box */
+    .box {
+        background: white;
+        width: 90%;
+        margin: 20px auto;
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
 
-.box h2 {
-    color: #1b5e20;
-    margin-bottom: 20px;
-}
+    button {
+        width: 90%;
+        padding: 15px;
+        font-size: 17px;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        margin: 10px 0;
+        cursor: pointer;
+    }
 
-.btn {
-    width: 95%;
-    padding: 14px;
-    background: #2e7d32;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    margin: 12px 0;
-}
+    .cusBtn { background-color: #166d33; }
+    .workBtn { background-color: #0b63c9; }
 
-.btn-worker {
-    background: #1565c0;
-}
+    button:hover {
+        opacity: 0.9;
+    }
 
-.logout {
-    color: #2e7d32;
-    margin-top: 15px;
-    display: block;
-    text-decoration: none;
-}
+    /* Footer */
+    .footer {
+        background-color: #166d33;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        margin-top: 30px;
+    }
 
-.footer {
-    margin-top: 40px;
-    text-align: center;
-    padding: 20px;
-    background: #1b5e20;
-    color: white;
-}
+    .social-icons img {
+        width: 35px;
+        margin: 0 10px;
+        cursor: pointer;
+        border-radius: 50%;
+        transition: transform 0.2s;
+    }
+    .social-icons img:hover {
+        transform: scale(1.1);
+    }
 </style>
 </head>
-
 <body>
 
-<div class="header">❤️ Seva App</div>
+<!-- Navbar -->
+<div class="navbar">
+    <div onclick="go('home.html')">🏠<br>Home</div>
+    <div onclick="go('need.html')">🤝<br>Need</div>
+    <div onclick="go('help.html')">🛠️<br>Help</div>
+    <div onclick="go('profile.html')">👤<br>Profile</div>
+    <div onclick="go('search.html')">🔍<br>Search</div>
+    <div onclick="go('about.html')">ℹ️<br>About</div>
+</div>
 
+<!-- Role Box -->
 <div class="box">
     <h2>Select Your Role</h2>
 
-    <button class="btn" onclick="setCustomer()">Continue as Customer</button>
-    <button class="btn btn-worker" onclick="setWorker()">Continue as Worker</button>
+    <button class="cusBtn" onclick="saveRole('customer')">Continue as Customer</button>
+    <button class="workBtn" onclick="saveRole('worker')">Continue as Worker</button>
 
-    <a href="login.html" class="logout">Logout</a>
+    <p style="margin-top:15px; color:#166d33; cursor:pointer;" onclick="logout()">Logout</p>
 </div>
 
-<div class="footer">© 2025 Seva – Helping People Daily ❤️</div>
-
-
-<!-- Firebase v8 SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<!-- Footer -->
+<div class="footer">
+    <div class="social-icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png">
+    </div>
+    <p>© 2025 Seva – Helping People Daily ❤️</p>
+</div>
 
 <script>
-// Firebase Config
+// ------------------ Firebase Config ------------------
 var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
@@ -104,37 +132,46 @@ var firebaseConfig = {
     measurementId: "G-78H32SRPCD"
 };
 firebase.initializeApp(firebaseConfig);
+// -----------------------------------------------------
 
-const auth = firebase.auth();
-const db   = firebase.firestore();
+// Page redirect helper
+function go(page) { window.location.href = page; }
 
+// Save role into Firebase
+function saveRole(roleName) {
+    var user = firebase.auth().currentUser;
 
-// CUSTOMER ROLE
-function setCustomer() {
-    let user = auth.currentUser;
-    if (!user) return alert("Please login first!");
+    if (!user) {
+        alert("Please login again!");
+        window.location.href = "login.html";
+        return;
+    }
 
-    db.collection("users").doc(user.uid).update({
-        role: "customer"
+    firebase.database().ref("users/" + user.uid).update({
+        role: roleName
+    }).then(() => {
+        if (roleName === "customer") {
+            window.location.href = "customer_home.html";
+        } else {
+            window.location.href = "worker_home.html";
+        }
     });
-
-    window.location.href = "customer_home.html";
 }
 
-
-// WORKER ROLE
-function setWorker() {
-    let user = auth.currentUser;
-    if (!user) return alert("Please login first!");
-
-    db.collection("users").doc(user.uid).update({
-        role: "worker",
-        available: true
+// Logout
+function logout() {
+    firebase.auth().signOut().then(() => {
+        window.location.href = "login.html";
     });
-
-    window.location.href = "worker_home.html";
 }
+
+// If user not logged in → redirect back
+firebase.auth().onAuthStateChanged(user => {
+    if (!user) {
+        window.location.href = "login.html";
+    }
+});
 </script>
 
 </body>
-</html>
+            </html>
