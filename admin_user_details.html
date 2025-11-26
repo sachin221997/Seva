@@ -80,6 +80,36 @@ body {
   font-size: 12px;
   font-weight: bold;
 }
+
+.kyc-img {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  border-radius: 10px;
+  margin-top: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.kyc-approve-btn {
+    background:#198754;
+    color:white;
+    padding:10px 14px;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.kyc-reject-btn {
+    background:#dc3545;
+    color:white;
+    padding:10px 14px;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    margin-top:10px;
+    margin-left:10px;
+}
 </style>
 </head>
 
@@ -90,7 +120,7 @@ body {
 <div class="container">
 
   <div id="mainContent">
-     Loading...
+     Loading user...
   </div>
 
 </div>
@@ -112,7 +142,6 @@ firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.firestore();
-
 
 // Get UID from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -170,11 +199,44 @@ function loadUserDetails() {
           <button class="btn unblock-btn" onclick="unblockUser()">Unblock User</button>
           <button class="btn delete-btn" onclick="deleteUser()">Delete User</button>
 
+          <div class="section-title">KYC Documents</div>
+
+          <div class="info-box">
+              <p><b>KYC Status:</b> ${u.kycStatus || "Pending"}</p>
+
+              <p><b>Aadhaar Front:</b><br>
+                  ${u.aadhaarFront 
+                      ? `<img src="${u.aadhaarFront}" class="kyc-img">`
+                      : `<span style='color:#777'>Not Uploaded</span>`}
+              </p>
+
+              <p><b>Aadhaar Back:</b><br>
+                  ${u.aadhaarBack
+                      ? `<img src="${u.aadhaarBack}" class="kyc-img">`
+                      : `<span style='color:#777'>Not Uploaded</span>`}
+              </p>
+
+              <p><b>Selfie:</b><br>
+                  ${u.selfie
+                      ? `<img src="${u.selfie}" class="kyc-img">`
+                      : `<span style='color:#777'>Not Uploaded</span>`}
+              </p>
+
+              <p><b>Address Proof:</b><br>
+                  ${u.addressProof
+                      ? `<img src="${u.addressProof}" class="kyc-img">`
+                      : `<span style='color:#777'>Not Uploaded</span>`}
+              </p>
+
+              <button class="kyc-approve-btn" onclick="approveKYC()">Approve KYC</button>
+              <button class="kyc-reject-btn" onclick="rejectKYC()">Reject KYC</button>
+          </div>
+
           <div class="section-title">History</div>
           <div class="info-box">
-            <p><b>Total Jobs Posted:</b> Loading...</p>
-            <p><b>Total Jobs Completed:</b> Loading...</p>
-            <p><b>Total Earnings:</b> Loading...</p>
+            <p><b>Total Jobs Posted:</b> Coming Soon...</p>
+            <p><b>Total Jobs Completed:</b> Coming Soon...</p>
+            <p><b>Total Earnings:</b> Coming Soon...</p>
           </div>
         `;
 
@@ -205,7 +267,27 @@ function deleteUser() {
         location.href = "worker_list.html";
       });
 }
+
+// APPROVE KYC
+function approveKYC() {
+    db.collection("users").doc(UID).update({
+        kycStatus: "Approved"
+    }).then(()=> {
+        alert("KYC Approved!");
+        loadUserDetails();
+    });
+}
+
+// REJECT KYC
+function rejectKYC() {
+    db.collection("users").doc(UID).update({
+        kycStatus: "Rejected"
+    }).then(()=> {
+        alert("KYC Rejected!");
+        loadUserDetails();
+    });
+}
 </script>
 
 </body>
-    </html>
+</html>
