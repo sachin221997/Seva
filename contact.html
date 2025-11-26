@@ -1,108 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Contact Us - Seva Care</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us - Seva</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #f1f5ff;
-            margin: 0;
-            text-align: center;
-        }
+<style>
+body {
+    font-family: Arial;
+    background:#f0f7f0;
+    margin:0; padding:0;
+}
 
-        header {
-            background: white;
-            padding: 15px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+.top {
+    background:#14532d;
+    padding:18px;
+    text-align:center;
+    color:white;
+    font-size:24px;
+    font-weight:bold;
+}
 
-        header h1 {
-            margin: 0;
-            color: #4a90e2;
-        }
+.container {
+    max-width:500px;
+    margin:20px auto;
+    background:white;
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.1);
+}
 
-        nav {
-            margin-top: 10px;
-        }
+input, textarea {
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
+    border:1px solid #bbb;
+    font-size:16px;
+}
 
-        nav a {
-            margin: 0 10px;
-            text-decoration: none;
-            color: #4a90e2;
-            font-weight: bold;
-        }
+button {
+    width:100%;
+    background:#14532d;
+    color:white;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    font-size:18px;
+    cursor:pointer;
+}
 
-        .container {
-            width: 85%;
-            margin: 20px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
+button:hover {
+    opacity:0.9;
+}
 
-        input, textarea {
-            width: 90%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
+.box {
+    margin-top:20px;
+    text-align:center;
+}
 
-        button {
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 14px 25px;
-            font-size: 18px;
-            border-radius: 10px;
-            cursor: pointer;
-        }
+.whatsapp-btn {
+    background:#25D366;
+    margin-top:10px;
+}
 
-        footer {
-            margin-top: 40px;
-            padding: 15px;
-            background: white;
-            color: #555;
-            font-size: 14px;
-        }
-    </style>
+.email-box, .phone-box {
+    background:white;
+    padding:12px;
+    border-radius:10px;
+    margin-top:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+</style>
 </head>
 
 <body>
 
-<header>
-    <h1>❤️ Seva Care</h1>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="seva.html">Services</a>
-        <a href="login.html">Login</a>
-        <a href="contact.html">Contact</a>
-    </nav>
-</header>
+<div class="top">Contact Us</div>
 
 <div class="container">
-    <h2>Contact Us</h2>
-    <p>If you have any questions, complaints, or support requests, feel free to contact us.</p>
 
-    <input type="text" placeholder="Your Name">
-    <input type="email" placeholder="Your Email">
-    <textarea placeholder="Your Message" rows="5"></textarea>
+    <h2 style="text-align:center;">Get in Touch</h2>
 
-    <button onclick="alert('Message Sent Successfully!')">Send Message</button>
+    <input id="name" type="text" placeholder="Your Name">
+    <input id="email" type="email" placeholder="Your Email">
+    <textarea id="msg" rows="4" placeholder="Write your message..."></textarea>
 
-    <h3 style="margin-top:25px;">📞 Contact Info</h3>
-    <p>Email: <b>sachiny4561@gmail.com</b></p>
-    <p>Phone: <b>+91 8755816570</b></p>
-    <p>Address: Haridwar, uttarakhand, India</p>
+    <button onclick="sendMsg()">Send Message</button>
+
+    <div class="box">
+        <h3>Quick Contact</h3>
+
+        <div class="phone-box">
+            📞 <b>+91 8755816570</b>
+        </div>
+
+        <div class="email-box">
+            ✉️ <b>support@seva.com</b>
+        </div>
+
+        <button class="whatsapp-btn" onclick="openWhatsApp()">WhatsApp</button>
+    </div>
+
 </div>
 
-<footer>
-    <p>© 2025 Seva – Spreading Care & Happiness ❤️</p>
-</footer>
+
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+// Firebase Config
+var firebaseConfig = {
+  apiKey: "AIzaSyB0csLpJaNSVCFo-XlGUfEttcoxyRFZik",
+  authDomain: "seva-6f191.firebaseapp.com",
+  projectId: "seva-6f191",
+};
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+
+// Save contact form to Firestore
+function sendMsg() {
+    let name = document.getElementById("name").value;
+    let email = document.getElementById("email").value;
+    let msg = document.getElementById("msg").value;
+
+    if (!name || !email || !msg) {
+        alert("Please fill all fields");
+        return;
+    }
+
+    db.collection("messages").add({
+        name,
+        email,
+        message: msg,
+        time: new Date().toISOString()
+    })
+    .then(() => {
+        alert("Message sent successfully!");
+        document.getElementById("name").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("msg").value = "";
+    })
+    .catch(err => alert(err));
+}
+
+// WhatsApp Button
+function openWhatsApp() {
+    window.location.href = "https://wa.me/918755816570?text=Hello%20Seva%20Team";
+}
+</script>
 
 </body>
 </html>
