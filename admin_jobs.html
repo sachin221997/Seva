@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin - All Jobs</title>
+
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    background: #f4f7f5;
+}
+.header {
+    background: #14532d;
+    color: #fff;
+    padding: 16px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+}
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 12px;
+}
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+}
+.title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #14532d;
+}
+.info {
+    margin: 5px 0;
+}
+.status-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+.pending { background: #fff3cd; color: #856404; }
+.accepted { background: #cfe2ff; color: #084298; }
+.completed { background: #d1e7dd; color: #0f5132; }
+.cancelled { background: #f8d7da; color: #842029; }
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">All Jobs (Admin Control)</div>
+
+<div class="container" id="jobList">
+    Loading jobs...
+</div>
+
+
+<!-- FIREBASE v8 CDN -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+// FIREBASE CONFIG
+var firebaseConfig = {
+    apiKey: "AIzaSyB0csLpJaNSVCFo-XlGUfEttcoxyRFZik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+
+// ADMIN AUTH CHECK
+auth.onAuthStateChanged(async user => {
+    if (!user) return location.href = "admin.html";
+
+    const adminDoc = await db.collection("admins").doc(user.uid).get();
+    if (!adminDoc.exists) {
+        alert("Access Denied — Not Admin");
+        return location.href = "admin.html";
+    }
+
+    loadJobs();
+});
+
+
+// LOAD JOBS
+function loadJobs() {
+    db.collection("jobs").orderBy("createdAt", "desc").onSnapshot(snap => {
+        let html = "";
+        if (snap.empty) {
+            document.getElementById("jobList").innerHTML = "<p>No jobs found</p>";
+            return;
+        }
+
+        snap.forEach(doc => {
+            let j = doc.data();
+            let id = doc.id;
+
+            let statusClass = j.status || "pending";
+
+            html += `
+            <div class="card">
+                <div class="title">${j.title || "No Title"}</div>
+
+                <div class="info"><b>Description:</b> ${j.description || "No Description"}</div>
+                <div class="info"><b>Budget:</b> ₹${j.amount || "0"}</div>
+                <div class="info"><b>Category:</b> ${j.category || "General"}</div>
+
+                <div class="info"><b>Posted By:</b> ${j.customerName || j.customerEmail || "Unknown User"}</div>
+
+                <div class="info"><b>Accepted By:</b> ${j.workerName || "Not accepted"}</div>
+
+                <div class="status-tag ${statusClass}">
+                    ${j.status ? j.status.toUpperCase() : "PENDING"}
+                </div>
+
+                <button class="delete-btn" onclick="deleteJob('${id}')">Delete Job</button>
+            </div>`;
+        });
+
+        document.getElementById("jobList").innerHTML = html;
+    });
+}
+
+
+// DELETE JOB
+function deleteJob(id) {
+    if (!confirm("Delete this job?")) return;
+
+    db.collection("jobs").doc(id).delete().then(() => {
+        alert("Job deleted!");
+    });
+}
+</script>
+
+</body>
+  </html>
