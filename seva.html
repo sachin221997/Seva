@@ -1,91 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Seva Services</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Seva - Home</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #f1f5ff;
-            text-align: center;
-            padding: 20px;
-        }
+  <style>
+    :root{
+      --green:#14532d;
+      --muted:#f4f7f5;
+      --card-bg:#fff;
+      --accent:#4a90e2;
+    }
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      background:var(--muted);
+      color:#222;
+    }
+    /* NAVBAR */
+    .navbar{
+      background:var(--green);
+      color:#fff;
+      padding:10px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .nav-left{display:flex;align-items:center;gap:12px}
+    .logo{font-weight:800;font-size:18px}
+    .nav-right{display:flex;gap:12px;align-items:center}
+    .nav-right a{
+      color:#fff;text-decoration:none;font-weight:600;padding:6px 8px;border-radius:8px;
+    }
+    .nav-right a:hover{opacity:.9;background:rgba(255,255,255,0.06)}
 
-        h1 {
-            color: #4a90e2;
-        }
+    /* HERO */
+    .hero{
+      max-width:980px;margin:18px auto;padding:22px;background:linear-gradient(180deg,#ffffff 0%, #f7fff7 100%);
+      border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.06);
+      text-align:center;
+    }
+    .hero p{color:#444;font-size:16px;line-height:1.5}
+    .role-btns{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+    .btn{
+      border:0;padding:14px 26px;border-radius:12px;font-weight:700;cursor:pointer;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+    }
+    .btn-green{background:var(--green);color:#fff}
+    .btn-blue{background:#0b78d1;color:#fff}
 
-        .card {
-            background: white;
-            width: 85%;
-            margin: 15px auto;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
+    /* quick actions */
+    .quick{
+      display:flex;gap:12px;max-width:980px;margin:18px auto;padding:10px;
+      justify-content:space-between;flex-wrap:wrap;
+    }
+    .quick .card{
+      background:var(--card-bg);padding:14px;border-radius:12px;flex:1;min-width:160px;
+      text-align:center;box-shadow:0 6px 18px rgba(0,0,0,0.04);
+    }
+    .quick .card p{margin:8px 0 0 0;font-weight:700}
 
-        button {
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-top: 10px;
-            width: 80%;
-            font-size: 18px;
-        }
-    </style>
+    /* services */
+    .section{max-width:980px;margin:18px auto;padding:0 8px}
+    .section h3{color:var(--green);margin-bottom:10px}
+    .services{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+    .service{
+      background:#fff;padding:12px 18px;border-radius:12px;min-width:140px;
+      box-shadow:0 6px 16px rgba(0,0,0,0.04);text-align:center;
+    }
+    .service p{margin:8px 0 0 0;font-weight:700}
+
+    footer{background:var(--green);color:#fff;padding:18px 10px;margin-top:24px;text-align:center}
+    footer .icons{display:flex;gap:18px;justify-content:center;margin-top:8px}
+    footer a{color:#fff;text-decoration:none;font-weight:700}
+
+    /* responsive tweaks */
+    @media(max-width:600px){
+      .nav-right{display:none}
+      .role-btns{flex-direction:column}
+      .quick{flex-direction:column}
+    }
+  </style>
 </head>
-
 <body>
 
-    <h1>Our Services</h1>
-    <p>Select a service to continue</p>
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="nav-left">
+      <div class="logo">Seva</div>
+      <div style="color:#fff;opacity:.9;font-size:14px">Share • Help • Earn</div>
+    </div>
 
+    <div class="nav-right">
+      <a href="index.html">Home</a>
+      <a href="need.html">Need</a>
+      <a href="help.html">Help</a>
+      <a href="profile.html">Profile</a>
+      <a href="search_jobs.html">Search</a>
+      <a href="about.html">About</a>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1 style="margin:0 0 8px 0">Share your feelings, find trusted helpers</h1>
+    <p>Book a worker who listens, supports and stays with you — at parties, home, or wherever you need.</p>
+
+    <h2 style="margin-top:18px">Select Your Role</h2>
+    <div class="role-btns">
+      <button class="btn btn-green" onclick="location.href='customer_home.html'">Continue as Customer</button>
+      <button class="btn btn-blue" onclick="location.href='worker_home.html'">Continue as Worker</button>
+    </div>
+
+    <div style="margin-top:12px">
+      <a href="login.html" style="color:var(--green);font-weight:700;text-decoration:none">Logout</a>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="quick">
     <div class="card">
-        <h2>Home Cleaning</h2>
-        <p>Professional house cleaning service.</p>
-        <button onclick="bookService('Home Cleaning')">Book Now</button>
+      <div style="font-size:22px">📌</div>
+      <p style="margin-top:8px">Book Service</p>
     </div>
 
     <div class="card">
-        <h2>Massage Service</h2>
-        <p>Relaxing body massage at your home.</p>
-        <button onclick="bookService('Massage Service')">Book Now</button>
+      <div style="font-size:22px">🛠️</div>
+      <p style="margin-top:8px">Become Worker</p>
     </div>
 
     <div class="card">
-        <h2>Electrician</h2>
-        <p>Fix electrical issues fast and safely.</p>
-        <button onclick="bookService('Electrician')">Book Now</button>
+      <div style="font-size:22px">📍</div>
+      <p style="margin-top:8px">Nearby Help</p>
     </div>
+  </div>
 
-    <div class="card">
-        <h2>Plumber</h2>
-        <p>Expert plumbing service at your doorstep.</p>
-        <button onclick="bookService('Plumber')">Book Now</button>
+  <!-- POPULAR SERVICES -->
+  <div class="section">
+    <h3>Popular Services</h3>
+    <div class="services" id="services">
+      <div class="service"><div>💇‍♂️</div><p>Haircut</p></div>
+      <div class="service"><div>🧹</div><p>Cleaning</p></div>
+      <div class="service"><div>🔧</div><p>Repair</p></div>
+      <div class="service"><div>🔌</div><p>Electrician</p></div>
+      <div class="service"><div>🚰</div><p>Plumber</p></div>
+      <div class="service"><div>👨‍🍳</div><p>Cooking Help</p></div>
     </div>
+  </div>
 
-    <div class="card">
-        <h2>Carpenter</h2>
-        <p>Wood repairs, furniture fixes and more.</p>
-        <button onclick="bookService('Carpenter')">Book Now</button>
+  <footer>
+    <div>Follow Us</div>
+    <div class="icons">
+      <a href="https://instagram.com" target="_blank">Instagram</a>
+      <a href="https://wa.me/918755816570" target="_blank">WhatsApp</a>
+      <a href="https://facebook.com" target="_blank">Facebook</a>
     </div>
+  </footer>
 
-    <div class="card">
-        <h2>Cooking Help</h2>
-        <p>Hire helpers to assist with household cooking.</p>
-        <button onclick="bookService('Cooking Help')">Book Now</button>
-    </div>
+  <!-- Firebase v8 (app + auth + firestore) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-    <!-- Firebase v10 SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+  <script>
+    // ---------- FIREBASE V8 CONFIG ----------
+    var firebaseConfig = {
+      apiKey: "AIzaSyB0csLpJaNSVCFo-XlGUfEttcoxyRFZik",
+      authDomain: "seva-6f191.firebaseapp.com",
+      projectId: "seva-6f191",
+      storageBucket: "seva-6f191.appspot.com",
+      messagingSenderId: "826009334816",
+      appId: "1:826009334816:web:19fe4b3b07cba09b21a5"
+    };
+    firebase.initializeApp(firebaseConfig);
 
-    <!-- Your JS -->
-    <script src="auth.js"></script>
+    // Firestore ref (if needed)
+    const db = firebase.firestore();
+  </script>
 
+  <script>
+    // Small helper: when user clicks a quick service button (if you later add)
+    function bookService(serviceName){
+      // navigate to create_post with query param (page should read ?service=..)
+      const url = "create_post.html?service=" + encodeURIComponent(serviceName);
+      location.href = url;
+    }
+
+    // Example: hook service cards to bookService if you want:
+    document.addEventListener("DOMContentLoaded", () => {
+      // optionally attach click handlers to services (if desired)
+      // e.g. document.querySelectorAll('.service').forEach((el,i)=>{ el.onclick = ()=> bookService(['Haircut','Cleaning','Repair','Electrician','Plumber','Cooking'][i]) })
+    });
+  </script>
 </body>
-</html>
+                                  </html>
