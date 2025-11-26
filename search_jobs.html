@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Search - Seva</title>
+
+<style>
+body {
+    margin:0;
+    padding:0;
+    font-family: Arial;
+    background:#f4f7f5;
+}
+.header {
+    background:#14532d;
+    padding:15px;
+    text-align:center;
+    color:white;
+    font-size:22px;
+    font-weight:bold;
+}
+.container {
+    max-width:900px;
+    margin:20px auto;
+    padding:10px;
+}
+.search-box input {
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    font-size:16px;
+    margin-bottom:15px;
+}
+.card {
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:12px;
+    box-shadow:0 6px 16px rgba(0,0,0,0.08);
+}
+.card-title {
+    font-size:18px;
+    font-weight:bold;
+    color:#14532d;
+}
+.info {
+    margin:5px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">Search Jobs</div>
+
+<div class="container">
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search by title, location, category..." onkeyup="filterJobs()">
+    </div>
+
+    <div id="jobList">Loading jobs...</div>
+
+</div>
+
+
+<!-- FIREBASE v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+// Firebase Config
+var firebaseConfig = {
+    apiKey: "AIzaSyB0csLpJaNSVCFo-XlGUfEttcoxyRFZik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191"
+};
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+let allJobs = [];
+
+// Load jobs
+db.collection("jobs").orderBy("createdAt","desc").onSnapshot(snap => {
+    allJobs = [];
+    snap.forEach(doc => {
+        let job = doc.data();
+        job.id = doc.id;
+        allJobs.push(job);
+    });
+    displayJobs(allJobs);
+});
+
+
+// Display Jobs
+function displayJobs(list) {
+    let html = "";
+
+    if (list.length === 0) {
+        document.getElementById("jobList").innerHTML = "<p>No jobs found</p>";
+        return;
+    }
+
+    list.forEach(j => {
+        html += `
+        <div class="card">
+            <div class="card-title">${j.title}</div>
+            <div class="info"><b>Location:</b> ${j.location || "Not Provided"}</div>
+            <div class="info"><b>Category:</b> ${j.category || "General"}</div>
+            <div class="info"><b>Budget:</b> ₹${j.amount}</div>
+            <div class="info"><b>Description:</b> ${j.description}</div>
+        </div>`;
+    });
+
+    document.getElementById("jobList").innerHTML = html;
+}
+
+
+// Search Filter
+function filterJobs() {
+    let text = document.getElementById("searchInput").value.toLowerCase();
+
+    let filtered = allJobs.filter(j =>
+        j.title.toLowerCase().includes(text) ||
+        (j.category || "").toLowerCase().includes(text) ||
+        (j.location || "").toLowerCase().includes(text) ||
+        (j.description || "").toLowerCase().includes(text)
+    );
+
+    displayJobs(filtered);
+}
+</script>
+
+</body>
+          </html>
