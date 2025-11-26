@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Details - Admin</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f4f7f5;
+  margin: 0;
+}
+
+.header {
+  background: #14532d;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 15px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 20px 0 10px 0;
+  color: #14532d;
+}
+
+.info-box {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #f9fff9;
+  margin-bottom: 12px;
+}
+
+.info-box p {
+  margin: 6px 0;
+}
+
+.profile-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #eee;
+  margin-bottom: 10px;
+}
+
+.btn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.block-btn { background: #dc3545; color: white; }
+.unblock-btn { background: #198754; color: white; }
+.delete-btn { background: #c82333; color: white; }
+
+.green-tag {
+  display: inline-block;
+  background: #b7f5c2;
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: #064d1c;
+  font-size: 12px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">User Details (Admin)</div>
+
+<div class="container">
+
+  <div id="mainContent">
+     Loading...
+  </div>
+
+</div>
+
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+// Firebase Config
+var firebaseConfig = {
+  apiKey: "AIzaSyB0csLpJaNSVCFo-XlGUfEttcoxyRFZik",
+  authDomain: "seva-6f191.firebaseapp.com",
+  projectId: "seva-6f191",
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+
+// Get UID from URL
+const urlParams = new URLSearchParams(window.location.search);
+const UID = urlParams.get("uid");
+
+if (!UID) {
+    document.getElementById("mainContent").innerHTML = "<h3>No User ID provided.</h3>";
+}
+
+
+// Admin check
+auth.onAuthStateChanged(async user => {
+    if (!user) return location.href = "login.html";
+
+    const adminDoc = await db.collection("admins").doc(user.uid).get();
+    if (!adminDoc.exists) {
+        alert("Access Denied – Not Admin");
+        return location.href = "login.html";
+    }
+
+    loadUserDetails();
+});
+
+
+function loadUserDetails() {
+    db.collection("users").doc(UID).get().then(doc => {
+        if (!doc.exists) {
+            document.getElementById("mainContent").innerHTML = "<h3>User Not Found</h3>";
+            return;
+        }
+
+        const u = doc.data();
+
+        let html = `
+          <div class="section-title">Profile</div>
+
+          <img src="${u.photoURL || 'https://via.placeholder.com/120'}" class="profile-photo">
+
+          <div class="info-box">
+             <p><b>Name:</b> ${u.name || "No Name"}</p>
+             <p><b>Email:</b> ${u.email}</p>
+             <p><b>Phone:</b> ${u.phone || "Not Added"}</p>
+             <p><b>Role:</b> ${u.role}</p>
+             <p><b>City:</b> ${u.city || "Not Added"}</p>
+             <p><b>Experience:</b> ${u.experience || "Not Added"}</p>
+             <p><b>Description:</b> ${u.description || "No Description"}</p>
+             <p><b>Status:</b> 
+                ${u.blocked ? '<span class="green-tag" style="background:#ffb3b3;color:#700;">Blocked</span>' 
+                            : '<span class="green-tag">Active</span>'}
+             </p>
+          </div>
+
+          <div class="section-title">Account Controls</div>
+          <button class="btn block-btn" onclick="blockUser()">Block User</button>
+          <button class="btn unblock-btn" onclick="unblockUser()">Unblock User</button>
+          <button class="btn delete-btn" onclick="deleteUser()">Delete User</button>
+
+          <div class="section-title">History</div>
+          <div class="info-box">
+            <p><b>Total Jobs Posted:</b> Loading...</p>
+            <p><b>Total Jobs Completed:</b> Loading...</p>
+            <p><b>Total Earnings:</b> Loading...</p>
+          </div>
+        `;
+
+        document.getElementById("mainContent").innerHTML = html;
+    });
+}
+
+
+// BLOCK
+function blockUser() {
+    db.collection("users").doc(UID).update({ blocked: true })
+      .then(() => { alert("User Blocked!"); loadUserDetails(); });
+}
+
+// UNBLOCK
+function unblockUser() {
+    db.collection("users").doc(UID).update({ blocked: false })
+      .then(() => { alert("User Unblocked!"); loadUserDetails(); });
+}
+
+// DELETE
+function deleteUser() {
+    if (!confirm("Delete this user?")) return;
+
+    db.collection("users").doc(UID).delete()
+      .then(() => {
+        alert("User Deleted!");
+        location.href = "worker_list.html";
+      });
+}
+</script>
+
+</body>
+    </html>
