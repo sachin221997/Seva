@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login - Seva</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #e9f5ec;
+    margin: 0;
+}
+.box {
+    max-width: 380px;
+    margin: 80px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+h2 {
+    text-align: center;
+    color: #14532d;
+    margin-bottom: 20px;
+}
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+button {
+    width: 100%;
+    background: #14532d;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+}
+button:hover {
+    opacity: 0.92;
+}
+.error {
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>Admin Login</h2>
+
+    <div id="errorBox" class="error"></div>
+
+    <input type="email" id="adminEmail" placeholder="Admin Email">
+    <input type="password" id="adminPassword" placeholder="Password">
+
+    <button onclick="adminLogin()">Login</button>
+</div>
+
+
+<!-- Firebase v8 CDN -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+// --- Firebase Config ---
+var firebaseConfig = {
+    apiKey: "AIzaSyB0csLpJaNSVCFo-XlGUfEttcoxyRFZik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+
+// --- ADMIN LOGIN FUNCTION ---
+function adminLogin() {
+    let email = document.getElementById("adminEmail").value;
+    let pass  = document.getElementById("adminPassword").value;
+
+    document.getElementById("errorBox").innerText = "";
+
+    if (!email || !pass) {
+        document.getElementById("errorBox").innerText = "Please fill all fields.";
+        return;
+    }
+
+    auth.signInWithEmailAndPassword(email, pass)
+    .then(async (userCred) => {
+        let uid = userCred.user.uid;
+
+        // Check if admin exists
+        let adminDoc = await db.collection("admins").doc(uid).get();
+
+        if (!adminDoc.exists) {
+            document.getElementById("errorBox").innerText = "Not an Admin!";
+            auth.signOut();
+            return;
+        }
+
+        // Admin Verified
+        location.href = "admin_dashboard.html";
+
+    })
+    .catch(err => {
+        document.getElementById("errorBox").innerText = err.message;
+    });
+}
+</script>
+
+</body>
+  </html>
