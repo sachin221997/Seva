@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin - Messages</title>
+
+<style>
+  body{font-family:Arial;margin:0;background:#f4f7f5;}
+  .top{background:#14532d;color:#fff;padding:16px;text-align:center;
+       font-size:22px;font-weight:700;margin-bottom:10px;}
+
+  .container{max-width:1000px;margin:20px auto;padding:12px;}
+
+  .actions{display:flex;gap:10px;align-items:center;margin-bottom:12px;}
+  button{padding:10px 12px;border:0;border-radius:8px;cursor:pointer;
+         font-weight:700}
+
+  .btn-export{background:#0b5ed7;color:#fff}
+  .btn-refresh{background:#6c757d;color:#fff}
+
+  .card{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;
+        box-shadow:0 6px 18px rgba(0,0,0,0.06);}
+
+  .meta{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .name{font-weight:700;font-size:18px}
+  .time{font-size:13px;color:#666}
+  .email{color:#14532d;font-weight:700}
+
+  .msg{white-space:pre-wrap;color:#222;margin-top:10px;font-size:15px}
+
+  .small-btn{padding:8px 10px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
+  .read{background:#e6ffed;color:#0f5132}
+  .unread{background:#fff3cd;color:#664d03}
+  .delete{background:#dc3545;color:#fff;margin-left:6px}
+
+  .green-tag{
+      display:inline-block;
+      background:#b7f5c2;
+      color:#064d1c;
+      padding:4px 10px;
+      border-radius:20px;
+      font-size:12px;
+      font-weight:700;
+      margin-top:6px;
+  }
+
+  textarea{
+      width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;
+      font-size:15px;margin-top:8px;
+  }
+
+  .reply-box{margin-top:12px;padding:12px;border-radius:10px;background:#f9fff9;
+             border:1px solid #d9f3d9}
+
+  .no-data{background:#fff;padding:16px;border-radius:10px;text-align:center;color:#666}
+
+  @media(max-width:600px){
+      .meta{flex-direction:column;align-items:flex-start}
+      .actions{flex-direction:column;align-items:stretch}
+  }
+</style>
+</head>
+
+<body>
+
+<div class="top">Admin — Messages</div>
+
+<div class="container">
+
+  <div class="actions">
+      <button class="btn-export" onclick="exportCSV()">Export CSV</button>
+      <button class="btn-refresh" onclick="loadMessages()">Refresh</button>
+  </div>
+
+  <div id="total" style="font-size:17px;font-weight:700;margin-bottom:10px;color:#14532d;">
+    Total: 0
+  </div>
+
+  <div id="list">
+    <div class="no-data">Loading messages...</div>
+  </div>
+
+</div>
+
+
+
+
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+// ---------- FIREBASE CONFIG ----------
+var firebaseConfig = {
+  apiKey: "AIzaSyB0csLpJaNSVCFo-XlGUfEttcoxyRFZik",
+  authDomain: "seva-6f191.firebaseapp.com",
+  projectId: "seva-6f191",
+  storageBucket: "seva-6f191.appspot.com",
+  messagingSenderId: "826009334816",
+  appId: "1:826009334816:web:19fe4b3b07cba09b21a5"
+};
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+
+// ---------- ADMIN PROTECTION ----------
+auth.onAuthStateChanged(async user=>{
+  if(!user) return location.href="login.html";
+
+  const adminDoc = await db.collection("admins").doc(user.uid).get();
+  if(!adminDoc.exists){
+      alert("Access Denied — Not Admin");
+      return location.href="login.html";
+  }
+
+  loadMessages();
+});
+
+
+// ---------- Load Messages ----------
+let unsubscribe = null;
+
+function loadMessages(){
+  if(unsubscribe) unsubscribe();
+
+  const list = document.getElementById("list");
+  list.innerHTML = '<div class="no-data">Loading messages...</div>';
+
+  unsubscribe = db.collection("messages").orderBy("time","desc")
+    .onSnapshot(snapshot=>{
+        if(snapshot.empty){
+            list.innerHTML = '<div class="no-data">No messages found.</div>';
+            document.getElementById("total").innerText="Total: 0";
+            return;
+        }
+
+        let html = "";
+        let count = 0;
+
+        snapshot.forEach(doc=>{
+            count++;
+            let d = doc.data();
+            let id = doc.id;
+
+            let name = d.name || "No Name";
+            let email = d.email || "No Email";
+            let msg = d.message || "";
+            let time = d.time ? new Date(d.time).toLocaleString() : "";
+            let read = !!d.read;
+            let replied = !!d.adminReply;
+
+            html += `
+              <div class="card">
+                
+                <div class="meta">
+                  <div>
+                    <div class="name">${escapeHtml(name)}</div>
+                    <div class="email">${escapeHtml(email)}</div>
+                    ${replied ? `<div class="green-tag">Replied ✓</div>` : ``}
+                  </div>
+
+                  <div style="text-align:right">
+                    <div class="time">${escapeHtml(time)}</div>
+
+                    <div style="margin-top:8px;">
+                      <button class="small-btn ${read?'read':'unread'}"
+                         onclick="toggleRead('${id}',${read})">
+                         ${read?'Read':'Unread'}
+                      </button>
+
+                      <button class="small-btn delete"
+                         onclick="deleteMsg('${id}')">Delete</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="msg">${escapeHtml(msg)}</div>
+
+                <div class="reply-box">
+                  <textarea id="reply-${id}" placeholder="Write admin reply...">${d.adminReply || ""}</textarea>
+
+                  <button style="background:#14532d;color:white;margin-top:8px"
+                    class="small-btn"
+                    onclick="sendReply('${id}')">Send Reply</button>
+
+                  ${d.adminReply ? 
+                     `<p style="margin-top:10px;background:#e6ffee;padding:10px;border-radius:8px;">
+                       <b>Admin Reply:</b> ${escapeHtml(d.adminReply)}
+                      </p>` : ``}
+                </div>
+
+              </div>
+            `;
+        });
+
+        list.innerHTML = html;
+        document.getElementById("total").innerText = "Total: " + count;
+    });
+}
+
+
+// ---------- Mark Read / Unread ----------
+function toggleRead(id, current){
+  db.collection("messages").doc(id).update({
+    read: !current
+  }).catch(e=>alert(e.message));
+}
+
+
+// ---------- Delete ----------
+function deleteMsg(id){
+  if(!confirm("Delete this message?")) return;
+  db.collection("messages").doc(id).delete()
+     .catch(e=>alert(e.message));
+}
+
+
+// ---------- Send Admin Reply ----------
+function sendReply(id){
+  let text = document.getElementById("reply-"+id).value.trim();
+  if(!text) return alert("Reply cannot be empty!");
+
+  db.collection("messages").doc(id).update({
+      adminReply: text,
+      replyTime: new Date().toISOString()
+  })
+  .then(()=> alert("Reply Sent Successfully!"))
+  .catch(err=> alert(err.message));
+}
+
+
+// ---------- Export CSV ----------
+function exportCSV(){
+  db.collection("messages").orderBy("time","desc").get()
+    .then(snap=>{
+        if(snap.empty) return alert("No messages to export");
+
+        let rows = [["Name","Email","Message","Reply","Read","Time"]];
+
+        snap.forEach(doc=>{
+            let d = doc.data();
+            rows.push([
+                d.name||"",
+                d.email||"",
+                d.message||"",
+                d.adminReply||"",
+                d.read?"Yes":"No",
+                d.time?new Date(d.time).toLocaleString():"",
+            ]);
+        });
+
+        downloadCSV(rows,"messages_export.csv");
+    });
+}
+
+function downloadCSV(rows,filename){
+    const csv = rows.map(r=>r.map(c=>`"${(""+c).replace(/"/g,'""')}"`).join(",")).join("\n");
+
+    let blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+}
+
+
+// ---------- Escape HTML ----------
+function escapeHtml(text){
+  if(!text) return "";
+  return String(text)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+</script>
+
+</body>
+  </html>
