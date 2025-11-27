@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seva App - Home</title>
+<title>Seva • Select Role</title>
 
 <!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -20,39 +20,35 @@
     /* Navbar */
     .navbar {
         background-color: #166d33;
+        color: white;
         padding: 12px;
         display: flex;
         justify-content: space-around;
-        align-items: center;
-        color: white;
-        font-weight: bold;
-        flex-wrap: wrap;
-    }
-    .navbar div {
         text-align: center;
+        font-weight: bold;
         font-size: 13px;
-        cursor: pointer;
-    }
-    .navbar div:hover {
-        opacity: 0.8;
-        transition: 0.2s;
     }
 
-    /* Main Box */
+    .navbar div { cursor: pointer; }
+
+    /* Main Container */
     .box {
         background: white;
         width: 90%;
         margin: 20px auto;
-        padding: 25px;
+        padding: 22px;
         border-radius: 20px;
-        text-align: center;
         box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        text-align: center;
     }
+
+    h2 { color: #166d33; }
 
     button {
         width: 90%;
-        padding: 15px;
+        padding: 14px;
         font-size: 17px;
+        font-weight: bold;
         color: white;
         border: none;
         border-radius: 8px;
@@ -67,23 +63,17 @@
     .quick-box {
         display: flex;
         justify-content: space-around;
-        margin-top: 25px;
+        margin-top: 20px;
     }
 
     .quick-card {
-        background: #ffffff;
         width: 28%;
         padding: 12px;
-        border-radius: 12px;
-        box-shadow: 0 0 6px rgba(0,0,0,0.1);
-        font-size: 14px;
-        text-align: center;
+        background: white;
+        border-radius: 13px;
+        box-shadow: 0px 0px 8px rgba(0,0,0,0.1);
+        font-size: 13px;
         cursor: pointer;
-    }
-
-    .quick-card:hover {
-        background: #eef7ee;
-        transition: 0.3s;
     }
 
     /* Categories */
@@ -91,24 +81,26 @@
         margin-top: 25px;
         font-size: 17px;
         font-weight: bold;
+        text-align: left;
     }
 
     .category-scroll {
         display: flex;
         overflow-x: auto;
-        margin-top: 15px;
         padding-bottom: 10px;
+        margin-top: 15px;
     }
 
     .cat {
-        min-width: 90px;
+        min-width: 100px;
         background: white;
         padding: 10px;
-        margin-right: 10px;
-        text-align: center;
+        margin-right: 12px;
         border-radius: 15px;
         box-shadow: 0px 0px 6px rgba(0,0,0,0.1);
-        font-size: 13px;
+        font-size: 15px;
+        text-align: center;
+        cursor: pointer;
     }
 
     /* Footer */
@@ -117,84 +109,82 @@
         color: white;
         padding: 15px;
         text-align: center;
-        margin-top: 30px;
+        margin-top: 25px;
     }
-
-    .social-icons img {
-        width: 35px;
-        margin: 0 10px;
-        cursor: pointer;
-        border-radius: 50%;
-        transition: transform 0.2s;
-    }
-    .social-icons img:hover {
-        transform: scale(1.1);
-    }
-
 </style>
 </head>
+
 <body>
 
-<!-- Navbar -->
+<!-- NAVBAR -->
 <div class="navbar">
     <div onclick="go('role.html')">🏠<br>Home</div>
-    <div onclick="go('need.html')">🤝<br>Need</div>
+    <div onclick="go('need.html')">📝<br>Need</div>
     <div onclick="go('help.html')">🛠️<br>Help</div>
     <div onclick="go('profile.html')">👤<br>Profile</div>
     <div onclick="go('search.html')">🔍<br>Search</div>
     <div onclick="go('about.html')">ℹ️<br>About</div>
 </div>
 
-<!-- Home + Role Box -->
+<!-- MAIN BOX -->
 <div class="box">
 
-    <!-- ⭐ Emotional Line Added Here -->
-    <p style="font-size:15px; color:#444; margin-bottom:18px;">
-        Share your feelings, spend quality time with trusted helpers.<br>
-        Book a worker who listens, supports, and stays with you — at parties or wherever you need.
-    </p>
+    <!-- GREEN ATTRACTIVE BANNER -->
+    <div style="
+        background: linear-gradient(135deg, #0B6C36, #18a14f);
+        padding: 22px;
+        border-radius: 18px;
+        color: white;
+        margin-bottom: 25px;
+        text-align: center;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    ">
+        <h2 style="margin:0; font-size:22px;">Do Work and Earn Money 💰</h2>
+        <p style="color:#e6ffe6; margin-top:8px;">
+            Flexible hours • Trusted customers • Fast payouts  
+        </p>
+        <button onclick="scrollToRole()" 
+        style="background:white; color:#0B6C36; padding:10px 20px; border-radius:25px; margin-top:10px; font-size:15px; font-weight:700; cursor:pointer;">
+            Choose Your Role
+        </button>
+    </div>
 
-    <h2>Select Your Role</h2>
+    <h2 id="roleArea">Select Your Role</h2>
 
     <button class="cusBtn" onclick="saveRole('customer')">Continue as Customer</button>
     <button class="workBtn" onclick="saveRole('worker')">Continue as Worker</button>
 
     <p onclick="logout()" style="color:#166d33; cursor:pointer;">Logout</p>
 
-    <!-- Quick Actions -->
+    <!-- QUICK ACTIONS -->
     <div class="quick-box">
         <div class="quick-card">📌 Book Service</div>
         <div class="quick-card">🛠️ Become Worker</div>
         <div class="quick-card">📍 Nearby Help</div>
     </div>
 
-    <!-- Categories -->
+    <!-- CATEGORIES -->
     <div class="category-title">Popular Services</div>
+
     <div class="category-scroll">
-        <div class="cat">💇 Haircut</div>
+        <div class="cat">💇‍♂️ Haircut</div>
         <div class="cat">🧹 Cleaning</div>
-        <div class="cat">🛠️ Repair</div>
+        <div class="cat">🔧 Repair</div>
         <div class="cat">🚗 Car Wash</div>
         <div class="cat">💆 Massage</div>
-        <div class="cat">🥣 Cooking</div>
+        <div class="cat">🍳 Cooking</div>
         <div class="cat">📦 Shifting</div>
     </div>
 
 </div>
 
-<!-- Footer -->
+<!-- FOOTER -->
 <div class="footer">
-    <div class="social-icons">
-        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png">
-    </div>
-    <p>© 2025 Seva – Helping People Daily ❤️</p>
+    © 2025 Seva • Helping People Daily ❤️
 </div>
 
-
 <script>
-// Firebase Config
+// Firebase config
 var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
@@ -205,36 +195,37 @@ var firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-// Page Redirect
-function go(page) {
-    window.location.href = page;
+function go(page){ window.location.href = page; }
+
+function scrollToRole(){
+    document.getElementById("roleArea").scrollIntoView({behavior:"smooth"});
 }
 
-// Save Role
-function saveRole(roleName) {
-    var user = firebase.auth().currentUser;
-
-    firebase.database().ref("users/" + user.uid).update({
-        role: roleName
-    });
-
-    if (roleName === "customer") {
-        go("customer_home.html");
-    } else {
-        go("worker_home.html");
-    }
-}
-
-// Logout
-function logout() {
-    firebase.auth().signOut().then(() => {
+/* Save Role */
+function saveRole(role){
+    let user = firebase.auth().currentUser;
+    if(!user){
+        alert("Please login first.");
         go("login.html");
+        return;
+    }
+
+    firebase.database().ref("users/"+user.uid).update({
+        role: role
+    }).then(()=>{
+        if(role === "customer") go("customer_dashboard.html");
+        else go("worker_dashboard.html");
     });
 }
 
-// If not logged in → back to login
-firebase.auth().onAuthStateChanged(user => {
-    if (!user) go("login.html");
+/* Logout */
+function logout(){
+    firebase.auth().signOut().then(()=> go("login.html"));
+}
+
+/* Force login check */
+firebase.auth().onAuthStateChanged(user=>{
+    if(!user) go("login.html");
 });
 </script>
 
