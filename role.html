@@ -62,7 +62,7 @@
         margin-top: 10px;
         cursor: pointer;
         position: relative;
-        z-index: 9999; /* FIXED */
+        z-index: 9999; /* ensures clickable */
     }
 
     .cusBtn { background-color: #166d33; }
@@ -99,7 +99,7 @@
         margin-top: 15px;
         padding-bottom: 10px;
         position: relative;
-        z-index: 1; /* FIXED */
+        z-index: 1;
     }
 
     .cat {
@@ -187,10 +187,13 @@ var firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-function go(page){ window.location.href = page; }
+function go(page){
+    window.location.href = page;
+}
 
 function saveRole(role){
     let user = firebase.auth().currentUser;
+
     if(!user){
         alert("Please login first.");
         go("login.html");
@@ -200,13 +203,22 @@ function saveRole(role){
     firebase.database().ref("users/" + user.uid).update({
         role: role
     }).then(()=>{
-        if(role === "customer") go("customer_dashboard.html");
-        else go("worker_dashboard.html");
+
+        if(role === "customer"){
+            go("customer_home.html");        // CORRECT FILE
+        } else {
+            go("worker_dashboard.html");     // CORRECT FILE
+        }
+
+    }).catch(err=>{
+        alert("Error: " + err.message);
     });
 }
 
 function logout(){
-    firebase.auth().signOut().then(()=> go("login.html"));
+    firebase.auth().signOut().then(()=>{
+        go("login.html");
+    });
 }
 
 firebase.auth().onAuthStateChanged(user=>{
