@@ -17,21 +17,18 @@
         background-color: #e9f6e9;
     }
 
-    /* Navbar */
     .navbar {
         background-color: #166d33;
         padding: 12px;
         display: flex;
         justify-content: space-around;
-        align-items: center;
         color: white;
         font-weight: bold;
-        font-size: 13px;
         text-align: center;
+        font-size: 13px;
     }
     .navbar div { cursor: pointer; }
 
-    /* Main Box */
     .box {
         background: white;
         width: 90%;
@@ -40,6 +37,18 @@
         border-radius: 20px;
         box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         text-align: center;
+        position: relative;
+        z-index: 5;
+    }
+
+    .banner {
+        background: linear-gradient(135deg, #0B6C36, #18a14f);
+        padding: 22px;
+        border-radius: 18px;
+        color: white;
+        margin-bottom: 25px;
+        text-align: center;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.2);
     }
 
     button {
@@ -52,12 +61,13 @@
         border-radius: 8px;
         margin-top: 10px;
         cursor: pointer;
+        position: relative;
+        z-index: 9999; /* FIXED */
     }
 
     .cusBtn { background-color: #166d33; }
     .workBtn { background-color: #0b63c9; }
 
-    /* Quick Actions */
     .quick-box {
         display: flex;
         justify-content: space-around;
@@ -75,9 +85,6 @@
         cursor: pointer;
     }
 
-    .quick-card:hover { background: #eef7ee; transition: 0.3s; }
-
-    /* Popular Services */
     .category-title {
         margin-top: 25px;
         font-size: 17px;
@@ -91,6 +98,8 @@
         overflow-x: auto;
         margin-top: 15px;
         padding-bottom: 10px;
+        position: relative;
+        z-index: 1; /* FIXED */
     }
 
     .cat {
@@ -105,7 +114,6 @@
         cursor: pointer;
     }
 
-    /* Footer */
     .footer {
         background-color: #166d33;
         padding: 15px;
@@ -128,42 +136,28 @@
     <div onclick="go('about.html')">ℹ️<br>About</div>
 </div>
 
-<!-- Main White Box -->
 <div class="box">
 
-    <!-- GREEN BANNER (SAFE, NO BUTTON, NO OVERLAY) -->
-    <div style="
-        background: linear-gradient(135deg, #0B6C36, #18a14f);
-        padding: 22px;
-        border-radius: 18px;
-        color: white;
-        margin-bottom: 25px;
-        text-align: center;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-        pointer-events: none;
-    ">
-        <h2 style="margin:0; font-size:22px;">Do Work and Earn Money 💰</h2>
-        <p style="color:#e6ffe6; margin-top:8px;">
+    <div class="banner">
+        <h2 style="margin:0;">Do Work and Earn Money 💰</h2>
+        <p style="margin-top:8px; color:#e6ffe6;">
             Flexible hours • Trusted customers • Fast payouts
         </p>
     </div>
 
-    <!-- MAIN ROLE SECTION -->
-    <h2 style="color:#166d33; margin-top:10px;">Select Your Role</h2>
+    <h2 style="color:#166d33;">Select Your Role</h2>
 
     <button class="cusBtn" onclick="saveRole('customer')">Continue as Customer</button>
     <button class="workBtn" onclick="saveRole('worker')">Continue as Worker</button>
 
     <p onclick="logout()" style="color:#166d33; cursor:pointer; margin-top:10px;">Logout</p>
 
-    <!-- Quick Actions -->
     <div class="quick-box">
         <div class="quick-card">📌 Book Service</div>
         <div class="quick-card">🛠️ Become Worker</div>
         <div class="quick-card">📍 Nearby Help</div>
     </div>
 
-    <!-- Popular Services -->
     <div class="category-title">Popular Services</div>
 
     <div class="category-scroll">
@@ -178,13 +172,11 @@
 
 </div>
 
-<!-- Footer -->
 <div class="footer">
     © 2025 Seva • Helping People Daily ❤️
 </div>
 
 <script>
-// Firebase Config
 var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
@@ -199,13 +191,13 @@ function go(page){ window.location.href = page; }
 
 function saveRole(role){
     let user = firebase.auth().currentUser;
-    if(!user){ 
-        alert("Please login first."); 
-        go("login.html"); 
-        return; 
+    if(!user){
+        alert("Please login first.");
+        go("login.html");
+        return;
     }
 
-    firebase.database().ref("users/"+user.uid).update({
+    firebase.database().ref("users/" + user.uid).update({
         role: role
     }).then(()=>{
         if(role === "customer") go("customer_dashboard.html");
@@ -223,4 +215,4 @@ firebase.auth().onAuthStateChanged(user=>{
 </script>
 
 </body>
-    </html>
+</html>
