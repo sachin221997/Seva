@@ -29,6 +29,27 @@
 
     .navbar div { cursor: pointer; }
 
+    /* Banner */
+    .banner {
+        width: 90%;
+        background: linear-gradient(135deg, #0b8636, #18a14f);
+        margin: 20px auto;
+        padding: 30px 20px;
+        border-radius: 20px;
+        text-align: center;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.15);
+    }
+    .banner small {
+        display: block;
+        margin-top: 10px;
+        font-size: 14px;
+        opacity: 0.9;
+        font-weight: normal;
+    }
+
     .box {
         width: 90%;
         margin: 20px auto;
@@ -57,6 +78,17 @@
 
     .cusBtn { background-color: #166d33; }
     .workBtn { background-color: #0b63c9; }
+    .contactBtn { background-color: #f39c12; }
+
+    .social-icons {
+        margin-top: 30px;
+        text-align: center;
+    }
+    .social-icons img {
+        width: 40px;
+        margin: 0 10px;
+        cursor: pointer;
+    }
 
     .footer {
         background-color: #166d33;
@@ -76,8 +108,14 @@
     <div onclick="go('need.html')">📌<br>Need</div>
     <div onclick="go('help.html')">🔧<br>Help</div>
     <div onclick="go('profile.html')">👤<br>Profile</div>
-    <div onclick="go('search.html')">🔍<br>Search</div>
+    <div onclick="go('contact.html')">📞<br>Contact</div>
     <div onclick="go('about.html')">ℹ️<br>About</div>
+</div>
+
+<!-- BANNER -->
+<div class="banner">
+    Do Work and Earn Money 💰
+    <small>Flexible hours • Trusted customers • Fast payouts</small>
 </div>
 
 <div class="box">
@@ -86,7 +124,17 @@
     <button class="cusBtn" onclick="saveRole('customer')">Continue as Customer</button>
     <button class="workBtn" onclick="saveRole('worker')">Continue as Worker</button>
 
+    <!-- Contact Button Inside Box -->
+    <button class="contactBtn" onclick="contactSupport()">📞 Contact Support</button>
+
     <p onclick="logout()" style="color:#166d33; cursor:pointer;">Logout</p>
+
+    <!-- SOCIAL ICONS -->
+    <div class="social-icons">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" title="Facebook">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" title="Instagram">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" title="WhatsApp">
+    </div>
 </div>
 
 <div class="footer">© 2025 Seva • Helping People Daily ❤️</div>
@@ -104,43 +152,38 @@ var firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-// Redirect function
-function go(page) {
-    window.location.href = page;
-}
+// Redirect
+function go(page){ window.location.href = page; }
 
-// SAVE ROLE + REDIRECT
-function saveRole(roleName) {
+// Save Role
+function saveRole(roleName){
     var user = firebase.auth().currentUser;
 
-    if (!user) {
+    if(!user){
         alert("Please login first.");
         go("login.html");
         return;
     }
 
-    firebase.database().ref("users/" + user.uid).update({
-        role: roleName
-    });
+    firebase.database().ref("users/" + user.uid).update({ role: roleName });
 
-    // IMPORTANT — Correct redirects
-    if (roleName === "customer") {
+    if(roleName === "customer"){
         go("customer_dashboard.html");
     } else {
         go("worker_dashboard.html");
     }
 }
 
-// LOGOUT
-function logout() {
-    firebase.auth().signOut().then(() => go("login.html"));
+// Contact Support Function
+function contactSupport(){
+    window.location.href = "mailto:support@sevaapp.com?subject=Need Help&body=Hi Support, I need help with...";
 }
 
-// LOGIN CHECK
-firebase.auth().onAuthStateChanged(user => {
-    if (!user) go("login.html");
-});
+// Logout
+function logout(){
+    firebase.auth().signOut().then(()=> go("login.html"));
+}
 </script>
 
 </body>
-</html>
+    </html>
