@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seva • Customer Dashboard</title>
+
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<style>
+    body {
+        margin: 0;
+        background: #e9f6e9;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Navbar */
+    .navbar {
+        background: #166d33;
+        padding: 12px;
+        display: flex;
+        justify-content: space-around;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        font-size: 13px;
+    }
+    .navbar div { cursor: pointer; }
+
+    /* Main Box */
+    .box {
+        width: 90%;
+        margin: 20px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 18px;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Banner */
+    .banner {
+        background: linear-gradient(135deg, #0B6C36, #18a14f);
+        color: white;
+        padding: 22px;
+        border-radius: 18px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Action Cards */
+    .actions {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 15px;
+    }
+
+    .card {
+        width: 28%;
+        background: white;
+        padding: 15px;
+        font-size: 14px;
+        border-radius: 12px;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .card:hover {
+        background: #edf9ed;
+        transition: 0.3s;
+    }
+
+    /* Job Section */
+    .jobs {
+        margin-top: 25px;
+    }
+
+    .job-box {
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0px 0px 8px rgba(0,0,0,0.1);
+        margin-bottom: 12px;
+    }
+
+    /* Footer */
+    .footer {
+        background: #166d33;
+        padding: 15px;
+        text-align: center;
+        color: white;
+        margin-top: 25px;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div onclick="go('customer_dashboard.html')">🏠<br>Home</div>
+    <div onclick="go('need.html')">📝<br>Post Job</div>
+    <div onclick="go('search.html')">🔍<br>Search</div>
+    <div onclick="go('profile.html')">👤<br>Profile</div>
+    <div onclick="logout()">🚪<br>Logout</div>
+</div>
+
+<div class="box">
+
+    <!-- Banner -->
+    <div class="banner">
+        <h2 style="margin:0;">Welcome Customer 🙏</h2>
+        <p style="margin-top:10px; color:#e8ffe8;">
+            Book trusted workers, post your needs, and get instant help.
+        </p>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions">
+        <div class="card" onclick="go('need.html')">📝 Post a Job</div>
+        <div class="card" onclick="go('search.html')">🔍 Search Workers</div>
+        <div class="card" onclick="loadMyJobs()">📦 My Jobs</div>
+    </div>
+
+    <!-- My Jobs -->
+    <h3 style="margin-top:25px; color:#166d33;">Your Recent Jobs</h3>
+
+    <div id="jobList" class="jobs">
+        <p style="color:#555;">Loading your jobs...</p>
+    </div>
+
+</div>
+
+<div class="footer">
+    © 2025 Seva • Helping People Daily ❤️
+</div>
+
+<script>
+// Firebase Config
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
+};
+firebase.initializeApp(firebaseConfig);
+
+// Redirect function
+function go(page){ window.location.href = page; }
+
+// Logout
+function logout(){
+    firebase.auth().signOut().then(()=> go("login.html"));
+}
+
+// Show My Jobs
+function loadMyJobs(){
+    let user = firebase.auth().currentUser;
+    if(!user) return;
+
+    firebase.database().ref("jobs").orderByChild("customerId").equalTo(user.uid)
+    .once("value", snap => {
+        let jobList = document.getElementById("jobList");
+        jobList.innerHTML = "";
+
+        if(!snap.exists()){
+            jobList.innerHTML = "<p>No jobs posted yet.</p>";
+            return;
+        }
+
+        snap.forEach(job => {
+            let j = job.val();
+            jobList.innerHTML += `
+                <div class="job-box">
+                    <b>${j.title}</b><br>
+                    <span>${j.description}</span><br><br>
+                    <b>₹${j.amount}</b> • ${j.hours}<br>
+                    <small>Status: ${j.status || "Pending"}</small>
+                </div>
+            `;
+        });
+    });
+}
+
+// Force login check
+firebase.auth().onAuthStateChanged(user=>{
+    if(!user) go("login.html");
+    else loadMyJobs();
+});
+</script>
+
+</body>
+  </html>
