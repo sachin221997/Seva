@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seva • Select Role</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Choose Role - Seva</title>
 
 <!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -25,204 +25,120 @@
         color: white;
         font-weight: bold;
         text-align: center;
-        font-size: 13px;
     }
+
     .navbar div { cursor: pointer; }
 
     .box {
-        background: white;
         width: 90%;
         margin: 20px auto;
+        background: white;
         padding: 25px;
         border-radius: 20px;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         text-align: center;
-        position: relative;
-        z-index: 5;
+        box-shadow: 0px 0px 8px rgba(0,0,0,0.1);
     }
 
-    .banner {
-        background: linear-gradient(135deg, #0B6C36, #18a14f);
-        padding: 22px;
-        border-radius: 18px;
-        color: white;
-        margin-bottom: 25px;
-        text-align: center;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+    h2 {
+        color: #166d33;
+        margin-bottom: 20px;
     }
 
     button {
         width: 90%;
         padding: 15px;
         font-size: 17px;
-        font-weight: bold;
         color: white;
         border: none;
-        border-radius: 8px;
-        margin-top: 10px;
+        border-radius: 10px;
+        margin: 10px 0;
         cursor: pointer;
-        position: relative;
-        z-index: 9999; /* ensures clickable */
     }
 
     .cusBtn { background-color: #166d33; }
     .workBtn { background-color: #0b63c9; }
 
-    .quick-box {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 25px;
-    }
-
-    .quick-card {
-        background: white;
-        width: 28%;
-        padding: 12px;
-        border-radius: 12px;
-        box-shadow: 0 0 6px rgba(0,0,0,0.1);
-        font-size: 14px;
-        text-align: center;
-        cursor: pointer;
-    }
-
-    .category-title {
-        margin-top: 25px;
-        font-size: 17px;
-        font-weight: bold;
-        text-align: left;
-        margin-left: 10px;
-    }
-
-    .category-scroll {
-        display: flex;
-        overflow-x: auto;
-        margin-top: 15px;
-        padding-bottom: 10px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .cat {
-        min-width: 100px;
-        background: white;
-        padding: 10px;
-        margin-right: 10px;
-        text-align: center;
-        border-radius: 15px;
-        box-shadow: 0px 0px 6px rgba(0,0,0,0.1);
-        font-size: 15px;
-        cursor: pointer;
-    }
-
     .footer {
         background-color: #166d33;
-        padding: 15px;
-        text-align: center;
+        padding: 12px;
+        margin-top: 25px;
         color: white;
-        margin-top: 30px;
+        text-align: center;
     }
 </style>
 </head>
 
 <body>
 
-<!-- Navbar -->
+<!-- NAVBAR -->
 <div class="navbar">
     <div onclick="go('role.html')">🏠<br>Home</div>
-    <div onclick="go('need.html')">📝<br>Need</div>
-    <div onclick="go('help.html')">🛠️<br>Help</div>
+    <div onclick="go('need.html')">📌<br>Need</div>
+    <div onclick="go('help.html')">🔧<br>Help</div>
     <div onclick="go('profile.html')">👤<br>Profile</div>
     <div onclick="go('search.html')">🔍<br>Search</div>
     <div onclick="go('about.html')">ℹ️<br>About</div>
 </div>
 
 <div class="box">
-
-    <div class="banner">
-        <h2 style="margin:0;">Do Work and Earn Money 💰</h2>
-        <p style="margin-top:8px; color:#e6ffe6;">
-            Flexible hours • Trusted customers • Fast payouts
-        </p>
-    </div>
-
-    <h2 style="color:#166d33;">Select Your Role</h2>
+    <h2>Select Your Role</h2>
 
     <button class="cusBtn" onclick="saveRole('customer')">Continue as Customer</button>
     <button class="workBtn" onclick="saveRole('worker')">Continue as Worker</button>
 
-    <p onclick="logout()" style="color:#166d33; cursor:pointer; margin-top:10px;">Logout</p>
-
-    <div class="quick-box">
-        <div class="quick-card">📌 Book Service</div>
-        <div class="quick-card">🛠️ Become Worker</div>
-        <div class="quick-card">📍 Nearby Help</div>
-    </div>
-
-    <div class="category-title">Popular Services</div>
-
-    <div class="category-scroll">
-        <div class="cat">💇‍♂️ Haircut</div>
-        <div class="cat">🧹 Cleaning</div>
-        <div class="cat">🔧 Repair</div>
-        <div class="cat">🚗 Car Wash</div>
-        <div class="cat">💆 Massage</div>
-        <div class="cat">🍳 Cooking</div>
-        <div class="cat">📦 Shifting</div>
-    </div>
-
+    <p onclick="logout()" style="color:#166d33; cursor:pointer;">Logout</p>
 </div>
 
-<div class="footer">
-    © 2025 Seva • Helping People Daily ❤️
-</div>
+<div class="footer">© 2025 Seva • Helping People Daily ❤️</div>
 
 <script>
+// Firebase Config
 var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
     projectId: "seva-6f191",
     storageBucket: "seva-6f191.firebasestorage.app",
     messagingSenderId: "826093348416",
-    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId: "G-78H32SRPCD"
 };
 firebase.initializeApp(firebaseConfig);
 
-function go(page){
+// Redirect function
+function go(page) {
     window.location.href = page;
 }
 
-function saveRole(role){
-    let user = firebase.auth().currentUser;
+// SAVE ROLE + REDIRECT
+function saveRole(roleName) {
+    var user = firebase.auth().currentUser;
 
-    if(!user){
+    if (!user) {
         alert("Please login first.");
         go("login.html");
         return;
     }
 
     firebase.database().ref("users/" + user.uid).update({
-        role: role
-    }).then(()=>{
-
-        if(role === "customer"){
-            go("customer_home.html");        // CORRECT FILE
-        } else {
-            go("worker_dashboard.html");     // CORRECT FILE
-        }
-
-    }).catch(err=>{
-        alert("Error: " + err.message);
+        role: roleName
     });
+
+    // IMPORTANT — Correct redirects
+    if (roleName === "customer") {
+        go("customer_dashboard.html");
+    } else {
+        go("worker_dashboard.html");
+    }
 }
 
-function logout(){
-    firebase.auth().signOut().then(()=>{
-        go("login.html");
-    });
+// LOGOUT
+function logout() {
+    firebase.auth().signOut().then(() => go("login.html"));
 }
 
-firebase.auth().onAuthStateChanged(user=>{
-    if(!user) go("login.html");
+// LOGIN CHECK
+firebase.auth().onAuthStateChanged(user => {
+    if (!user) go("login.html");
 });
 </script>
 
