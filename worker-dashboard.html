@@ -1,20 +1,91 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-    <title>Worker Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Worker Dashboard — Seva</title>
+  <style>
+    :root{
+      --green:#1a8f4a;
+      --accent:#0b63c9;
+      --muted:#6b7280;
+      --card:#fff;
+      --bg:#f1faf3;
+      font-family: Inter, system-ui, Arial, sans-serif;
+    }
+    body{ margin:0; background:var(--bg); color:#0f1724; padding:14px; }
+    .topbar{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      background:var(--green); color:#fff; padding:12px 14px;
+      border-radius:10px; box-shadow:0 6px 18px rgba(26,143,74,0.12);
+    }
+    .topbar h1{ margin:0; font-size:16px; }
+    .small{ font-size:13px; color:var(--muted); }
+    .card{
+      background:var(--card); border-radius:12px; padding:12px;
+      box-shadow:0 6px 18px rgba(2,6,23,0.06); margin-top:12px;
+    }
+    .btn{
+      background:var(--green); color:#fff; border:0; padding:10px 12px;
+      border-radius:10px; cursor:pointer; font-weight:700;
+    }
+    .btn.secondary{
+      background:#f3f4f6; color:#111; border:1px solid #e6eef0;
+    }
+    .jobs{ margin-top:12px; display:flex; flex-direction:column; gap:12px; }
+    .job{
+      border-radius:12px; padding:12px; background:#fff;
+      box-shadow:0 6px 16px rgba(2,6,23,0.04);
+    }
+    .job h3{ margin:0 0 6px 0; font-size:16px; }
+    .meta{
+      display:flex; gap:12px; flex-wrap:wrap; color:var(--muted);
+      font-size:13px; margin-bottom:8px;
+    }
+    .status{
+      font-weight:700; padding:6px 8px; border-radius:8px; font-size:13px;
+      margin-top:8px;
+    }
+    .status.open{ background:#fff9e6; color:#b45309; }
+    .status.accepted{ background:#e6f8ff; color:#0b63c9; }
+    .status.payment_received{ background:#fff0f6; color:#9f1239; }
+    .status.fee_pending{ background:#fff4e6; color:#b45309; }
+    .status.completed{ background:#e6fff1; color:#0a5f3b; }
+    .actions{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    @media(max-width:520px){
+      .topbar{ flex-direction:column; gap:8px; align-items:flex-start; }
+    }
+  </style>
+</head>
 
-    <!-- Firebase v8 Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+<body>
 
-    <script>
-    // --------------------------------------
-    // 🔥 YOUR REAL FIREBASE CONFIG
-    // --------------------------------------
-    const firebaseConfig = {
+  <div class="topbar">
+    <div>
+      <h1>Seva — Worker Dashboard</h1>
+      <div class="small" id="workerName">Hello, Worker</div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn secondary" onclick="goHome()">Home</button>
+      <button class="btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="card" id="locationCard">
+    <strong>Nearby Jobs</strong>
+    <div class="small" id="locStatus">Requesting location…</div>
+  </div>
+
+  <div id="jobsContainer" class="jobs"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+  // ✔ YOUR FIREBASE CONFIG (added)
+  var firebaseConfig = {
       apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
       authDomain: "seva-6f191.firebaseapp.com",
       projectId: "seva-6f191",
@@ -22,195 +93,210 @@
       messagingSenderId: "826093348416",
       appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
       measurementId: "G-78H32SRPCD"
-    };
+  };
+  firebase.initializeApp(firebaseConfig);
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const rdb = firebase.database();
 
-    // --------------------------------------
-    // AUTH PROTECTION
-    // --------------------------------------
-    auth.onAuthStateChanged(user => {
-        if (!user) {
-            window.location.href = "worker-login.html";
-        } else {
-            loadBookings();
-            loadFeed(); // NEW FEATURE
-        }
+  const ADMIN_UPI = "sachiny4561@oksbi";
+  const PLATFORM_FEE = 50;
+
+  const jobsContainer = document.getElementById("jobsContainer");
+  const workerNameEl = document.getElementById("workerName");
+  const locStatus = document.getElementById("locStatus");
+
+  let workerUid = null;
+  let workerProfile = null;
+  let workerLat = null;
+  let workerLng = null;
+
+  // Auth check
+  auth.onAuthStateChanged(async user => {
+    if (!user) return location = "login.html";
+    workerUid = user.uid;
+
+    const snap = await rdb.ref("users/"+workerUid).once("value");
+    workerProfile = snap.val() || {};
+    workerNameEl.innerText = "Hello, " + (workerProfile.name || "Worker");
+
+    getLocationAndLoadJobs();
+  });
+
+  function goHome(){ location = "home.html"; }
+
+  // Get geolocation
+  function getLocationAndLoadJobs(){
+    if (!navigator.geolocation){
+      locStatus.innerText = "Geolocation not supported.";
+      loadJobs();
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(pos=>{
+      workerLat = pos.coords.latitude;
+      workerLng = pos.coords.longitude;
+      locStatus.innerText = "Location found.";
+      loadJobs();
+    }, err=>{
+      locStatus.innerText = "Location denied.";
+      loadJobs();
+    });
+  }
+
+  // Load nearby jobs
+  async function loadJobs(){
+    jobsContainer.innerHTML = "<div class='small'>Loading jobs…</div>";
+
+    const q = db.collection("jobs").where("status","==","open").orderBy("createdAt","desc");
+    const snap = await q.get();
+
+    const list = [];
+    snap.forEach(doc=>{
+      const j = doc.data();
+      j.id = doc.id;
+      list.push(j);
     });
 
-    // --------------------------------------
-    // OLD SYSTEM: LOAD BOOKINGS
-    // --------------------------------------
-    function loadBookings() {
-        db.collection("bookings")
-          .orderBy("time", "desc")
-          .get()
-          .then(snapshot => {
+    // No distance filter simple for now
+    renderJobs(list);
+  }
 
-            let container = document.getElementById("bookings");
-            container.innerHTML = "";
+  function renderJobs(list){
+    jobsContainer.innerHTML = "";
+    if (!list.length){
+      jobsContainer.innerHTML = "<div class='small'>No jobs found nearby.</div>";
+      return;
+    }
 
-            snapshot.forEach(doc => {
-                let data = doc.data();
+    list.forEach(job=>{
+      const box = document.createElement("div");
+      box.className = "job";
+      box.innerHTML = `
+        <h3>${job.title || job.type}</h3>
+        <div class="meta">
+          <div>₹${job.amount}</div>
+          <div>${job.duration || ""}</div>
+          <div>${job.location || ""}</div>
+        </div>
+        <div class="small">${job.description || ""}</div>
 
-                container.innerHTML += `
-                    <div class="booking-card">
-                        <p><b>Service:</b> ${data.service}</p>
-                        <p><b>User Email:</b> ${data.userEmail}</p>
-                        <p><b>Time:</b> ${data.time}</p>
+        <div class="status open">OPEN</div>
 
-                        <button onclick="acceptBooking('${doc.id}', '${data.service}', '${data.userEmail}')">
-                            Accept Job
-                        </button>
-                    </div>
-                    <hr>
-                `;
-            });
+        <div class="actions">
+          <button class="btn" onclick="acceptJob('${job.id}')">Accept Job</button>
+        </div>
+      `;
+      jobsContainer.appendChild(box);
+    });
+  }
+
+  // Accept job
+  async function acceptJob(id){
+    if (!confirm("Accept this job?")) return;
+
+    await db.collection("jobs").doc(id).update({
+      status:"accepted",
+      workerId: workerUid,
+      workerName: workerProfile.name || "",
+      acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    alert("Job Accepted!");
+    location = "worker_dashboard.html?tab=accepted";
+  }
+
+  // Extra listener for accepted jobs
+  setTimeout(()=>{
+    listenAcceptedJobs();
+  },1200);
+
+  function listenAcceptedJobs(){
+    db.collection("jobs")
+      .where("workerId","==",workerUid)
+      .where("status","in",["accepted","payment_received","fee_pending"])
+      .onSnapshot(snap=>{
+        const old = document.getElementById("acceptedSection");
+        if (old) old.remove();
+
+        const card = document.createElement("div");
+        card.id = "acceptedSection";
+        card.className = "card";
+        card.innerHTML = "<strong>Your Active Jobs</strong>";
+
+        snap.forEach(doc=>{
+          const j = doc.data();
+          j.id = doc.id;
+
+          const box = document.createElement("div");
+          box.className = "job";
+
+          let statusHTML = `<div class="status ${j.status}">${j.status.toUpperCase()}</div>`;
+          let actionsHTML = renderAcceptedActions(j);
+
+          box.innerHTML = `
+            <h3>${j.title || j.type}</h3>
+            <div class="meta">
+              <div>Amount: ₹${j.amount}</div>
+              <div>Worker Share: ₹${(j.amount - PLATFORM_FEE)}</div>
+            </div>
+            ${statusHTML}
+            <div class="actions">${actionsHTML}</div>
+          `;
+
+          card.appendChild(box);
         });
+
+        document.body.insertBefore(card, jobsContainer);
+      });
+  }
+
+  function renderAcceptedActions(j){
+    if (j.status === "accepted"){
+      return `
+        <button class="btn" onclick="markPaymentReceived('${j.id}')">Payment Received</button>
+      `;
     }
-
-    function acceptBooking(id, service, userEmail) {
-
-        let workerEmail = auth.currentUser.email;
-
-        let acceptedJob = {
-            bookingId: id,
-            worker: workerEmail,
-            userEmail: userEmail,
-            service: service,
-            time: new Date().toISOString(),
-            status: "accepted"
-        };
-
-        db.collection("acceptedJobs")
-          .add(acceptedJob)
-          .then(() => {
-              db.collection("bookings").doc(id).delete();
-              alert("Job Accepted Successfully!");
-              loadBookings();
-          })
-          .catch(error => alert(error.message));
+    if (j.status === "payment_received"){
+      return `
+        <button class="btn" onclick="openPayPlatform('${j.id}')">Pay Platform Fee ₹${PLATFORM_FEE}</button>
+        <button class="btn secondary" onclick="confirmPlatformPaid('${j.id}')">I Have Paid</button>
+      `;
     }
-
-    // --------------------------------------
-    // NEW SYSTEM: FACEBOOK-LIKE FEED SYSTEM
-    // --------------------------------------
-
-    function distanceKm(lat1, lon1, lat2, lon2){
-        const R = 6371;
-        const dLat = (lat2-lat1) * Math.PI/180;
-        const dLon = (lon2-lon1) * Math.PI/180;
-        const a =
-            Math.sin(dLat/2)**2 +
-            Math.cos(lat1*Math.PI/180) *
-            Math.cos(lat2*Math.PI/180) *
-            Math.sin(dLon/2)**2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+    if (j.status === "fee_pending"){
+      return `<div class="small">Waiting for admin fee confirmation…</div>`;
     }
+    return `<div class="small">No actions</div>`;
+  }
 
-    function loadFeed() {
-        navigator.geolocation.getCurrentPosition((pos) => {
-            let myLat = pos.coords.latitude;
-            let myLng = pos.coords.longitude;
+  async function markPaymentReceived(id){
+    await db.collection("jobs").doc(id).update({
+      status:"payment_received"
+    });
+    alert("Status updated!");
+  }
 
-            let feedBox = document.getElementById("feed");
+  function openPayPlatform(id){
+    const url = `upi://pay?pa=${ADMIN_UPI}&am=${PLATFORM_FEE}&pn=Seva%20Platform`;
+    location.href = url;
+  }
 
-            db.collection("posts")
-              .where("status", "==", "open")
-              .orderBy("timestamp", "desc")
-              .onSnapshot(snapshot => {
+  async function confirmPlatformPaid(id){
+    await db.collection("jobs").doc(id).update({
+      status:"completed",
+      completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
 
-                feedBox.innerHTML = "";
-                let count = 0;
+    await rdb.ref("admin/earnings").transaction(v => (v || 0) + PLATFORM_FEE);
 
-                snapshot.forEach(doc => {
-                    let d = doc.data();
+    alert("Job Completed!");
+  }
 
-                    if (!d.lat || !d.lng) return;
+  function logout(){
+    auth.signOut().then(()=> location="login.html");
+  }
 
-                    let km = distanceKm(myLat, myLng, d.lat, d.lng);
-
-                    if (km <= 10) {
-
-                        count++;
-
-                        let card = `
-                            <div style="border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:8px;">
-                                <p><b>Message:</b> ${d.text || "<i>Voice request</i>"}</p>
-                                <p><b>Distance:</b> ${km.toFixed(1)} km</p>
-                                <p><b>Posted:</b> ${new Date(d.timestamp?.toDate()).toLocaleString()}</p>
-                        `;
-
-                        if (d.voiceUrl) {
-                            card += `
-                                <audio controls src="${d.voiceUrl}" style="width:100%; margin-top:6px;"></audio>
-                            `;
-                        }
-
-                        card += `
-                                <br>
-                                <button onclick="openPost('${doc.id}')">View / Accept</button>
-                            </div>
-                        `;
-
-                        feedBox.innerHTML += card;
-                    }
-                });
-
-                let notif = document.getElementById("notif");
-                if (count > 0) {
-                    notif.style.display = "block";
-                    notif.innerText = count + " nearby";
-                    setTimeout(() => notif.style.display="none", 4000);
-                }
-            });
-        });
-    }
-
-    function openPost(id){
-        window.location.href = "post_details.html?postId=" + id;
-    }
-
-    // --------------------------------------
-    // LOGOUT
-    // --------------------------------------
-    function workerLogout() {
-        auth.signOut().then(() => {
-            window.location.href = "worker-login.html";
-        });
-    }
-
-    </script>
-
-</head>
-
-<body>
-
-<h1>👷 Worker Dashboard</h1>
-
-<!-- OLD BOOKINGS -->
-<h2>📦 Bookings</h2>
-<div id="bookings">
-    <p>Loading bookings...</p>
-</div>
-
-<br><hr><br>
-
-<!-- NEW FACEBOOK-LIKE FEED -->
-<h2>📌 Nearby Requests (New Feature)</h2>
-<div id="feed">Loading nearby requests...</div>
-
-<div id="notif" 
-     style="display:none; background:#ff3b30;color:white;padding:6px 12px;
-     border-radius:20px; position:fixed; top:20px; right:20px;">
-</div>
-
-<br><hr><br>
-
-<button onclick="workerLogout()">Logout</button>
+  </script>
 
 </body>
 </html>
