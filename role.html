@@ -20,39 +20,37 @@
     /* Navbar */
     .navbar {
         background-color: #166d33;
-        color: white;
         padding: 12px;
         display: flex;
         justify-content: space-around;
-        text-align: center;
+        align-items: center;
+        color: white;
         font-weight: bold;
         font-size: 13px;
+        text-align: center;
     }
-
     .navbar div { cursor: pointer; }
 
-    /* Main Container */
+    /* Main Box */
     .box {
         background: white;
         width: 90%;
         margin: 20px auto;
-        padding: 22px;
+        padding: 25px;
         border-radius: 20px;
         box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         text-align: center;
     }
 
-    h2 { color: #166d33; }
-
     button {
         width: 90%;
-        padding: 14px;
+        padding: 15px;
         font-size: 17px;
         font-weight: bold;
         color: white;
         border: none;
         border-radius: 8px;
-        margin: 10px 0;
+        margin-top: 10px;
         cursor: pointer;
     }
 
@@ -63,60 +61,64 @@
     .quick-box {
         display: flex;
         justify-content: space-around;
-        margin-top: 20px;
+        margin-top: 25px;
     }
 
     .quick-card {
+        background: white;
         width: 28%;
         padding: 12px;
-        background: white;
-        border-radius: 13px;
-        box-shadow: 0px 0px 8px rgba(0,0,0,0.1);
-        font-size: 13px;
+        border-radius: 12px;
+        box-shadow: 0 0 6px rgba(0,0,0,0.1);
+        font-size: 14px;
+        text-align: center;
         cursor: pointer;
     }
 
-    /* Categories */
+    .quick-card:hover { background: #eef7ee; transition: 0.3s; }
+
+    /* Popular Services */
     .category-title {
         margin-top: 25px;
         font-size: 17px;
         font-weight: bold;
         text-align: left;
+        margin-left: 10px;
     }
 
     .category-scroll {
         display: flex;
         overflow-x: auto;
-        padding-bottom: 10px;
         margin-top: 15px;
+        padding-bottom: 10px;
     }
 
     .cat {
         min-width: 100px;
         background: white;
         padding: 10px;
-        margin-right: 12px;
+        margin-right: 10px;
+        text-align: center;
         border-radius: 15px;
         box-shadow: 0px 0px 6px rgba(0,0,0,0.1);
         font-size: 15px;
-        text-align: center;
         cursor: pointer;
     }
 
     /* Footer */
     .footer {
         background-color: #166d33;
-        color: white;
         padding: 15px;
         text-align: center;
-        margin-top: 25px;
+        color: white;
+        margin-top: 30px;
     }
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
+<!-- Navbar -->
 <div class="navbar">
     <div onclick="go('role.html')">🏠<br>Home</div>
     <div onclick="go('need.html')">📝<br>Need</div>
@@ -126,10 +128,10 @@
     <div onclick="go('about.html')">ℹ️<br>About</div>
 </div>
 
-<!-- MAIN BOX -->
+<!-- Main White Box -->
 <div class="box">
 
-    <!-- GREEN ATTRACTIVE BANNER -->
+    <!-- GREEN BANNER (SAFE, NO BUTTON, NO OVERLAY) -->
     <div style="
         background: linear-gradient(135deg, #0B6C36, #18a14f);
         padding: 22px;
@@ -138,32 +140,30 @@
         margin-bottom: 25px;
         text-align: center;
         box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+        pointer-events: none;
     ">
         <h2 style="margin:0; font-size:22px;">Do Work and Earn Money 💰</h2>
         <p style="color:#e6ffe6; margin-top:8px;">
-            Flexible hours • Trusted customers • Fast payouts  
+            Flexible hours • Trusted customers • Fast payouts
         </p>
-        <button onclick="scrollToRole()" 
-        style="background:white; color:#0B6C36; padding:10px 20px; border-radius:25px; margin-top:10px; font-size:15px; font-weight:700; cursor:pointer;">
-            Choose Your Role
-        </button>
     </div>
 
-    <h2 id="roleArea">Select Your Role</h2>
+    <!-- MAIN ROLE SECTION -->
+    <h2 style="color:#166d33; margin-top:10px;">Select Your Role</h2>
 
     <button class="cusBtn" onclick="saveRole('customer')">Continue as Customer</button>
     <button class="workBtn" onclick="saveRole('worker')">Continue as Worker</button>
 
-    <p onclick="logout()" style="color:#166d33; cursor:pointer;">Logout</p>
+    <p onclick="logout()" style="color:#166d33; cursor:pointer; margin-top:10px;">Logout</p>
 
-    <!-- QUICK ACTIONS -->
+    <!-- Quick Actions -->
     <div class="quick-box">
         <div class="quick-card">📌 Book Service</div>
         <div class="quick-card">🛠️ Become Worker</div>
         <div class="quick-card">📍 Nearby Help</div>
     </div>
 
-    <!-- CATEGORIES -->
+    <!-- Popular Services -->
     <div class="category-title">Popular Services</div>
 
     <div class="category-scroll">
@@ -178,13 +178,13 @@
 
 </div>
 
-<!-- FOOTER -->
+<!-- Footer -->
 <div class="footer">
     © 2025 Seva • Helping People Daily ❤️
 </div>
 
 <script>
-// Firebase config
+// Firebase Config
 var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
@@ -197,17 +197,12 @@ firebase.initializeApp(firebaseConfig);
 
 function go(page){ window.location.href = page; }
 
-function scrollToRole(){
-    document.getElementById("roleArea").scrollIntoView({behavior:"smooth"});
-}
-
-/* Save Role */
 function saveRole(role){
     let user = firebase.auth().currentUser;
-    if(!user){
-        alert("Please login first.");
-        go("login.html");
-        return;
+    if(!user){ 
+        alert("Please login first."); 
+        go("login.html"); 
+        return; 
     }
 
     firebase.database().ref("users/"+user.uid).update({
@@ -218,12 +213,10 @@ function saveRole(role){
     });
 }
 
-/* Logout */
 function logout(){
     firebase.auth().signOut().then(()=> go("login.html"));
 }
 
-/* Force login check */
 firebase.auth().onAuthStateChanged(user=>{
     if(!user) go("login.html");
 });
