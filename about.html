@@ -1,221 +1,190 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>About – Seva App</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About – Seva App</title>
 
-  <style>
-    :root{
-      --bg:#F0FDF4;
-      --card:#ffffff;
-      --accent:#22C55E;
-      --accent-dark:#15803D;
-      --muted:#666;
-      --radius:12px;
-      font-family: Inter, system-ui, Arial;
-    }
+    <style>
+        :root{
+            --bg:#F0FDF4;
+            --card:#ffffff;
+            --accent:#22C55E;
+            --accent-dark:#15803D;
+            --muted:#666;
+            --radius:12px;
+            font-family: Inter, system-ui, Arial;
+        }
 
-    body{
-      margin:0;
-      background:var(--bg);
-      color:#111;
-    }
+        body{
+            margin:0;
+            background:var(--bg);
+            color:#111;
+        }
 
-    /* =======================
-          TOP NAVIGATION
-       ======================= */
+        /* ================================
+               TOP HEADER (BACK BUTTON)
+        ================================= */
+        .header {
+            background: var(--accent-dark);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+        }
 
-    .topnav {
-      background: var(--accent);
-      color: white;
-      padding: 14px 20px;
-      border-radius: 0 0 18px 18px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
+        .back-btn {
+            background: white;
+            color: var(--accent-dark);
+            padding: 7px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+        }
 
-    .topnav .logo {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
+        .title {
+            flex: 1;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-right: 45px; 
+        }
 
-    .topnav .links a {
-      margin-left: 20px;
-      color: white;
-      font-size: 16px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: 0.2s;
-    }
+        /* ===========================
+                ABOUT PAGE STYLE
+        ============================ */
+        .container{
+            max-width:900px;
+            margin:20px auto;
+            padding:20px;
+        }
 
-    .topnav .links a:hover {
-      opacity: 0.8;
-    }
+        .card{
+            background:white;
+            padding:24px;
+            border-radius:var(--radius);
+            box-shadow:0 6px 18px rgba(0,0,0,0.06);
+            margin-bottom:20px;
+        }
 
-    @media (max-width: 700px) {
-      .topnav {
-        flex-direction: column;
-        text-align: center;
-      }
-      .topnav .links {
-        margin-top: 8px;
-      }
-      .topnav .links a {
-        display: inline-block;
-        margin: 6px 10px;
-      }
-    }
+        h1{
+            margin-top:0;
+            font-size:30px;
+            color:#15803D;
+        }
 
-    /* =======================
-         ABOUT PAGE STYLE
-       ======================= */
+        h2{
+            margin-top:20px;
+            font-size:22px;
+            color:#15803D;
+        }
 
-    .container{
-      max-width:900px;
-      margin:20px auto;
-      padding:20px;
-    }
+        p{
+            font-size:16px;
+            line-height:1.7;
+            margin:12px 0;
+        }
 
-    .card{
-      background:white;
-      padding:24px;
-      border-radius:var(--radius);
-      box-shadow:0 6px 18px rgba(0,0,0,0.06);
-      margin-bottom:20px;
-    }
+        ul{
+            padding-left:20px;
+            line-height:1.7;
+            font-size:16px;
+        }
 
-    h1{
-      margin-top:0;
-      font-size:30px;
-      color:#15803D;
-    }
-
-    h2{
-      margin-top:20px;
-      font-size:22px;
-      color:#15803D;
-    }
-
-    p{
-      font-size:16px;
-      line-height:1.7;
-      margin:12px 0;
-    }
-
-    ul{
-      padding-left:20px;
-      line-height:1.7;
-      font-size:16px;
-    }
-
-    .highlight{
-      background:#DCFCE7;
-      padding:4px 8px;
-      border-radius:6px;
-      color:#15803D;
-    }
-
-  </style>
+        .highlight{
+            background:#DCFCE7;
+            padding:4px 8px;
+            border-radius:6px;
+            color:#15803D;
+        }
+    </style>
 </head>
 
 <body>
 
-  <!-- =======================
-          TOP NAV BAR
-       ======================= -->
-  <nav class="topnav">
-    <div class="logo">Seva</div>
-    <div class="links">
-      <a href="index.html">Home</a>
-      <a href="need.html">Post Need</a>
-      <a href="jobs.html">Jobs</a>
-      <a href="help.html">Help</a>
-      <a href="about.html">About</a>
-    </div>
-  </nav>
-
-  <div class="container">
-
-    <!-- About Intro -->
-    <div class="card">
-      <h1>About Seva App</h1>
-      <p>
-        <strong>Seva App</strong> is a simple and powerful platform where
-        <span class="highlight">anyone with skills can work, help others, and earn money daily or per hour.</span>
-      </p>
-
-      <p>
-        Our mission is to make work accessible for everyone — students, workers, homemakers,
-        skilled professionals, and anyone who wants to earn through their talent.
-      </p>
+    <!-- HEADER WITH BACK BUTTON -->
+    <div class="header">
+        <a href="javascript:history.back()" class="back-btn">← Back</a>
+        <div class="title">About Seva App</div>
     </div>
 
-    <!-- How it works -->
-    <div class="card">
-      <h2>How Seva App Works</h2>
-      <p><strong>For People Who Need Help:</strong></p>
-      <ul>
-        <li>Post your need (cleaning, tuition, delivery, repair, cooking, etc.)</li>
-        <li>Nearby workers can view your job</li>
-        <li>They contact you & complete the work</li>
-      </ul>
+    <div class="container">
 
-      <p><strong>For People Who Want to Earn:</strong></p>
-      <ul>
-        <li>Go to the Jobs page</li>
-        <li>Find available work near you</li>
-        <li>Use your skill → help others → earn money</li>
-      </ul>
+        <!-- About Intro -->
+        <div class="card">
+            <h1>About Seva App</h1>
+            <p>
+                <strong>Seva App</strong> is a simple and powerful platform where 
+                <span class="highlight">anyone with skills can work, help others, and earn money daily or per hour.</span>
+            </p>
+
+            <p>
+                Our mission is to make work accessible for everyone — students, workers,
+                homemakers, skilled professionals, and anyone who wants to earn through their talent.
+            </p>
+        </div>
+
+        <!-- How It Works -->
+        <div class="card">
+            <h2>How Seva App Works</h2>
+
+            <p><strong>For People Who Need Help:</strong></p>
+            <ul>
+                <li>Post your need (cleaning, tuition, delivery, repair, cooking, etc.)</li>
+                <li>Nearby workers can view your job</li>
+                <li>They contact you & complete the work</li>
+            </ul>
+
+            <p><strong>For People Who Want to Earn:</strong></p>
+            <ul>
+                <li>Go to the Jobs page</li>
+                <li>Find available work near you</li>
+                <li>Use your skill → help others → earn money</li>
+            </ul>
+        </div>
+
+        <!-- Why This App Exists -->
+        <div class="card">
+            <h2>Why We Created This App</h2>
+            <p>
+                India me har person ke paas koi na koi skill hoti hai — par sabko mauka nahi milta.
+            </p>
+
+            <p>Seva App ka goal hai:</p>
+            <ul>
+                <li>Every skill should have value</li>
+                <li>Everyone should get work easily</li>
+                <li>People should earn daily without any struggle</li>
+                <li>Community help & trust build ho</li>
+            </ul>
+        </div>
+
+        <!-- Who Can Use -->
+        <div class="card">
+            <h2>Who Can Use This App?</h2>
+            <ul>
+                <li>Students</li>
+                <li>Skilled workers</li>
+                <li>Home makers</li>
+                <li>Tutors, electricians, plumbers</li>
+                <li>Delivery helpers</li>
+                <li>Anyone who wants to earn or get help</li>
+            </ul>
+        </div>
+
+        <!-- Thank You -->
+        <div class="card">
+            <h2>Thank You!</h2>
+            <p>
+                Thank you for being a part of the <strong>Seva community</strong>.  
+                Let's help each other and grow together. ❤️
+            </p>
+        </div>
+
     </div>
-
-    <!-- Why this app exists -->
-    <div class="card">
-      <h2>Why We Created This App</h2>
-      <p>
-        India me har person ke paas koi na koi skill hoti hai —  
-        par sabko mauka nahi milta.  
-      </p>
-      <p>
-        Seva App ka goal hai:
-      </p>
-      <ul>
-        <li>Every skill should have value</li>
-        <li>Everyone should get work easily</li>
-        <li>People should earn daily without any struggle</li>
-        <li>Community help & trust build ho</li>
-      </ul>
-    </div>
-
-    <!-- Who can use -->
-    <div class="card">
-      <h2>Who Can Use This App?</h2>
-      <ul>
-        <li>Students</li>
-        <li>Skilled workers</li>
-        <li>Home makers</li>
-        <li>Tutors, electricians, plumbers</li>
-        <li>Delivery helpers</li>
-        <li>Anyone who wants to earn or get help</li>
-      </ul>
-    </div>
-
-    <!-- Thank you -->
-    <div class="card">
-      <h2>Thank You!</h2>
-      <p>
-        Thank you for being a part of the <strong>Seva community</strong>.  
-        Let's help each other and grow together. ❤️
-      </p>
-    </div>
-
-  </div>
 
 </body>
-  </html>
+          </html>
