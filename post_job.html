@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Post a Job</title>
+
+<style>
+body{
+  margin:0; font-family:Arial; background:#f0fff4;
+}
+.container{
+  max-width:700px; margin:25px auto; padding:20px; background:white;
+  border-radius:16px; box-shadow:0 3px 10px rgba(0,0,0,0.15);
+}
+h2{ text-align:center; color:#0a662e; margin-bottom:20px; }
+input, textarea{
+  width:100%; padding:12px; margin:10px 0;
+  border-radius:10px; border:1px solid #ccc; font-size:15px;
+}
+button{
+  width:100%; padding:14px; background:#0a662e;
+  border:none; border-radius:10px; color:white; font-size:17px; font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Post a Job</h2>
+
+    <input type="text" id="jobTitle" placeholder="Job Title">
+    <textarea id="description" rows="4" placeholder="Describe your work..."></textarea>
+
+    <input type="number" id="jobPrice" placeholder="Price (₹)">
+    <input type="text" id="city" placeholder="Your City">
+    <input type="text" id="address" placeholder="Full Address">
+    <input type="text" id="customerPhone" placeholder="Your Mobile Number">
+
+    <button onclick="submitJob()">Post Job</button>
+</div>
+
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
+// Auto-fill from category
+window.onload = () => {
+    if(localStorage.getItem("jobTitle"))
+        document.getElementById("jobTitle").value = localStorage.getItem("jobTitle");
+
+    if(localStorage.getItem("jobPrice"))
+        document.getElementById("jobPrice").value = localStorage.getItem("jobPrice");
+
+    if(localStorage.getItem("jobDesc"))
+        document.getElementById("description").value = localStorage.getItem("jobDesc");
+};
+
+function submitJob(){
+    var user = firebase.auth().currentUser;
+    if(!user){ alert("Login first!"); return; }
+
+    db.collection("jobs").add({
+        title: jobTitle.value,
+        description: description.value,
+        price: jobPrice.value,
+        city: city.value,
+        address: address.value,
+        customerPhone: customerPhone.value,
+        customerId: user.uid,
+        status: "open",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(()=>{
+        alert("Job Posted Successfully!");
+        window.location.href = "customer_dashboard.html";
+    });
+}
+</script>
+
+</body>
+  </html>
