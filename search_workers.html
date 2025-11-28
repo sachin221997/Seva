@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search Workers</title>
+
+<style>
+body{ margin:0; font-family:Arial; background:#f2fff5; }
+.container{ max-width:700px; margin:20px auto; padding:20px; }
+input{
+  width:100%; padding:12px; border-radius:10px;
+  border:1px solid #ccc; font-size:16px;
+}
+.worker-card{
+  background:white; padding:16px; border-radius:14px;
+  margin-top:15px; box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+.title{ font-size:17px; font-weight:bold; color:#0a662e; }
+.small{ font-size:14px; margin-top:4px; color:#444; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2 style="text-align:center; color:#0a662e;">Search Workers</h2>
+
+    <input id="searchCity" placeholder="Enter city name..." onkeyup="searchWorkers()">
+
+    <div id="results"></div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
+function searchWorkers(){
+    let city = searchCity.value;
+
+    if(city.length < 2){
+        results.innerHTML = "";
+        return;
+    }
+
+    db.collection("users")
+      .where("city","==",city)
+      .where("role","==","worker")
+      .get().then(snap=>{
+          if(snap.empty){
+              results.innerHTML = "<p>No workers found.</p>";
+              return;
+          }
+
+          let html = "";
+          snap.forEach(doc=>{
+              let w = doc.data();
+              html += `
+              <div class="worker-card">
+                  <div class="title">${w.name || "Worker"}</div>
+                  <div class="small">Experience: ${w.experience || "Not given"}</div>
+                  <div class="small">Job Type: ${w.jobTitle || "General Work"}</div>
+                  <div class="small">Phone: ${w.mobile || "Not added"}</div>
+                  <div class="small">City: ${w.city}</div>
+              </div>`;
+          });
+
+          results.innerHTML = html;
+      });
+}
+</script>
+
+</body>
+  </html>
