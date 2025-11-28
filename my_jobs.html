@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Jobs</title>
+
+<style>
+body{ margin:0; font-family:Arial; background:#ecffef; }
+.container{ max-width:700px; margin:20px auto; padding:20px; }
+.job-card{
+  background:white; padding:16px; border-radius:14px;
+  margin-bottom:15px; box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+.title{ font-size:18px; font-weight:bold; color:#0a662e; }
+.small{ font-size:14px; color:#444; margin-top:5px; }
+.status{
+  margin-top:8px; font-weight:bold; padding:6px 12px; border-radius:8px; display:inline-block;
+}
+.open{ background:#e1ffe1; color:#0a662e; }
+.accepted{ background:#fff4d2; color:#a06800; }
+.completed{ background:#d8ffe7; color:#006b30; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2 style="text-align:center; color:#0a662e;">My Posted Jobs</h2>
+    <div id="jobList">Loading...</div>
+</div>
+
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+
+firebase.auth().onAuthStateChanged(user=>{
+    if(!user) return alert("Login first!");
+
+    db.collection("jobs")
+      .where("customerId","==",user.uid)
+      .orderBy("createdAt","desc")
+      .onSnapshot(snap=>{
+          if(snap.empty){
+              jobList.innerHTML = "No jobs posted yet.";
+              return;
+          }
+
+          let html = "";
+          snap.forEach(doc=>{
+              let j = doc.data();
+              html += `
+              <div class="job-card">
+                  <div class="title">${j.title}</div>
+                  <div class="small">${j.description}</div>
+                  <div class="small">Price: ₹${j.price}</div>
+                  <div class="small">City: ${j.city}</div>
+                  <div class="status ${j.status}">${j.status}</div>
+              </div>`;
+          });
+          jobList.innerHTML = html;
+      });
+});
+</script>
+
+</body>
+  </html>
