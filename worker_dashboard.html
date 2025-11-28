@@ -1,302 +1,144 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Worker Dashboard — Seva</title>
-  <style>
-    :root{
-      --green:#1a8f4a;
-      --accent:#0b63c9;
-      --muted:#6b7280;
-      --card:#fff;
-      --bg:#f1faf3;
-      font-family: Inter, system-ui, Arial, sans-serif;
+<meta charset="UTF-8">
+<title>Worker Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #eaf7e9;
     }
-    body{ margin:0; background:var(--bg); color:#0f1724; padding:14px; }
-    .topbar{
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
-      background:var(--green); color:#fff; padding:12px 14px;
-      border-radius:10px; box-shadow:0 6px 18px rgba(26,143,74,0.12);
-    }
-    .topbar h1{ margin:0; font-size:16px; }
-    .small{ font-size:13px; color:var(--muted); }
-    .card{
-      background:var(--card); border-radius:12px; padding:12px;
-      box-shadow:0 6px 18px rgba(2,6,23,0.06); margin-top:12px;
-    }
-    .btn{
-      background:var(--green); color:#fff; border:0; padding:10px 12px;
-      border-radius:10px; cursor:pointer; font-weight:700;
-    }
-    .btn.secondary{
-      background:#f3f4f6; color:#111; border:1px solid #e6eef0;
-    }
-    .jobs{ margin-top:12px; display:flex; flex-direction:column; gap:12px; }
-    .job{
-      border-radius:12px; padding:12px; background:#fff;
-      box-shadow:0 6px 16px rgba(2,6,23,0.04);
-    }
-    .job h3{ margin:0 0 6px 0; font-size:16px; }
-    .meta{
-      display:flex; gap:12px; flex-wrap:wrap; color:var(--muted);
-      font-size:13px; margin-bottom:8px;
-    }
-    .status{
-      font-weight:700; padding:6px 8px; border-radius:8px; font-size:13px;
-      margin-top:8px;
-    }
-    .status.open{ background:#fff9e6; color:#b45309; }
-    .status.accepted{ background:#e6f8ff; color:#0b63c9; }
-    .status.payment_received{ background:#fff0f6; color:#9f1239; }
-    .status.fee_pending{ background:#fff4e6; color:#b45309; }
-    .status.completed{ background:#e6fff1; color:#0a5f3b; }
-    .actions{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
-    @media(max-width:520px){
-      .topbar{ flex-direction:column; gap:8px; align-items:flex-start; }
-    }
-  </style>
-</head>
 
+    /* Header */
+    .header {
+        background: #0a662e;
+        color: white;
+        padding: 20px;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+    }
+    .header h2 {
+        margin: 0;
+    }
+    .menu {
+        margin-top: 10px;
+    }
+    .menu a {
+        background: white;
+        padding: 8px 14px;
+        border-radius: 10px;
+        margin-right: 10px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #0a662e;
+    }
+
+    .card {
+        background: white;
+        margin: 15px;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    .info-box {
+        background: #fff8e0;
+        padding: 15px;
+        margin: 15px;
+        border-left: 6px solid orange;
+        border-radius: 10px;
+        font-size: 15px;
+    }
+
+    .complete-info {
+        background: #f1f1f1;
+        padding: 15px;
+        margin: 15px;
+        border-left: 6px solid #777;
+        border-radius: 10px;
+        font-size: 15px;
+    }
+
+    footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #0a662e;
+    }
+</style>
+</head>
 <body>
 
-  <div class="topbar">
-    <div>
-      <h1>Seva — Worker Dashboard</h1>
-      <div class="small" id="workerName">Hello, Worker</div>
+<!-- HEADER -->
+<div class="header">
+    <h2>Seva — Worker Dashboard</h2>
+    <div class="menu">
+        <a href="#" id="homeBtn">Home</a>
+        <a href="#" id="logoutBtn" style="background:#d32f2f; color:white;">Logout</a>
     </div>
-    <div style="display:flex; gap:8px;">
-      <button class="btn secondary" onclick="goHome()">Home</button>
-      <button class="btn" onclick="logout()">Logout</button>
-    </div>
-  </div>
+    <p>Hello, Worker</p>
+</div>
 
-  <div class="card" id="locationCard">
-    <strong>Nearby Jobs</strong>
-    <div class="small" id="locStatus">Requesting location…</div>
-  </div>
+<!-- MOTIVATION BOX -->
+<div class="card">
+    <h3>Work • Earn • Grow 💰</h3>
+    <p>Start accepting jobs and build your career with Seva.</p>
+</div>
 
-  <div id="jobsContainer" class="jobs"></div>
+<!-- PLATFORM FEE BOX -->
+<div class="info-box">
+    <b>Platform Fee: ₹50 per job</b>
+    <p>This small fee helps us keep the platform running smoothly ❤️</p>
+</div>
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<!-- NEARBY JOBS -->
+<div class="card">
+    <h3>Nearby Jobs</h3>
+    <p id="jobsText">Requesting location...</p>
+</div>
 
-  <script>
-  // ✔ YOUR FIREBASE CONFIG (added)
-  var firebaseConfig = {
-      apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
-      authDomain: "seva-6f191.firebaseapp.com",
-      projectId: "seva-6f191",
-      storageBucket: "seva-6f191.firebasestorage.app",
-      messagingSenderId: "826093348416",
-      appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
-      measurementId: "G-78H32SRPCD"
-  };
-  firebase.initializeApp(firebaseConfig);
+<!-- WORK COMPLETION PROCESS -->
+<div class="complete-info">
+    <b>Job Completion Rule:</b>
+    <p>✔ Complete your assigned job</p>
+    <p>✔ Pay platform fee: <b>₹50</b></p>
+    <p>✔ Then press “Mark as Completed”</p>
+</div>
 
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  const rdb = firebase.database();
+<!-- FOOTER -->
+<footer>
+    Spread Happiness ❤️ and Care.
+</footer>
 
-  const ADMIN_UPI = "sachiny4561@oksbi";
-  const PLATFORM_FEE = 50;
+<!-- Firebase v8 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-  const jobsContainer = document.getElementById("jobsContainer");
-  const workerNameEl = document.getElementById("workerName");
-  const locStatus = document.getElementById("locStatus");
+<script>
+    var firebaseConfig = {
+        apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+        authDomain: "seva-6f191.firebaseapp.com",
+        projectId: "seva-6f191",
+        storageBucket: "seva-6f191.firebasestorage.app",
+        messagingSenderId: "826093348416",
+        appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
 
-  let workerUid = null;
-  let workerProfile = null;
-  let workerLat = null;
-  let workerLng = null;
-
-  // Auth check
-  auth.onAuthStateChanged(async user => {
-    if (!user) return location = "login.html";
-    workerUid = user.uid;
-
-    const snap = await rdb.ref("users/"+workerUid).once("value");
-    workerProfile = snap.val() || {};
-    workerNameEl.innerText = "Hello, " + (workerProfile.name || "Worker");
-
-    getLocationAndLoadJobs();
-  });
-
-  function goHome(){ location = "home.html"; }
-
-  // Get geolocation
-  function getLocationAndLoadJobs(){
-    if (!navigator.geolocation){
-      locStatus.innerText = "Geolocation not supported.";
-      loadJobs();
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(pos=>{
-      workerLat = pos.coords.latitude;
-      workerLng = pos.coords.longitude;
-      locStatus.innerText = "Location found.";
-      loadJobs();
-    }, err=>{
-      locStatus.innerText = "Location denied.";
-      loadJobs();
-    });
-  }
-
-  // Load nearby jobs
-  async function loadJobs(){
-    jobsContainer.innerHTML = "<div class='small'>Loading jobs…</div>";
-
-    const q = db.collection("jobs").where("status","==","open").orderBy("createdAt","desc");
-    const snap = await q.get();
-
-    const list = [];
-    snap.forEach(doc=>{
-      const j = doc.data();
-      j.id = doc.id;
-      list.push(j);
-    });
-
-    // No distance filter simple for now
-    renderJobs(list);
-  }
-
-  function renderJobs(list){
-    jobsContainer.innerHTML = "";
-    if (!list.length){
-      jobsContainer.innerHTML = "<div class='small'>No jobs found nearby.</div>";
-      return;
-    }
-
-    list.forEach(job=>{
-      const box = document.createElement("div");
-      box.className = "job";
-      box.innerHTML = `
-        <h3>${job.title || job.type}</h3>
-        <div class="meta">
-          <div>₹${job.amount}</div>
-          <div>${job.duration || ""}</div>
-          <div>${job.location || ""}</div>
-        </div>
-        <div class="small">${job.description || ""}</div>
-
-        <div class="status open">OPEN</div>
-
-        <div class="actions">
-          <button class="btn" onclick="acceptJob('${job.id}')">Accept Job</button>
-        </div>
-      `;
-      jobsContainer.appendChild(box);
-    });
-  }
-
-  // Accept job
-  async function acceptJob(id){
-    if (!confirm("Accept this job?")) return;
-
-    await db.collection("jobs").doc(id).update({
-      status:"accepted",
-      workerId: workerUid,
-      workerName: workerProfile.name || "",
-      acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    alert("Job Accepted!");
-    location = "worker_dashboard.html?tab=accepted";
-  }
-
-  // Extra listener for accepted jobs
-  setTimeout(()=>{
-    listenAcceptedJobs();
-  },1200);
-
-  function listenAcceptedJobs(){
-    db.collection("jobs")
-      .where("workerId","==",workerUid)
-      .where("status","in",["accepted","payment_received","fee_pending"])
-      .onSnapshot(snap=>{
-        const old = document.getElementById("acceptedSection");
-        if (old) old.remove();
-
-        const card = document.createElement("div");
-        card.id = "acceptedSection";
-        card.className = "card";
-        card.innerHTML = "<strong>Your Active Jobs</strong>";
-
-        snap.forEach(doc=>{
-          const j = doc.data();
-          j.id = doc.id;
-
-          const box = document.createElement("div");
-          box.className = "job";
-
-          let statusHTML = `<div class="status ${j.status}">${j.status.toUpperCase()}</div>`;
-          let actionsHTML = renderAcceptedActions(j);
-
-          box.innerHTML = `
-            <h3>${j.title || j.type}</h3>
-            <div class="meta">
-              <div>Amount: ₹${j.amount}</div>
-              <div>Worker Share: ₹${(j.amount - PLATFORM_FEE)}</div>
-            </div>
-            ${statusHTML}
-            <div class="actions">${actionsHTML}</div>
-          `;
-
-          card.appendChild(box);
+    // Logout
+    document.getElementById("logoutBtn").onclick = function () {
+        firebase.auth().signOut().then(() => {
+            window.location.href = "login.html";
         });
+    };
 
-        document.body.insertBefore(card, jobsContainer);
-      });
-  }
-
-  function renderAcceptedActions(j){
-    if (j.status === "accepted"){
-      return `
-        <button class="btn" onclick="markPaymentReceived('${j.id}')">Payment Received</button>
-      `;
-    }
-    if (j.status === "payment_received"){
-      return `
-        <button class="btn" onclick="openPayPlatform('${j.id}')">Pay Platform Fee ₹${PLATFORM_FEE}</button>
-        <button class="btn secondary" onclick="confirmPlatformPaid('${j.id}')">I Have Paid</button>
-      `;
-    }
-    if (j.status === "fee_pending"){
-      return `<div class="small">Waiting for admin fee confirmation…</div>`;
-    }
-    return `<div class="small">No actions</div>`;
-  }
-
-  async function markPaymentReceived(id){
-    await db.collection("jobs").doc(id).update({
-      status:"payment_received"
-    });
-    alert("Status updated!");
-  }
-
-  function openPayPlatform(id){
-    const url = `upi://pay?pa=${ADMIN_UPI}&am=${PLATFORM_FEE}&pn=Seva%20Platform`;
-    location.href = url;
-  }
-
-  async function confirmPlatformPaid(id){
-    await db.collection("jobs").doc(id).update({
-      status:"completed",
-      completedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    await rdb.ref("admin/earnings").transaction(v => (v || 0) + PLATFORM_FEE);
-
-    alert("Job Completed!");
-  }
-
-  function logout(){
-    auth.signOut().then(()=> location="login.html");
-  }
-
-  </script>
+    // Nearby Jobs (later add karta hoon)
+</script>
 
 </body>
 </html>
