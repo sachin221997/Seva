@@ -2,169 +2,174 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Profile</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f2f2f2;
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .container {
+        max-width: 420px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+    }
+    #uploadBtn, #saveBtn {
+        width: 100%;
+        padding: 14px;
+        background: #0a662e;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        margin-top: 15px;
+        font-size: 16px;
+    }
+    #logoutBtn {
+        width: 100%;
+        padding: 14px;
+        background: #d32f2f;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        margin-top: 15px;
+    }
+    #emailDisplay {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 15px;
+        font-size: 16px;
+    }
+</style>
+</head>
+<body>
+
+<h2>My Profile</h2>
+
+<div class="container">
+
+    <!-- Profile Photo -->
+    <input type="file" id="profilePic">
+    <button id="uploadBtn">Upload Photo</button>
+
+    <!-- Email -->
+    <p id="emailDisplay"></p>
+
+    <!-- UPI ID (worker only) -->
+    <input type="text" id="upi" placeholder="Your UPI ID (worker only)" style="display:none;">
+
+    <!-- Mobile Number -->
+    <input type="text" id="phone" placeholder="Your Mobile Number">
+
+    <!-- Description -->
+    <input type="text" id="description" placeholder="Write something about yourself...">
+
+    <!-- Experience (worker only) -->
+    <input type="text" id="experience" placeholder="Experience (e.g., 2 years)" style="display:none;">
+
+    <!-- City / Area -->
+    <input type="text" id="city" placeholder="Your City / Area">
+
+    <!-- Job Title (worker only) -->
+    <input type="text" id="jobTitle" placeholder="Your Job Title / What you offer" style="display:none;">
+
+    <button id="saveBtn">Save Details</button>
+    <button id="logoutBtn">Logout</button>
+</div>
+
 
 <!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-
-<style>
-    body {
-        margin: 0;
-        background-color: #e9f6e9;
-        font-family: Arial, sans-serif;
-    }
-
-    .box {
-        width: 90%;
-        margin: 20px auto;
-        padding: 20px;
-        background: white;
-        border-radius: 20px;
-        text-align: center;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .profile-pic {
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        border: 4px solid #166d33;
-        object-fit: cover;
-    }
-
-    input, textarea {
-        width: 90%;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 8px;
-        border: 1px solid gray;
-        font-size: 15px;
-    }
-
-    button {
-        width: 90%;
-        padding: 12px;
-        margin-top: 10px;
-        border: none;
-        border-radius: 8px;
-        background: #166d33;
-        color: white;
-        font-size: 17px;
-        cursor: pointer;
-    }
-
-    button:hover { opacity: 0.9; }
-
-    .logout {
-        background: #d33;
-        margin-top: 20px;
-    }
-</style>
-
-</head>
-<body>
-
-<div class="box">
-    <h2>My Profile</h2>
-
-    <img id="profilePic" class="profile-pic" src="">
-
-    <input type="file" id="photoInput">
-
-    <button onclick="uploadPhoto()">Upload Photo</button>
-
-    <h3 id="email"></h3>
-
-    <textarea id="description" placeholder="Write something about yourself..."></textarea>
-    <input id="experience" placeholder="Experience (e.g., 2 years in cleaning)">
-    <input id="location" placeholder="Your City / Area">
-    <input id="post" placeholder="Your Job Title / What you offer">
-
-    <button onclick="saveDetails()">Save Details</button>
-
-    <button class="logout" onclick="logout()">Logout</button>
-</div>
-
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-// Firebase config
-var firebaseConfig = {
-    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
-    authDomain: "seva-6f191.firebaseapp.com",
-    projectId: "seva-6f191",
-    storageBucket: "seva-6f191.firebasestorage.app",
-    messagingSenderId: "826093348416",
-    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
-};
-firebase.initializeApp(firebaseConfig);
+    // Your Firebase Config
+    var firebaseConfig = {
+        apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+        authDomain: "seva-6f191.firebaseapp.com",
+        projectId: "seva-6f191",
+        storageBucket: "seva-6f191.firebasestorage.app",
+        messagingSenderId: "826093348416",
+        appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
+        measurementId: "G-78H32SRPCD"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
 
-// Show user email + load profile
-firebase.auth().onAuthStateChanged(user => {
-    if (!user) return location.href = "login.html";
+    // Load Profile Data
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById("emailDisplay").innerText = user.email;
 
-    document.getElementById("email").innerText = user.email;
+            db.collection("users").doc(user.uid).get().then(doc => {
+                let data = doc.data();
 
-    firebase.database().ref("users/" + user.uid).once("value", snap => {
-        let data = snap.val() || {};
+                // Basic fields load
+                document.getElementById("phone").value = data.phone || "";
+                document.getElementById("description").value = data.description || "";
+                document.getElementById("city").value = data.city || "";
 
-        document.getElementById("description").value = data.description || "";
-        document.getElementById("experience").value = data.experience || "";
-        document.getElementById("location").value = data.location || "";
-        document.getElementById("post").value = data.post || "";
-        document.getElementById("profilePic").src = data.photoURL || "";
-    });
-});
+                // If worker, show extras
+                if (data.role === "worker") {
+                    document.getElementById("upi").style.display = "block";
+                    document.getElementById("experience").style.display = "block";
+                    document.getElementById("jobTitle").style.display = "block";
 
-
-// SAVE DETAILS
-function saveDetails() {
-    var user = firebase.auth().currentUser;
-
-    firebase.database().ref("users/" + user.uid).update({
-        description: document.getElementById("description").value,
-        experience: document.getElementById("experience").value,
-        location: document.getElementById("location").value,
-        post: document.getElementById("post").value
-    }).then(() => {
-        alert("Profile Saved Successfully!");
-    });
-}
-
-
-// PHOTO UPLOAD
-function uploadPhoto() {
-    var file = document.getElementById("photoInput").files[0];
-    var user = firebase.auth().currentUser;
-
-    if (!file) return alert("Please choose a photo first.");
-
-    var storageRef = firebase.storage().ref("profilePics/" + user.uid);
-
-    storageRef.put(file).then(() => {
-        storageRef.getDownloadURL().then(url => {
-
-            firebase.database().ref("users/" + user.uid).update({
-                photoURL: url
+                    document.getElementById("upi").value = data.upi || "";
+                    document.getElementById("experience").value = data.experience || "";
+                    document.getElementById("jobTitle").value = data.jobTitle || "";
+                }
             });
+        }
+    });
 
-            document.getElementById("profilePic").src = url;
+    // Save Details
+    document.getElementById("saveBtn").onclick = function () {
+        var user = firebase.auth().currentUser;
 
-            alert("Photo Uploaded Successfully!");
+        db.collection("users").doc(user.uid).get().then(doc => {
+            let data = doc.data();
+
+            let updateData = {
+                phone: document.getElementById("phone").value,
+                description: document.getElementById("description").value,
+                city: document.getElementById("city").value
+            };
+
+            if (data.role === "worker") {
+                updateData.upi = document.getElementById("upi").value;
+                updateData.experience = document.getElementById("experience").value;
+                updateData.jobTitle = document.getElementById("jobTitle").value;
+            }
+
+            db.collection("users").doc(user.uid).update(updateData).then(() => {
+                alert("Profile updated successfully!");
+            });
         });
-    });
-}
+    };
 
-
-// LOGOUT
-function logout() {
-    firebase.auth().signOut().then(() => {
-        location.href = "login.html";
-    });
-}
+    // Logout
+    document.getElementById("logoutBtn").onclick = function () {
+        firebase.auth().signOut().then(() => {
+            window.location.href = "login.html";
+        });
+    };
 </script>
 
 </body>
