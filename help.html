@@ -1,133 +1,183 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Help – Seva App</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Help – Seva App</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, Arial;
-      background: #f7f7fb;
-      color: #222;
-    }
-    .container {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 20px;
-    }
-    .card {
-      background: #fff;
-      padding: 24px;
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-      margin-bottom: 20px;
-    }
-    h1, h2 {
-      margin-top: 0;
-    }
-    p, li {
-      line-height: 1.7;
-      font-size: 16px;
-    }
-    ul {
-      padding-left: 20px;
-    }
-    .faq {
-      margin: 14px 0;
-    }
-    .q {
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-    .contact-box {
-      background: #fff4df;
-      padding: 16px;
-      border-radius: 10px;
-      margin-top: 16px;
-      line-height: 1.7;
-    }
-  </style>
+    <style>
+        :root{
+            --bg:#F0FDF4;
+            --card:#ffffff;
+            --accent:#22C55E;
+            --accent-dark:#15803D;
+            --muted:#666;
+            --radius:12px;
+            font-family: Inter, system-ui, Arial;
+        }
+
+        body{
+            margin:0;
+            background:var(--bg);
+            color:#111;
+        }
+
+        /* ================================
+               TOP HEADER (BACK BUTTON)
+        ================================= */
+        .header {
+            background: var(--accent-dark);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+        }
+
+        .back-btn {
+            background: white;
+            color: var(--accent-dark);
+            padding: 7px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .title {
+            flex: 1;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-right: 45px;
+        }
+
+        /* ===========================
+                HELP PAGE STYLE
+        ============================ */
+        .container{
+            max-width:900px;
+            margin:20px auto;
+            padding:20px;
+        }
+
+        .card{
+            background:white;
+            padding:24px;
+            border-radius:var(--radius);
+            box-shadow:0 6px 18px rgba(0,0,0,0.06);
+            margin-bottom:20px;
+        }
+
+        h1, h2{
+            margin-top:0;
+            color:#15803D;
+        }
+
+        h1{
+            font-size:28px;
+        }
+
+        h2{
+            font-size:22px;
+            margin-top:10px;
+        }
+
+        p, li{
+            font-size:16px;
+            line-height:1.7;
+        }
+
+        ul{
+            padding-left:22px;
+        }
+
+        .highlight{
+            background:#DCFCE7;
+            padding:4px 8px;
+            border-radius:6px;
+            color:#15803D;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="container">
 
-    <div class="card">
-      <h1>Help & Support</h1>
-      <p>
-        Need help? Don’t worry!  
-        This page will guide you on how to use the app, post needs, find work, and get support.
-      </p>
+    <!-- HEADER WITH BACK BUTTON -->
+    <div class="header">
+        <a href="javascript:history.back()" class="back-btn">← Back</a>
+        <div class="title">Help</div>
     </div>
 
-    <!-- How to Post a Need -->
-    <div class="card">
-      <h2>How to Post a Need</h2>
-      <ul>
-        <li>Open <strong>Need Page</strong></li>
-        <li>Fill the title, description, location</li>
-        <li>(Optional) Add budget & image</li>
-        <li>Click on <strong>Post Need</strong></li>
-        <li>Your need will show in the “Posted Needs” list</li>
-      </ul>
-      <p>People nearby can see your need and help you.</p>
+    <div class="container">
+
+        <!-- Basic Help -->
+        <div class="card">
+            <h1>How Can We Help You?</h1>
+            <p>Welcome to the <strong>Seva App Help Center</strong>.  
+            Here you will find answers to common questions and support for using Seva smoothly.</p>
+        </div>
+
+        <!-- Posting Help -->
+        <div class="card">
+            <h2>How to Post a Job (Customer)</h2>
+            <ul>
+                <li>Go to the <span class="highlight">Post Need</span> page</li>
+                <li>Fill details (work type, description, amount, location)</li>
+                <li>Submit → Your job will appear to workers in your city</li>
+                <li>Workers will contact you & complete the task</li>
+            </ul>
+        </div>
+
+        <!-- Worker Help -->
+        <div class="card">
+            <h2>How Workers Earn Money</h2>
+            <ul>
+                <li>Open the <span class="highlight">Worker Dashboard</span></li>
+                <li>See jobs posted in your city</li>
+                <li>Accept a job → Contact customer</li>
+                <li>Complete work → Earn money</li>
+                <li>Pay ₹50 platform fee after job completion</li>
+            </ul>
+        </div>
+
+        <!-- Platform Fee -->
+        <div class="card">
+            <h2>Platform Fee (Important)</h2>
+            <p>Seva App charges a <span class="highlight">₹50 platform fee per job</span> from workers.  
+            This helps keep the app running, secure, and free for customers.</p>
+        </div>
+
+        <!-- FAQs -->
+        <div class="card">
+            <h2>Frequently Asked Questions</h2>
+
+            <p><strong>1. Job accept nahi ho raha?</strong></p>
+            <p>Make sure your location & city match the job’s location.</p>
+
+            <p><strong>2. Customer reply nahi kar raha?</strong></p>
+            <p>Wait for some time. Many customers take time to respond.</p>
+
+            <p><strong>3. Payment kaise milega?</strong></p>
+            <p>Customer directly aapko amount dega after work completion.</p>
+
+            <p><strong>4. Platform fee kab dena hota hai?</strong></p>
+            <p>Work complete hone ke baad worker ₹50 admin ko pay karega.</p>
+        </div>
+
+        <!-- Contact -->
+        <div class="card">
+            <h2>Contact Support</h2>
+            <p>If you need further help, you can contact our support team:</p>
+            <ul>
+                <li><strong>Email:</strong> seva.support@example.com</li>
+                <li><strong>Admin UPI:</strong> sachiny4561@oksbi</li>
+            </ul>
+            <p>We are here to help you ❤️</p>
+        </div>
+
     </div>
 
-    <!-- How to Find Work -->
-    <div class="card">
-      <h2>How to Find Work</h2>
-      <p>
-        If you have skills, you can earn daily or per hour by helping people.
-      </p>
-      <ul>
-        <li>Open <strong>Jobs Page</strong></li>
-        <li>Search needs posted by users</li>
-        <li>Contact them and provide the service</li>
-        <li>Earn money directly from the customer</li>
-      </ul>
-      <p>You can work anytime — part-time or full-time.</p>
-    </div>
-
-    <!-- FAQ -->
-    <div class="card">
-      <h2>Frequently Asked Questions</h2>
-
-      <div class="faq">
-        <div class="q">✔️ Is this app free?</div>
-        <p>Yes, 100% free to use.</p>
-      </div>
-
-      <div class="faq">
-        <div class="q">✔️ How do I earn?</div>
-        <p>You earn by helping people with the skills you have.</p>
-      </div>
-
-      <div class="faq">
-        <div class="q">✔️ Is my data safe?</div>
-        <p>Yes, everything is stored safely on your device or via your account.</p>
-      </div>
-
-      <div class="faq">
-        <div class="q">✔️ Do I need any special qualification?</div>
-        <p>No. Anyone with basic skills can start earning.</p>
-      </div>
-    </div>
-
-    <!-- Contact Support -->
-    <div class="card">
-      <h2>Need More Help?</h2>
-
-      <p>If you are facing any problem, you can contact our support team.</p>
-
-      <div class="contact-box">
-        <strong>Support Email:</strong> support@sevaapp.com<br />
-        <strong>Available:</strong> 10 AM – 6 PM<br />
-        <strong>Response Time:</strong> Within 24 hours
-      </div>
-    </div>
-
-  </div>
 </body>
   </html>
