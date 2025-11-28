@@ -2,198 +2,281 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seva • Customer Dashboard</title>
-
-<!-- Firebase v8 -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Dashboard</title>
 
 <style>
     body {
         margin: 0;
-        background: #e9f6e9;
         font-family: Arial, sans-serif;
+        background: #e8f8e6;
     }
 
-    /* Navbar */
+    /* TOP NAVBAR */
     .navbar {
-        background: #166d33;
-        padding: 12px;
+        background: #0a662e;
+        padding: 15px;
         display: flex;
         justify-content: space-around;
+        align-items: center;
         color: white;
         font-weight: bold;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+    }
+
+    .nav-item {
         text-align: center;
         font-size: 13px;
-    }
-    .navbar div { cursor: pointer; }
-
-    /* Main Box */
-    .box {
-        width: 90%;
-        margin: 20px auto;
-        background: white;
-        padding: 20px;
-        border-radius: 18px;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-    }
-
-    /* Banner */
-    .banner {
-        background: linear-gradient(135deg, #0B6C36, #18a14f);
         color: white;
+        text-decoration: none;
+    }
+
+    .nav-item img {
+        width: 26px;
+        display: block;
+        margin: 0 auto 3px;
+    }
+
+    /* MAIN CONTAINER */
+    .container {
+        max-width: 750px;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .welcome-card {
+        background: #0a662e;
+        color: white;
+        padding: 20px;
+        border-radius: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+
+    .welcome-card h2 {
+        margin: 0;
+        font-size: 22px;
+    }
+
+    .welcome-card p {
+        margin-top: 10px;
+        font-size: 15px;
+        color: #d8ffe0;
+    }
+
+    /* CATEGORY GRID */
+    .categories-card {
+        background: white;
         padding: 22px;
         border-radius: 18px;
-        text-align: center;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.10);
         margin-bottom: 20px;
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
     }
 
-    /* Action Cards */
-    .actions {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 15px;
+    .categories-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #0a662e;
     }
 
-    .card {
-        width: 28%;
-        background: white;
-        padding: 15px;
-        font-size: 14px;
-        border-radius: 12px;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .cat {
+        background: #fafff8;
+        padding: 16px;
+        border-radius: 14px;
         text-align: center;
         cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: 0.2s;
     }
 
-    .card:hover {
-        background: #edf9ed;
-        transition: 0.3s;
+    .cat:hover {
+        background: #dfffe0;
+        transform: scale(1.03);
     }
 
-    /* Job Section */
-    .jobs {
-        margin-top: 25px;
+    .cat img {
+        width: 45px;
+        margin-bottom: 8px;
     }
 
-    .job-box {
+    .cat-name {
+        font-weight: bold;
+        font-size: 15px;
+        color: #0a662e;
+    }
+
+    .cat-price {
+        font-size: 13px;
+        color: #444;
+        margin-top: 3px;
+    }
+
+    /* RECENT JOBS */
+    .recent-card {
         background: white;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0px 0px 8px rgba(0,0,0,0.1);
-        margin-bottom: 12px;
+        padding: 18px;
+        border-radius: 18px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.1);
     }
 
-    /* Footer */
-    .footer {
-        background: #166d33;
-        padding: 15px;
-        text-align: center;
-        color: white;
-        margin-top: 25px;
+    .recent-card h3 {
+        margin-bottom: 10px;
+        color: #0a662e;
     }
+
+    footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 14px;
+        color: #0a662e;
+        font-weight: bold;
+    }
+
 </style>
 </head>
-
 <body>
 
 <!-- NAVBAR -->
 <div class="navbar">
-    <div onclick="go('customer_dashboard.html')">🏠<br>Home</div>
-    <div onclick="go('need.html')">📝<br>Post Job</div>
-    <div onclick="go('search.html')">🔍<br>Search</div>
-    <div onclick="go('profile.html')">👤<br>Profile</div>
-    <div onclick="logout()">🚪<br>Logout</div>
+    <a class="nav-item" href="#">
+        <img src="https://img.icons8.com/fluency/48/home.png">
+        Home
+    </a>
+    <a class="nav-item" href="post_job.html">
+        <img src="https://img.icons8.com/fluency/48/task.png">
+        Post Job
+    </a>
+    <a class="nav-item" href="search_workers.html">
+        <img src="https://img.icons8.com/fluency/48/search.png">
+        Search
+    </a>
+    <a class="nav-item" href="profile.html">
+        <img src="https://img.icons8.com/fluency/48/user.png">
+        Profile
+    </a>
+    <a class="nav-item" id="logoutBtn">
+        <img src="https://img.icons8.com/fluency/48/exit.png">
+        Logout
+    </a>
 </div>
 
-<div class="box">
+<div class="container">
 
-    <!-- Banner -->
-    <div class="banner">
-        <h2 style="margin:0;">Welcome Customer 🙏</h2>
-        <p style="margin-top:10px; color:#e8ffe8;">
-            Book trusted workers, post your needs, and get instant help.
-        </p>
+    <!-- WELCOME CARD -->
+    <div class="welcome-card">
+        <h2>Welcome Customer 🙏</h2>
+        <p>Book trusted workers, post your needs & get instant help.</p>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="actions">
-        <div class="card" onclick="go('need.html')">📝 Post a Job</div>
-        <div class="card" onclick="go('search.html')">🔍 Search Workers</div>
-        <div class="card" onclick="loadMyJobs()">📦 My Jobs</div>
+    <!-- CATEGORIES -->
+    <div class="categories-card">
+        <div class="categories-title">Choose a Service</div>
+
+        <div class="grid">
+
+            <div class="cat" onclick="selectCategory('Massage Service','200','1 hour massage — ₹200 + platform fee ₹50 = ₹250')">
+                <img src="https://img.icons8.com/fluency/96/massage.png">
+                <div class="cat-name">Massage</div>
+                <div class="cat-price">Starts ₹200</div>
+            </div>
+
+            <div class="cat" onclick="selectCategory('Car Washing','150','Car washing service — add house parking details')">
+                <img src="https://img.icons8.com/fluency/96/car-wash.png">
+                <div class="cat-name">Car Wash</div>
+                <div class="cat-price">Starts ₹150</div>
+            </div>
+
+            <div class="cat" onclick="selectCategory('House Cleaning','300','Cleaning jobs — kitchen, room, hall, bathroom')">
+                <img src="https://img.icons8.com/fluency/96/cleaning-a-surface.png">
+                <div class="cat-name">Cleaning</div>
+                <div class="cat-price">Starts ₹300</div>
+            </div>
+
+            <div class="cat" onclick="selectCategory('Loading / Unloading','250','Heavy lifting, loading vehicles or items')">
+                <img src="https://img.icons8.com/fluency/96/parcel.png">
+                <div class="cat-name">Loading</div>
+                <div class="cat-price">Starts ₹250</div>
+            </div>
+
+            <div class="cat" onclick="selectCategory('Labour Work','200','General labour work — decide time & pay')">
+                <img src="https://img.icons8.com/fluency/96/worker-male.png">
+                <div class="cat-name">Labour</div>
+                <div class="cat-price">Starts ₹200</div>
+            </div>
+
+            <div class="cat" onclick="selectCategory('Electrician','150','Electric issues — fan, light, wiring etc.')">
+                <img src="https://img.icons8.com/fluency/96/electrician.png">
+                <div class="cat-name">Electrician</div>
+                <div class="cat-price">Starts ₹150</div>
+            </div>
+
+            <div class="cat" onclick="selectCategory('Plumber','200','Leakage, pipe fitting & bathroom repair work')">
+                <img src="https://img.icons8.com/fluency/96/plunger.png">
+                <div class="cat-name">Plumber</div>
+                <div class="cat-price">Starts ₹200</div>
+            </div>
+
+            <div class="cat" onclick="selectCategory('Custom Work','0','Describe your work or send a voice note')">
+                <img src="https://img.icons8.com/fluency/96/microphone.png">
+                <div class="cat-name">Other Work</div>
+                <div class="cat-price">Describe Work</div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- My Jobs -->
-    <h3 style="margin-top:25px; color:#166d33;">Your Recent Jobs</h3>
-
-    <div id="jobList" class="jobs">
-        <p style="color:#555;">Loading your jobs...</p>
+    <!-- RECENT JOBS -->
+    <div class="recent-card">
+        <h3>Your Recent Jobs</h3>
+        <div id="recentJobs">Loading your jobs...</div>
     </div>
 
 </div>
 
-<div class="footer">
-    © 2025 Seva • Helping People Daily ❤️
-</div>
+<footer>© 2025 Seva • Helping People Daily ❤️</footer>
+
+<!-- Firebase JS -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-// Firebase Config
-var firebaseConfig = {
-    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
-    authDomain: "seva-6f191.firebaseapp.com",
-    projectId: "seva-6f191",
-    storageBucket: "seva-6f191.firebasestorage.app",
-    messagingSenderId: "826093348416",
-    appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
-};
-firebase.initializeApp(firebaseConfig);
+    // FIREBASE CONFIG
+    var firebaseConfig = {
+        apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+        authDomain: "seva-6f191.firebaseapp.com",
+        projectId: "seva-6f191",
+        storageBucket: "seva-6f191.firebasestorage.app",
+        messagingSenderId: "826093348416",
+        appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
 
-// Redirect function
-function go(page){ window.location.href = page; }
+    // Auto-fill category → Post Job Page
+    function selectCategory(title, price, description) {
+        localStorage.setItem("jobTitle", title);
+        localStorage.setItem("jobPrice", price);
+        localStorage.setItem("jobDesc", description);
+        window.location.href = "post_job.html";
+    }
 
-// Logout
-function logout(){
-    firebase.auth().signOut().then(()=> go("login.html"));
-}
+    // Logout
+    document.getElementById("logoutBtn").onclick = () => {
+        firebase.auth().signOut();
+        window.location.href = "login.html";
+    };
 
-// Show My Jobs
-function loadMyJobs(){
-    let user = firebase.auth().currentUser;
-    if(!user) return;
-
-    firebase.database().ref("jobs").orderByChild("customerId").equalTo(user.uid)
-    .once("value", snap => {
-        let jobList = document.getElementById("jobList");
-        jobList.innerHTML = "";
-
-        if(!snap.exists()){
-            jobList.innerHTML = "<p>No jobs posted yet.</p>";
-            return;
-        }
-
-        snap.forEach(job => {
-            let j = job.val();
-            jobList.innerHTML += `
-                <div class="job-box">
-                    <b>${j.title}</b><br>
-                    <span>${j.description}</span><br><br>
-                    <b>₹${j.amount}</b> • ${j.hours}<br>
-                    <small>Status: ${j.status || "Pending"}</small>
-                </div>
-            `;
-        });
-    });
-}
-
-// Force login check
-firebase.auth().onAuthStateChanged(user=>{
-    if(!user) go("login.html");
-    else loadMyJobs();
-});
 </script>
 
 </body>
-  </html>
+</html>
