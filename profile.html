@@ -18,16 +18,25 @@
         max-width: 420px;
         margin: auto;
         background: #fff;
-        padding: 20px;
-        border-radius: 8px;
+        padding: 25px;
+        border-radius: 12px;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    input {
+    .profile-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 3px solid #0a662e;
+        margin: 0 auto 15px auto;
+        background-size: cover;
+        background-position: center;
+    }
+    input, select {
         width: 100%;
         padding: 12px;
-        margin-top: 10px;
+        margin-top: 12px;
         border: 1px solid #ccc;
-        border-radius: 6px;
+        border-radius: 8px;
         font-size: 15px;
     }
     #uploadBtn, #saveBtn {
@@ -36,7 +45,7 @@
         background: #0a662e;
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         margin-top: 15px;
         font-size: 16px;
     }
@@ -46,13 +55,14 @@
         background: #d32f2f;
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         margin-top: 15px;
+        font-size: 16px;
     }
     #emailDisplay {
         text-align: center;
         font-weight: bold;
-        margin-top: 15px;
+        margin-top: 10px;
         font-size: 16px;
     }
 </style>
@@ -64,32 +74,49 @@
 <div class="container">
 
     <!-- Profile Photo -->
+    <div id="profileCircle" class="profile-circle"></div>
+
     <input type="file" id="profilePic">
     <button id="uploadBtn">Upload Photo</button>
+
+    <!-- NAME -->
+    <input type="text" id="name" placeholder="Your Name">
+
+    <!-- AGE -->
+    <input type="number" id="age" placeholder="Your Age">
+
+    <!-- GENDER -->
+    <select id="gender">
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+    </select>
 
     <!-- Email -->
     <p id="emailDisplay"></p>
 
-    <!-- UPI ID (worker only) -->
+    <!-- UPI ID (Worker Only) -->
     <input type="text" id="upi" placeholder="Your UPI ID (worker only)" style="display:none;">
 
-    <!-- Mobile Number -->
+    <!-- Mobile -->
     <input type="text" id="phone" placeholder="Your Mobile Number">
 
     <!-- Description -->
     <input type="text" id="description" placeholder="Write something about yourself...">
 
-    <!-- Experience (worker only) -->
+    <!-- Experience (Worker Only) -->
     <input type="text" id="experience" placeholder="Experience (e.g., 2 years)" style="display:none;">
 
-    <!-- City / Area -->
+    <!-- City -->
     <input type="text" id="city" placeholder="Your City / Area">
 
-    <!-- Job Title (worker only) -->
+    <!-- Job Title (Worker Only) -->
     <input type="text" id="jobTitle" placeholder="Your Job Title / What you offer" style="display:none;">
 
     <button id="saveBtn">Save Details</button>
     <button id="logoutBtn">Logout</button>
+
 </div>
 
 
@@ -97,9 +124,9 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
 <script>
-    // Your Firebase Config
     var firebaseConfig = {
         apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
         authDomain: "seva-6f191.firebaseapp.com",
@@ -111,8 +138,8 @@
     };
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
+    var storage = firebase.storage();
 
-    // Load Profile Data
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             document.getElementById("emailDisplay").innerText = user.email;
@@ -120,12 +147,22 @@
             db.collection("users").doc(user.uid).get().then(doc => {
                 let data = doc.data();
 
-                // Basic fields load
+                // Load name, age, gender
+                document.getElementById("name").value = data.name || "";
+                document.getElementById("age").value = data.age || "";
+                document.getElementById("gender").value = data.gender || "";
+
+                // Load basic fields
                 document.getElementById("phone").value = data.phone || "";
                 document.getElementById("description").value = data.description || "";
                 document.getElementById("city").value = data.city || "";
 
-                // If worker, show extras
+                // Load profile photo
+                if (data.photoURL) {
+                    document.getElementById("profileCircle").style.backgroundImage = `url(${data.photoURL})`;
+                }
+
+                // Worker extra fields
                 if (data.role === "worker") {
                     document.getElementById("upi").style.display = "block";
                     document.getElementById("experience").style.display = "block";
@@ -139,14 +176,38 @@
         }
     });
 
+    // Upload Photo
+    document.getElementById("uploadBtn").onclick = function () {
+        let file = document.getElementById("profilePic").files[0];
+        let user = firebase.auth().currentUser;
+        if (!file) return alert("Choose a file!");
+
+        let uploadTask = storage.ref("profilePics/" + user.uid).put(file);
+
+        uploadTask.on("state_changed", () => {},
+        (err) => alert("Upload error"),
+        () => {
+            uploadTask.snapshot.ref.getDownloadURL().then(url => {
+                db.collection("users").doc(user.uid).update({
+                    photoURL: url
+                });
+                document.getElementById("profileCircle").style.backgroundImage = `url(${url})`;
+                alert("Photo updated!");
+            });
+        });
+    };
+
     // Save Details
     document.getElementById("saveBtn").onclick = function () {
-        var user = firebase.auth().currentUser;
+        let user = firebase.auth().currentUser;
 
         db.collection("users").doc(user.uid).get().then(doc => {
             let data = doc.data();
 
             let updateData = {
+                name: document.getElementById("name").value,
+                age: document.getElementById("age").value,
+                gender: document.getElementById("gender").value,
                 phone: document.getElementById("phone").value,
                 description: document.getElementById("description").value,
                 city: document.getElementById("city").value
@@ -159,7 +220,7 @@
             }
 
             db.collection("users").doc(user.uid).update(updateData).then(() => {
-                alert("Profile updated successfully!");
+                alert("Profile updated!");
             });
         });
     };
@@ -173,4 +234,4 @@
 </script>
 
 </body>
-</html>
+        </html>
