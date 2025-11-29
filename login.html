@@ -29,18 +29,19 @@ input { width:90%; padding:12px; margin:10px 0; border:1px solid #aaa; border-ra
 
 <button class="btn" onclick="login()">Login</button>
 
-<a class="link" href="Seva/forgot.html">Forgot Password?</a>
-<a class="link" href="Seva/signup.html">Create Account</a>
+<a class="link" href="forgot.html">Forgot Password?</a>
+<a class="link" href="signup.html">Create Account</a>
 </div>
 
-<div class="footer">© 2025 Seva – Spreading happiness & care ❤️</div>
+<div class="footer">© 2025 Seva – Spreading Happiness & Care ❤️</div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
 <script>
 var firebaseConfig = {
-    apiKey: "AIzaSyBOcsJLpaNSVCFo-Xl6UFtEtcoyxRFzik",
+    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
     projectId: "seva-6f191",
     storageBucket: "seva-6f191.appspot.com",
@@ -57,7 +58,7 @@ function login(){
     firebase.auth().signInWithEmailAndPassword(email, pass)
     .then(()=>{
         alert("Login Successful!");
-        window.location.href = "Seva/role.html";  // FIXED PATH
+        window.location.href = "role.html"; // SAME FOLDER
     })
     .catch(err=>alert(err.message));
 }
