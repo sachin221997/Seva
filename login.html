@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Seva Care - Login</title>
 
 <style>
@@ -11,8 +11,8 @@ body { margin:0; font-family: Inter; background:#e8f5e9; }
 .card { width:90%; max-width:380px; margin:40px auto; background:white; padding:25px; border-radius:14px; box-shadow:0 4px 18px rgba(0,0,0,0.15); text-align:center; }
 .card h2 { margin-bottom:10px; color:#1b5e20; }
 input { width:90%; padding:12px; margin:10px 0; border:1px solid #aaa; border-radius:8px; font-size:16px; }
-.btn { width:95%; padding:12px; background:#2e7d32; color:white; border:none; border-radius:8px; font-size:18px; margin-top:10px; cursor:pointer; }
-.link { margin-top:10px; display:block; color:#2e7d32; }
+.btn { width:90%; padding:12px; background:#1b5e20; color:white; border:none; border-radius:8px; font-size:18px; margin-top:10px; cursor:pointer; }
+.link { margin-top:10px; display:block; color:#2e7d32; font-size:16px; }
 .footer { text-align:center; padding:25px; background:#1b5e20; color:white; margin-top:40px; }
 </style>
 </head>
@@ -22,28 +22,28 @@ input { width:90%; padding:12px; margin:10px 0; border:1px solid #aaa; border-ra
 <div class="header">❤️ Seva Care</div>
 
 <div class="card">
-    <h2>Login to Your Account</h2>
+<h2>Login to Your Account</h2>
 
-    <input type="email" id="username" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
+<input type="email" id="username" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
 
-    <button class="btn" onclick="login()">Login</button>
+<button class="btn" onclick="login()">Login</button>
 
-    <a class="link" href="forgot.html">Forgot Password?</a>
-    <a class="link" href="signup.html">Create Account</a>
+<a class="link" href="Seva/forgot.html">Forgot Password?</a>
+<a class="link" href="Seva/signup.html">Create Account</a>
 </div>
 
-<div class="footer">© 2025 Seva – Spreading Care ❤️</div>
+<div class="footer">© 2025 Seva – Spreading happiness & care ❤️</div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
 <script>
 var firebaseConfig = {
-    apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
+    apiKey: "AIzaSyBOcsJLpaNSVCFo-Xl6UFtEtcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
     projectId: "seva-6f191",
-    storageBucket: "seva-6f191.firebasestorage.app",
+    storageBucket: "seva-6f191.appspot.com",
     messagingSenderId: "826093348416",
     appId: "1:826093348416:web:19fefe43b9b7cba09b21a5",
     measurementId: "G-78H32SRPCD"
@@ -52,15 +52,15 @@ firebase.initializeApp(firebaseConfig);
 
 function login(){
     let email = document.getElementById("username").value;
-    let pass  = document.getElementById("password").value;
+    let pass = document.getElementById("password").value;
 
     firebase.auth().signInWithEmailAndPassword(email, pass)
     .then(()=>{
         alert("Login Successful!");
-        window.location.href = "role.html";
+        window.location.href = "Seva/role.html";  // FIXED PATH
     })
     .catch(err=>alert(err.message));
 }
 </script>
 </body>
-</html>    
+</html>
