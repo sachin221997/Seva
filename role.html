@@ -11,43 +11,91 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-body{ margin:0; font-family:Arial,sans-serif; background:#e9f6e9; }
-.navbar{ background:#166d33; padding:12px; display:flex; justify-content:space-around; color:white; font-weight:bold; text-align:center; }
-.navbar div{ cursor:pointer; }
-
-.banner{
-    width:90%; margin:20px auto; padding:25px;
-    background:linear-gradient(135deg,#0B6C36,#0F8A34); color:white;
-    text-align:center; border-radius:25px;
-    box-shadow:0 0 12px rgba(0,0,0,0.15);
-}
-.banner h2{ margin-bottom:8px; }
-.banner p{ font-size:15px; opacity:.9; }
-
-.box{
-    width:90%; margin:20px auto; padding:25px; text-align:center;
-    background:white; border-radius:20px; 
-    box-shadow:0 0 8px rgba(0,0,0,.1);
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #e9f6e9;
 }
 
-button{
-    width:90%; padding:15px; margin:12px 0;
-    color:white; font-size:17px; border:none; border-radius:12px; cursor:pointer;
+.navbar {
+    background-color: #166d33;
+    padding: 12px;
+    display: flex;
+    justify-content: space-around;
+    color: white;
+    font-weight: bold;
+    text-align: center;
 }
-.cusBtn{ background:#166d33; }
-.workBtn{ background:#0b63c9; }
-.contactBtn{ background:#f2a104; }
+.navbar div { cursor: pointer; }
 
-.social-box{ text-align:center; margin-top:20px; }
-.social-box img{ width:45px; margin:10px; cursor:pointer; }
+.banner {
+    width: 90%;
+    margin: 20px auto;
+    background: linear-gradient(135deg, #0B6C36, #0F8A34);
+    padding: 25px;
+    border-radius: 25px;
+    color: white;
+    text-align: center;
+    box-shadow: 0px 0px 12px rgba(0,0,0,0.15);
+}
 
-.footer{ background:#166d33; color:white; padding:12px; text-align:center; margin-top:25px; }
+.banner h2 { margin-bottom:8px; }
+.banner p { font-size:15px; opacity:0.9; }
+
+.box {
+    width: 90%;
+    margin: 20px auto;
+    padding: 25px;
+    border-radius: 20px;
+    text-align: center;
+    background: white;
+    box-shadow: 0px 0px 8px rgba(0,0,0,0.1);
+}
+
+h2 {
+    color: #166d33;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+button {
+    width: 90%;
+    padding: 15px;
+    font-size: 17px;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    margin: 12px 0;
+    cursor: pointer;
+}
+.cusBtn { background-color: #166d33; }
+.workBtn { background-color: #0b63c9; }
+.contactBtn { background-color: #f2a104; }
+
+.social-box {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.social-box img {
+    width: 45px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.footer {
+    background-color: #166d33;
+    padding: 12px;
+    margin-top: 25px;
+    color: white;
+    text-align: center;
+}
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
+<!-- NAVBAR SAME AS YOURS -->
 <div class="navbar">
     <div onclick="go('role.html')">🏠<br>Home</div>
     <div onclick="go('need.html')">📌<br>Need</div>
@@ -72,15 +120,15 @@ button{
 
     <button class="contactBtn" onclick="go('contact.html')">📞 Contact Support</button>
 
-    <p onclick="logout()" style="color:#166d33;cursor:pointer;margin-top:10px;">Logout</p>
+    <p onclick="logout()" style="color:#166d33; cursor:pointer; margin-top:10px;">Logout</p>
 
     <div class="social-box">
 
-        <img src="https://cdn-icons-png.flaticon.com/512/1384/1384095.png" onclick="openLink('https://instagram.com/')">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" onclick="openLink('https://instagram.com/')">
         <img src="https://cdn-icons-png.flaticon.com/128/3670/3670051.png" onclick="openLink('https://wa.me/91XXXXXXXXXX')">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" onclick="openLink('https://facebook.com/')">
 
-        <!-- ⭐ NEW SHARE ICON ⭐ -->
+        <!-- ⭐ SHARE BUTTON ONLY ADD -->
         <img src="https://cdn-icons-png.flaticon.com/512/2958/2958791.png" onclick="shareApp()">
 
     </div>
@@ -89,62 +137,64 @@ button{
 <div class="footer">© 2025 Seva • Helping People Daily ❤️</div>
 
 <script>
-// Firebase Config
-var firebaseConfig={
-apiKey:"AIzaSyBOcsJLpaMSVcFo-XlGUEftIcoyxRFzik",
-authDomain:"seva-6f191.firebaseapp.com",
-projectId:"seva-6f191",
-storageBucket:"seva-6f191.firebasestorage.app",
-messagingSenderId:"826093348416",
-appId:"1:826093348416:web:19fe4d3b9b7cba09b21a5",
-measurementId:"G-7H8ZSRSCP0"
+// Firebase config SAME as yours
+var firebaseConfig = {
+    apiKey: "AIzaSyBOcsJLpaMSVcFo-XlGUEftIcoyxRFzik",
+    authDomain: "seva-6f191.firebaseapp.com",
+    projectId: "seva-6f191",
+    storageBucket: "seva-6f191.firebasestorage.app",
+    messagingSenderId: "826093348416",
+    appId: "1:826093348416:web:19fe4d3b9b7cba09b21a5",
+    measurementId: "G-7H8ZSRSCP0"
 };
 firebase.initializeApp(firebaseConfig);
 
-// Redirect
-function go(p){ window.location.href=p; }
+// PAGE REDIRECT FIXED
+function go(page){ window.location.href = page; }
 
-// Links
-function openLink(url){ window.open(url,"_blank"); }
+// OPEN SOCIAL CLICK
+function openLink(url){ window.open(url, "_blank"); }
 
-// SAVE ROLE
-function saveRole(role){
- let user=firebase.auth().currentUser;
- if(!user){
-     alert("Please login first.");
-     go("login.html");
-     return;
- }
+// SAVE ROLE FIXED
+function saveRole(roleName){
+    var user = firebase.auth().currentUser;
 
- firebase.database().ref("users/"+user.uid).update({ role:role });
+    if(!user){
+        alert("Please login first.");
+        go("login.html");
+        return;
+    }
 
- if(role==="customer") go("customer_dashboard.html");
- else go("worker_dashboard.html");
+    firebase.database().ref("users/"+user.uid).update({ role: roleName });
+
+    if(roleName === "customer") go("customer_dashboard.html");
+    else go("worker_dashboard.html");
 }
 
 // LOGOUT
 function logout(){
- firebase.auth().signOut().then(()=>go("login.html"));
+ firebase.auth().signOut().then(() => go("login.html"));
 }
 
 // ⭐ SHARE FUNCTION ⭐
 function shareApp(){
- const data={
-   title:"Seva — Helping People Daily",
-   text:"Join Seva App! Find work or hire workers easily.",
-   url:"https://in221997.github.io"
- };
-
- if(navigator.share){
-   navigator.share(data);
- } else {
-   alert("Sharing not supported!");
- }
+    const data = {
+        title: "Seva",
+        text: "Join Seva App! Find work or hire workers easily.",
+        url: "https://in221997.github.io"
+    };
+    if(navigator.share){
+        navigator.share(data);
+    } else {
+        alert("Sharing not supported!");
+    }
 }
 
-// LOGIN CHECK — MUST BE LAST
+// FORCE LOGIN — FINAL FIX
 firebase.auth().onAuthStateChanged(user=>{
-    if(!user) window.location.href="login.html";
+    if(!user){
+        window.location.href = "login.html";
+    }
 });
 </script>
 
