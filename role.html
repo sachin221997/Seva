@@ -1,83 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Choose Role - Seva</title>
 
-<!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #e9f6e9;
-}
+body { margin:0; font-family: Arial; background-color:#e9f6e9; }
 
+/* NAVBAR */
 .navbar {
-    background-color: #166d33;
-    padding: 12px;
-    display: flex;
-    justify-content: space-around;
-    color: white;
-    font-weight: bold;
-    text-align: center;
+    background:#166d33; padding:12px; display:flex;
+    justify-content:space-around; color:white; font-weight:bold;
 }
+.navbar div { cursor:pointer; text-align:center; }
 
-.navbar div { cursor: pointer; }
-
+/* Banner */
 .banner {
-    width: 90%;
-    margin: 20px auto;
-    background: linear-gradient(135deg, #0B6C36, #0F8A34);
-    padding: 25px;
-    border-radius: 25px;
-    color: white;
-    text-align: center;
-    box-shadow: 0px 0px 12px rgba(0,0,0,0.15);
+    width:90%; margin:20px auto;
+    background:linear-gradient(135deg,#0B6C36,#0F8A34);
+    padding:25px; border-radius:25px; color:white; text-align:center;
+    box-shadow:0 0px 12px rgba(0,0,0,0.15);
 }
+.banner h2 { margin-bottom:8px; }
 
+/* Role box */
 .box {
-    width: 90%;
-    margin: 20px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0px 0px 8px rgba(0,0,0,0.1);
+    width:90%; margin:20px auto; background:white; padding:25px;
+    border-radius:20px; text-align:center; box-shadow:0 0px 8px rgba(0,0,0,0.1);
 }
+h2 { color:#166d33; margin-bottom:20px; }
 
 button {
-    width: 90%;
-    padding: 15px;
-    font-size: 17px;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    margin: 12px 0;
-    cursor: pointer;
+    width:90%; padding:15px; font-size:17px; color:white; border:none;
+    border-radius:12px; margin:12px 0; cursor:pointer;
 }
+.cusBtn { background:#166d33; }
+.workBtn { background:#0b6c39; }
+.contactBtn { background:#f2a104; }
+.shareBtn { background:#0d47a1; }
 
-.cusBtn { background-color: #166d33; }
-.workBtn { background-color: #0b63c9; }
-.contactBtn { background-color: #F2A104; }
-.shareBtn { background-color: #0C9F5A; }
+/* Social Icons */
+.social-box { margin-top:20px; }
+.social-box img { width:45px; margin:0 10px; cursor:pointer; }
 
-.social-box img {
-    width: 45px;
-    margin: 0 10px;
-    cursor: pointer;
-}
-
+/* FOOTER */
 .footer {
-    background-color: #166d33;
-    padding: 12px;
-    margin-top: 25px;
-    color: white;
-    text-align: center;
+    background:#166d33; padding:12px; margin-top:25px;
+    color:white; text-align:center;
 }
 </style>
 </head>
@@ -86,9 +60,9 @@ button {
 
 <!-- NAVBAR -->
 <div class="navbar">
-    <div onclick="go('role.html')">🏠<br>Home</div>
-    <div onclick="go('need.html')">📌<br>Need</div>
-    <div onclick="go('help.html')">🛠️<br>Help</div>
+    <div onclick="go('role.html')">🏡<br>Home</div>
+    <div onclick="go('need.html')">📝<br>Need</div>
+    <div onclick="go('help.html')">❓<br>Help</div>
     <div onclick="go('profile.html')">👤<br>Profile</div>
     <div onclick="go('contact.html')">📞<br>Contact</div>
     <div onclick="go('about.html')">ℹ️<br>About</div>
@@ -96,68 +70,50 @@ button {
 
 <!-- Banner -->
 <div class="banner">
-    <h2>Do Work and Earn Money 💰</h2>
+    <h2>Do Work and Earn Money 💰💫</h2>
     <p>Flexible hours • Trusted customers • Fast payouts</p>
 </div>
 
-<!-- Role Box -->
+<!-- Role Selection -->
 <div class="box">
-    <h2>Select Your Role</h2>
+<h2>Select Your Role</h2>
 
-    <button class="cusBtn" onclick="saveRole('customer')">Continue as Customer</button>
-    <button class="workBtn" onclick="saveRole('worker')">Continue as Worker</button>
+<button class="cusBtn" onclick="saveRole('customer')">Continue as Customer</button>
+<button class="workBtn" onclick="saveRole('worker')">Continue as Worker</button>
 
-    <button class="contactBtn" onclick="go('contact.html')">📞 Contact Support</button>
+<button class="contactBtn" onclick="go('contact.html')">🛠 Contact Support</button>
+<button class="shareBtn" onclick="share()">🔗 Share App</button>
 
-    <button class="shareBtn" onclick="shareApp()">🔗 Share This App</button>
+<p onclick="logout()" style="color:#166d33; cursor:pointer; margin-top:10px;">Logout</p>
 
-    <p onclick="logout()" style="color:#166d33; cursor:pointer; margin-top:10px;">Logout</p>
+<!-- Social -->
+<div class="social-box">
+    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" onclick="openLink('https://instagram.com')">
+    <img src="https://cdn-icons-png.flaticon.com/128/3670/3670051.png" onclick="openLink('https://wa.me/91XXXXXXXXXX')">
+    <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" onclick="openLink('https://facebook.com')">
 </div>
-
-<!-- Social Icons -->
-<div class="box" style="text-align:center;">
-    <div class="social-box">
-        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" onclick="openLink('https://instagram.com')">
-        <img src="https://cdn-icons-png.flaticon.com/128/3670/3670051.png" onclick="openLink('https://wa.me/91XXXXXXXXXX')">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" onclick="openLink('https://facebook.com')">
-    </div>
 </div>
 
 <div class="footer">© 2025 Seva • Helping People Daily ❤️</div>
 
 <script>
-// Firebase Config
+// Firebase
 var firebaseConfig = {
-    apiKey: "AIzaSyBOcsJLpaNSVCFo-XI6UFEItcoxyRFzik",
-    authDomain: "seva-6f191.firebaseapp.com",
-    projectId: "seva-6f191",
-    storageBucket: "seva-6f191.appspot.com",
-    messagingSenderId: "826093384416",
-    appId: "1:826093384416:web:19fe4e43b9b7cba09b21a5",
-    measurementId: "G-78H3ZSRPCD"
+    apiKey:"AIzaSyBOcsJLpaNSVCFo-Xl6UFtEtcoyxRFzik",
+    authDomain:"seva-6f191.firebaseapp.com",
+    projectId:"seva-6f191",
+    storageBucket:"seva-6f191.appspot.com",
+    messagingSenderId:"826093348416",
+    appId:"1:826093348416:web:19fefe43b9b7cba09b21a5",
+    measurementId:"G-78H32SRPCD"
 };
 firebase.initializeApp(firebaseConfig);
 
-// Redirect
-function go(page){ window.location.href = page; }
+function go(page){ window.location.href = "Seva/" + page; }
 
-// Open social links
-function openLink(url){ window.open(url, "_blank"); }
+function openLink(url){ window.open(url,"_blank"); }
 
-// SHARE BUTTON FUNCTION
-function shareApp() {
-    if (navigator.share) {
-        navigator.share({
-            title: "Seva App",
-            text: "Try this amazing app Seva Care!",
-            url: "https://sachin221997.github.io/Seva/"
-        });
-    } else {
-        alert("Sharing not supported on this device.");
-    }
-}
-
-// SAVE ROLE FUNCTION
+// SAVE ROLE
 function saveRole(roleName){
     var user = firebase.auth().currentUser;
     if(!user){
@@ -165,14 +121,9 @@ function saveRole(roleName){
         go("login.html");
         return;
     }
-
-    firebase.database().ref("users/" + user.uid).update({ role: roleName });
-
-    if(roleName === "customer"){
-        go("customer_dashboard.html");
-    } else {
-        go("worker_dashboard.html");
-    }
+    firebase.database().ref("users/"+user.uid).update({ role: roleName });
+    if(roleName === "customer") go("customer_dashboard.html");
+    else go("worker_dashboard.html");
 }
 
 // LOGOUT
@@ -180,16 +131,23 @@ function logout(){
     firebase.auth().signOut().then(()=> go("login.html"));
 }
 
-// LOGIN CHECK (fixed)
-firebase.auth().onAuthStateChanged(function(user){
-    if(user){
-        console.log("User logged in");
-    } else {
-        console.log("Redirecting to login...");
-        setTimeout(()=>{ go("login.html"); }, 500);
-    }
+// FORCE LOGIN CHECK
+firebase.auth().onAuthStateChanged(user=>{
+    if(!user) go("login.html");
 });
-</script>
 
+// SHARE
+function share(){
+    if(navigator.share){
+        navigator.share({
+            title:"Seva App",
+            text:"Join Seva — Find help or earn income!",
+            url:"https://sachin221997.github.io/Seva/login.html"
+        });
+    } else {
+        alert("Sharing not supported in this browser.");
+    }
+}
+</script>
 </body>
     </html>
