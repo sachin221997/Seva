@@ -9,10 +9,9 @@
 body { margin:0; font-family: Inter; background:#e8f5e9; }
 .header { background:#1b5e20; padding:25px; color:white; font-size:32px; text-align:center; font-weight:700; }
 .card { width:90%; max-width:380px; margin:40px auto; background:white; padding:25px; border-radius:14px; box-shadow:0 4px 18px rgba(0,0,0,0.15); text-align:center; }
-.card h2 { margin-bottom:10px; color:#1b5e20; }
-input { width:90%; padding:12px; margin:10px 0; border:1px solid #aaa; border-radius:8px; font-size:16px; }
-.btn { width:90%; padding:12px; background:#1b5e20; color:white; border:none; border-radius:8px; font-size:18px; margin-top:10px; cursor:pointer; }
-.link { margin-top:10px; display:block; color:#2e7d32; font-size:16px; }
+input { width:90%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #aaa; }
+.btn { width:90%; padding:12px; border:none; background:#1b5e20; color:white; font-size:18px; border-radius:8px; cursor:pointer; }
+.link { display:block; margin-top:10px; color:#2e7d32; }
 .footer { text-align:center; padding:25px; background:#1b5e20; color:white; margin-top:40px; }
 </style>
 </head>
@@ -35,7 +34,6 @@ input { width:90%; padding:12px; margin:10px 0; border:1px solid #aaa; border-ra
 
 <div class="footer">© 2025 Seva – Spreading Happiness & Care ❤️</div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
@@ -58,10 +56,13 @@ function login(){
     firebase.auth().signInWithEmailAndPassword(email, pass)
     .then(()=>{
         alert("Login Successful!");
-        window.location.href = "role.html"; // SAME FOLDER
+
+        // 🔥 Correct redirect
+        window.location.href = "/Seva/role.html";
     })
-    .catch(err=>alert(err.message));
+    .catch(err => alert(err.message));
 }
 </script>
+
 </body>
 </html>
