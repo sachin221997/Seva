@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Seva – Home</title>
+<title>Choose Role - Seva</title>
 
 <!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -11,49 +11,17 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-body { margin:0; font-family: Arial; background:#e9f6e9; }
-
-/* NAVBAR */
-.navbar{
-    background:#166d33; padding:12px; display:flex;
-    justify-content:space-around; color:white; font-weight:bold;
-}
-.navbar div{ cursor:pointer; text-align:center; }
-
-/* Banner */
-.banner{
-    width:90%; margin:20px auto; padding:25px;
-    background:linear-gradient(135deg,#0B6C36,#0F8A34);
-    border-radius:25px; color:white; text-align:center;
-    box-shadow:0 0 12px rgba(0,0,0,0.15);
-}
-.banner h2{ margin-bottom:8px; }
-
-/* Role box */
-.box{
-    width:90%; margin:20px auto; background:white;
-    padding:25px; border-radius:20px; text-align:center;
-    box-shadow:0 0 8px rgba(0,0,0,0.1);
-}
-button{
-    width:90%; padding:15px; margin:12px 0;
-    font-size:17px; color:white; border:none;
-    border-radius:12px; cursor:pointer;
-}
-.cusBtn{ background:#166d33; }
-.workBtn{ background:#0b6c39; }
-.contactBtn{ background:#f2a104; }
-.shareBtn{ background:#0d47a1; }
-
-/* Social */
-.social-box{ margin-top:20px; }
-.social-box img{ width:45px; margin:0 10px; cursor:pointer; }
-
-/* Footer */
-.footer{
-    background:#166d33; padding:15px; text-align:center;
-    color:white; margin-top:25px;
-}
+body { margin:0; font-family: Arial; background-color:#e9f6e9; }
+.navbar { background:#166d33; padding:12px; display:flex; justify-content:space-around; color:white; font-weight:bold; }
+.navbar div { cursor:pointer; text-align:center; }
+.banner { width:90%; margin:20px auto; background:linear-gradient(135deg,#0B6C36,#0F8A34); padding:25px; border-radius:25px; color:white; text-align:center; }
+.box { width:90%; margin:20px auto; background:white; padding:25px; border-radius:20px; text-align:center; }
+button { width:90%; padding:15px; margin:12px 0; font-size:17px; color:white; border:none; border-radius:12px; cursor:pointer; }
+.cusBtn { background:#166d33; }
+.workBtn { background:#0b6c39; }
+.contactBtn { background:#f2a104; }
+.shareBtn { background:#0d47a1; }
+.footer { background:#166d33; padding:12px; margin-top:25px; color:white; text-align:center; }
 </style>
 </head>
 
@@ -71,11 +39,11 @@ button{
 
 <!-- Banner -->
 <div class="banner">
-    <h2>Do Work and Earn Money 💰</h2>
-    <p>Trusted customers • Fast payouts • Flexible hours</p>
+    <h2>Do Work and Earn Money 💰💫</h2>
+    <p>Flexible hours • Trusted customers • Fast payouts</p>
 </div>
 
-<!-- Role Box -->
+<!-- Role Selection -->
 <div class="box">
 <h2>Select Your Role</h2>
 
@@ -86,18 +54,12 @@ button{
 <button class="shareBtn" onclick="share()">🔗 Share App</button>
 
 <p onclick="logout()" style="color:#166d33; cursor:pointer; margin-top:10px;">Logout</p>
-
-<div class="social-box">
-    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" onclick="openLink('https://instagram.com')">
-    <img src="https://cdn-icons-png.flaticon.com/128/3670/3670051.png" onclick="openLink('https://wa.me/91XXXXXXXXXX')">
-    <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" onclick="openLink('https://facebook.com')">
-</div>
 </div>
 
 <div class="footer">© 2025 Seva • Helping People Daily ❤️</div>
 
 <script>
-/* FIREBASE CONFIG — 100% Correct */
+// Firebase Config
 var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
@@ -109,51 +71,49 @@ var firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-/* Redirect */
-function go(page){ window.location.href = page; }
+// Page redirect
+function go(page){
+    window.location.href = page;   // FIXED (NO “Seva/”)
+}
 
-/* Social */
-function openLink(url){ window.open(url,"_blank"); }
-
-/* SAVE ROLE */
+// Save role
 function saveRole(roleName){
     var user = firebase.auth().currentUser;
-
     if(!user){
         alert("Please login first.");
         go("login.html");
         return;
     }
 
-    firebase.database()
-    .ref("users/"+user.uid)
-    .update({ role: roleName });
+    firebase.database().ref("users/" + user.uid).update({ role: roleName });
 
     if(roleName === "customer") go("customer_dashboard.html");
     else go("worker_dashboard.html");
 }
 
-/* LOGOUT */
+// Logout
 function logout(){
     firebase.auth().signOut().then(()=> go("login.html"));
 }
 
-/* FORCE CHECK */
+// Force login check
 firebase.auth().onAuthStateChanged(user=>{
     if(!user) go("login.html");
 });
 
-/* SHARE */
+// Share
 function share(){
     if(navigator.share){
         navigator.share({
             title:"Seva App",
-            text:"Find help or earn income using Seva!",
+            text:"Join Seva – Find help or earn income!",
             url:"https://sachin221997.github.io/Seva/login.html"
         });
-    } else alert("Sharing not supported");
+    } else {
+        alert("Sharing not supported.");
+    }
 }
 </script>
 
 </body>
-</html>
+                                                </html>
