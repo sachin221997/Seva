@@ -71,9 +71,7 @@ button {
 .workBtn { background-color: #0b63c9; }
 .contactBtn { background-color: #f2a104; }
 
-.social-box {
-    margin-top: 20px;
-}
+.social-box { margin-top: 20px; }
 .social-box img {
     width: 45px;
     margin: 10px;
@@ -94,7 +92,7 @@ button {
 
 <!-- NAVBAR -->
 <div class="navbar">
-    <div onclick="go('role.html')">🏠<br>Home</div>
+    <div>🏠<br>Home</div> <!-- SAME PAGE, no reload -->
     <div onclick="go('need.html')">📌<br>Need</div>
     <div onclick="go('help.html')">🛠️<br>Help</div>
     <div onclick="go('profile.html')">👤<br>Profile</div>
@@ -124,7 +122,7 @@ button {
         <img src="https://cdn-icons-png.flaticon.com/128/3670/3670051.png" onclick="openLink('https://wa.me/91XXXXXXXXXX')">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" onclick="openLink('https://facebook.com/')">
 
-        <!-- ⭐ SHARE ICON ⭐ -->
+        <!-- ⭐ SHARE BUTTON ⭐ -->
         <img src="https://cdn-icons-png.flaticon.com/512/2958/2958791.png" onclick="shareApp()">
     </div>
 </div>
@@ -186,10 +184,14 @@ function shareApp(){
     }
 }
 
-// Login check
-firebase.auth().onAuthStateChanged(user => {
-    if (!user) {
-        window.location.href = "login.html";
+// ⭐ FIXED LOGIN CHECK — 100% NO LOOP ⭐
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+        console.log("User logged in");
+        // stay here (no redirect)
+    } else {
+        console.log("No user");
+        window.location.replace("login.html");
     }
 });
 </script>
