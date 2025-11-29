@@ -93,7 +93,7 @@ button {
 
 <body>
 
-<!-- NAVBAR FIXED (Home = same page, NO onclick) -->
+<!-- NAVBAR -->
 <div class="navbar">
     <div>🏠<br>Home</div>
     <div onclick="go('need.html')">📌<br>Need</div>
@@ -120,13 +120,13 @@ button {
 
     <p onclick="logout()" style="color:#166d33; cursor:pointer; margin-top:10px;">Logout</p>
 
-    <!-- Social Box -->
+    <!-- Social -->
     <div class="social-box">
         <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" onclick="openLink('https://instagram.com/')">
         <img src="https://cdn-icons-png.flaticon.com/128/3670/3670051.png" onclick="openLink('https://wa.me/91XXXXXXXXXX')">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" onclick="openLink('https://facebook.com/')">
 
-        <!-- ⭐ SHARE BUTTON ADDED ⭐ -->
+        <!-- SHARE ICON -->
         <img src="https://cdn-icons-png.flaticon.com/512/2958/2958791.png" onclick="shareApp()">
     </div>
 </div>
@@ -134,7 +134,7 @@ button {
 <div class="footer">© 2025 Seva • Helping People Daily ❤️</div>
 
 <script>
-// Firebase config SAME as your code
+// Firebase Config
 var firebaseConfig = {
     apiKey: "AIzaSyBOcsJLpaMSVcFo-XlGUEftIcoyxRFzik",
     authDomain: "seva-6f191.firebaseapp.com",
@@ -149,7 +149,7 @@ firebase.initializeApp(firebaseConfig);
 // Redirect
 function go(page){ window.location.href = page; }
 
-// Social links
+// Open Social link
 function openLink(url){ window.open(url, "_blank"); }
 
 // SAVE ROLE
@@ -177,17 +177,15 @@ function logout(){
 function shareApp(){
     const data = {
         title: "Seva",
-        text: "Try Seva App! Work or hire workers easily.",
+        text: "Try Seva App! Work & hire workers easily.",
         url: "https://in221997.github.io"
     };
-    if(navigator.share){
-        navigator.share(data);
-    }
+    if(navigator.share){ navigator.share(data); }
 }
 
-// FORCE LOGIN CHECK
+// FORCE LOGIN CHECK (FIXED)
 firebase.auth().onAuthStateChanged(user=>{
-    if(!user){
+    if(!user){  // ← YAHI FIX HAI
         window.location.href = "login.html";
     }
 });
