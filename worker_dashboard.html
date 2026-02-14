@@ -264,6 +264,14 @@ function acceptJob(id){
         acceptedBy:currentUser.uid,
         platformFeePaid:false
       });
+      // 🔔 CUSTOMER NOTIFICATION
+db.collection("notifications").add({
+  toUser: doc.data().customerId,   // customer UID from job
+  jobId: id,
+  message: "A worker has accepted your job",
+  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  read: false
+});
     });
   }).then(()=>alert("Job Accepted"));
 }
