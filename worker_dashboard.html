@@ -2,213 +2,189 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Worker Dashboard</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #e8f8e6;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #e8f8e6;
+}
 
-    /* HEADER */
-    .header {
-        background: #0a662e;
-        padding: 20px 15px;
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-        color: white;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
+/* HEADER */
+.header {
+  background: #0a662e;
+  padding: 20px 15px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.back-btn {
+  background: white;
+  color: #0a662e;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-decoration: none;
+}
+.logout-btn {
+  background: #d32f2f;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-decoration: none;
+}
+h2 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  font-size: 20px;
+}
 
-    .header-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+/* CONTAINER */
+.container {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 0 15px;
+  padding-bottom: 100px;
+}
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+.big {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0a662e;
+}
+.muted {
+  font-size: 14px;
+  color: #555;
+  margin-top: 6px;
+}
+.info-box {
+  background: #fff3cf;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 6px solid #ffb300;
+  margin-bottom: 18px;
+}
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
 
-    .back-btn {
-        background: white;
-        color: #0a662e;
-        padding: 8px 14px;
-        border-radius: 10px;
-        font-weight: bold;
-        text-decoration: none;
-    }
+/* JOB CARD */
+.job-card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  border-left: 5px solid #0a662e;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.job-title {
+  font-size: 17px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.job-desc {
+  color: #555;
+  margin-bottom: 8px;
+}
+.job-price {
+  font-weight: bold;
+  color: #0a662e;
+  margin-bottom: 6px;
+}
+.small {
+  font-size: 13px;
+  color: #333;
+}
 
-    .logout-btn {
-        background: #d32f2f;
-        color: white;
-        padding: 8px 14px;
-        border-radius: 10px;
-        font-weight: bold;
-        text-decoration: none;
-    }
+/* BUTTONS */
+.btn {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  width: 100%;
+}
+.btn-accept { background: #0a662e; color: white; }
+.btn-work { background: #00a4e4; color: white; }
+.btn-pay { background: #0077cc; color: white; }
+.btn-disabled { background: #ccc; color: #777; }
 
-    h2 {
-        margin: 0;
-        flex: 1;
-        text-align: center;
-        font-size: 20px;
-    }
-
-    /* CONTAINER */
-    .container {
-        max-width: 700px;
-        margin: 20px auto;
-        padding: 0 15px;
-        padding-bottom: 100px;
-    }
-
-    .card {
-        background: white;
-        padding: 18px;
-        border-radius: 14px;
-        margin-bottom: 18px;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-    }
-
-    .big {
-        font-size: 18px;
-        font-weight: 700;
-        color: #0a662e;
-    }
-
-    .muted {
-        font-size: 14px;
-        color: #555;
-        margin-top: 6px;
-    }
-
-    .info-box {
-        background: #fff3cf;
-        padding: 15px;
-        border-radius: 10px;
-        border-left: 6px solid #ffb300;
-        margin-bottom: 18px;
-        font-size: 15px;
-    }
-
-    .section-title {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 8px;
-    }
-
-    .job-card {
-        background: white;
-        padding: 16px;
-        border-radius: 12px;
-        margin-bottom: 14px;
-        border-left: 5px solid #0a662e;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .job-title {
-        font-size: 17px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .job-desc {
-        color: #555;
-        margin-bottom: 8px;
-    }
-
-    .job-price {
-        font-weight: bold;
-        color: #0a662e;
-        margin-bottom: 6px;
-        font-size: 16px;
-    }
-
-    .small {
-        font-size: 13px;
-        color: #333;
-    }
-
-    .btn {
-        padding: 10px 14px;
-        border-radius: 8px;
-        border: none;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 8px;
-        width: 100%;
-    }
-
-    .btn-accept { background: #0a662e; color: white; }
-    .btn-work { background: #f0ad4e; color: white; }
-    .btn-pay { background: #0077cc; color: white; }
-    .btn-disabled { background:#ccc; color:#777; }
-
-    footer {
-        text-align: center;
-        padding: 20px;
-        font-size: 16px;
-        font-weight: bold;
-        color: #0a662e;
-    }
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #0a662e;
+}
 </style>
 </head>
+
 <body>
 
-<!-- HEADER -->
 <div class="header">
-    <div class="header-row">
-        <a href="javascript:history.back()" class="back-btn">← Back</a>
-
-        <h2>Worker Dashboard</h2>
-
-        <a id="logoutBtn" class="logout-btn">Logout</a>
-    </div>
-
-    <p id="greeting" style="margin:10px 0 0 0; font-size:15px;">Hello, Worker</p>
+  <div class="header-row">
+    <a href="javascript:history.back()" class="back-btn">← Back</a>
+    <h2>Worker Dashboard</h2>
+    <a id="logoutBtn" class="logout-btn">Logout</a>
+  </div>
+  <p id="greeting" style="margin:10px 0 0; font-size:15px;">Hello, Worker</p>
 </div>
 
-<!-- BODY CONTAINER -->
 <div class="container">
 
-    <!-- MOTIVATION -->
-    <div class="card">
-        <div class="big">Work • Earn • Grow 💰</div>
-        <div class="muted">
-            Accept jobs in your city and start earning.  
-            Each job accepts requires a platform fee of ₹50.
-        </div>
+  <div class="card">
+    <div class="big">Work · Earn · Grow 💰</div>
+    <div class="muted">
+      Accept jobs in your city and start earning.
+      Each job accepts requires a platform fee of ₹50.
     </div>
+  </div>
 
-    <!-- FEE INFO -->
-    <div class="info-box">
-        <b>Platform Fee:</b> ₹50 per job — Helps keep Seva Care running ❤️
-    </div>
+  <div class="info-box">
+    <b>Platform Fee:</b> ₹50 per job – Helps keep Seva Care running ❤️
+  </div>
 
-    <!-- NEARBY JOBS -->
-    <div class="card">
-        <div class="section-title">Nearby Jobs</div>
-        <div class="small" id="cityText">Finding your city...</div>
-        <div id="jobsList" style="margin-top:15px;"></div>
-        <div id="noJobs" class="small" style="text-align:center; margin-top:20px; display:none;">
-            No jobs found in your city — check again later.
-        </div>
+  <div class="card">
+    <div class="section-title">Nearby Jobs</div>
+    <div class="small" id="cityText">Finding your city...</div>
+    <div id="jobsList" style="margin-top:15px;"></div>
+    <div id="noJobs" class="small" style="text-align:center;margin-top:20px;display:none;">
+      No jobs found in your city – check again later.
     </div>
+  </div>
 
-    <!-- RULES -->
-    <div class="card">
-        <div class="section-title">Job Completion Rule</div>
-        <div class="small">
-            
-            ✔ Accept a job  
-            ✔ Pay platform fee ₹50 to admin  
-            ✔ Confirm fee paid → Then do a Job and marked completed  
-        </div>
+  <div class="card">
+    <div class="section-title">Job Completion Rule</div>
+    <div class="small">
+      ✔ Accept a job <br>
+      ✔ Pay platform fee ₹50 to admin <br>
+      ✔ Confirm fee paid → Then do job and mark completed
     </div>
+  </div>
 
 </div>
 
 <footer>Spread Happiness ❤️ and Care.</footer>
-
 
 <!-- Firebase v8 -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -216,179 +192,175 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 <script>
-    var firebaseConfig = {
-        apiKey: "AIzaSyBOcsJLpaNSVcFo-Xl6UFEtItcoyxRFzik",
-        authDomain: "seva-6f191.firebaseapp.com",
-        projectId: "seva-6f191",
-        storageBucket: "seva-6f191.firebasestorage.app",
-        messagingSenderId: "826093348416",
-        appId: "1:826093348416:web:19fefe43b9b7cba09b21a5"
-    };
+var firebaseConfig = {
+  apiKey: "AIzaSyBozLSplaNSVCo-XI0UFEtlcoyxRFZik",
+  authDomain: "seva-6f191.firebaseapp.com",
+  projectId: "seva-6f191",
+  storageBucket: "seva-6f191.appspot.com",
+  messagingSenderId: "82609348416",
+  appId: "1:82609348416:web:19fef43b9b7cba09b21a5"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
 
-    firebase.initializeApp(firebaseConfig);
-    var db = firebase.firestore();
+const ADMIN_UPI = "sachiny4561@oksbi";
+const PLATFORM_FEE = 50;
 
-    const ADMIN_UPI = "sachiny4561@oksbi";
-    const PLATFORM_FEE = "50";
+let currentUser = null;
+let workerCity = null;
+let unsubscribe = null;
 
-    let currentUser = null;
-    let workerCity = null;
-    let jobsUnsubscribe = null;
+const greetingEl = document.getElementById("greeting");
+const jobsListEl = document.getElementById("jobsList");
+const noJobsEl = document.getElementById("noJobs");
+const cityTextEl = document.getElementById("cityText");
 
-    const greetingEl = document.getElementById("greeting");
-    const jobsListEl = document.getElementById("jobsList");
-    const noJobsEl = document.getElementById("noJobs");
-    const cityTextEl = document.getElementById("cityText");
+firebase.auth().onAuthStateChanged(user => {
+  if (!user) {
+    window.location = "login.html";
+    return;
+  }
+  currentUser = user;
+  greetingEl.textContent = "Hello, " + user.email;
 
-    firebase.auth().onAuthStateChanged(user => {
-        if (!user) return (window.location = "login.html");
-        currentUser = user;
-        greetingEl.textContent = "Hello, " + user.email;
+  db.collection("users").doc(user.uid).get().then(doc => {
+    workerCity = doc.data().city || "";
+    cityTextEl.textContent = "City: " + workerCity;
+    loadJobs(workerCity);
+  });
+});
 
-        db.collection("users").doc(user.uid).get().then(doc => {
-            let data = doc.data();
-            workerCity = data.city || "";
-            cityTextEl.textContent = "City: " + workerCity;
+function loadJobs(city) {
+  if (unsubscribe) unsubscribe();
 
-            loadJobs(workerCity);
-        });
+  unsubscribe = db.collection("jobs")
+    .where("city", "==", city)
+    .orderBy("createdAt", "desc")
+    .onSnapshot(snapshot => {
+      if (snapshot.empty) {
+        jobsListEl.innerHTML = "";
+        noJobsEl.style.display = "block";
+        return;
+      }
+
+      let html = "";
+      snapshot.forEach(doc => {
+        let job = doc.data();
+        job.id = doc.id;
+        html += renderJob(job);
+      });
+      jobsListEl.innerHTML = html;
+      noJobsEl.style.display = "none";
+      attachButtons();
     });
+}
 
-    function loadJobs(city) {
-        if (jobsUnsubscribe) jobsUnsubscribe();
+function renderJob(job) {
+  let status = job.status || "open";
+  let mine = job.acceptedBy === currentUser.uid;
+  let btn = "";
 
-        jobsUnsubscribe = db.collection("jobs")
-            .where("city", "==", city)
-            .orderBy("createdAt", "desc")
-            .onSnapshot(snapshot => {
-                if (snapshot.empty) {
-                    jobsListEl.innerHTML = "";
-                    noJobsEl.style.display = "block";
-                    return;
-                }
+  if (status === "open") {
+    btn = `<button class="btn btn-accept" data-accept="${job.id}">Accept Job</button>`;
+  }
 
-                let html = "";
-                snapshot.forEach(doc => {
-                    let j = doc.data();
-                    j.id = doc.id;
-                    html += renderJob(j);
-                });
+  if (status === "accepted" && mine) {
+    btn = `
+      <button class="btn btn-pay" data-pay="${job.id}">Pay Platform Fee ₹50</button>
+      <button class="btn btn-work" data-complete="${job.id}">Mark as Completed</button>
+      <div class="small">Fee Paid: <b>${job.platformFeePaid ? "Yes" : "No"}</b></div>
+    `;
+  }
 
-                jobsListEl.innerHTML = html;
-                noJobsEl.style.display = "none";
+  if (status === "accepted" && !mine) {
+    btn = `<div class="small">Already accepted by another worker</div>`;
+  }
 
-                attachButtons();
-            });
+  if (status === "completed") {
+    btn = `<div class="small">Job Completed ✔</div>`;
+  }
+
+  return `
+    <div class="job-card">
+      <div class="job-title">${job.title || "Job"}</div>
+      <div class="job-desc">${job.description || ""}</div>
+      <div class="job-price">₹${job.price || job.amount || "-"}</div>
+      <div class="small">City: ${job.city}</div>
+      ${btn}
+    </div>
+  `;
+}
+
+function attachButtons() {
+  document.querySelectorAll("[data-accept]").forEach(b =>
+    b.onclick = () => acceptJob(b.dataset.accept)
+  );
+  document.querySelectorAll("[data-pay]").forEach(b =>
+    b.onclick = () => payFee(b.dataset.pay)
+  );
+  document.querySelectorAll("[data-complete]").forEach(b =>
+    b.onclick = () => markComplete(b.dataset.complete)
+  );
+}
+
+/* SAFE JOB ACCEPT */
+function acceptJob(id) {
+  const ref = db.collection("jobs").doc(id);
+  db.runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) throw "Not found";
+    if (snap.data().status !== "open") {
+      alert("Job already accepted");
+      throw "Taken";
     }
+    tx.update(ref, {
+      status: "accepted",
+      acceptedBy: currentUser.uid,
+      acceptedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      platformFeePaid: false
+    });
+  }).then(() => alert("Job Accepted – Start Working!"));
+}
 
-    function renderJob(job) {
-        let status = job.status || "open";
-        let acceptedByMe = job.acceptedBy === currentUser.uid;
-        let price = job.price || job.amount || "--";
-
-        let btn = "";
-
-        if (status === "open") {
-            btn = `<button class="btn btn-accept" data-accept="${job.id}">
-                    Accept Job • ₹${price}
-                   </button>`;
-        }
-
-        if (status === "accepted" && acceptedByMe) {
-            btn = `
-                <button class="btn btn-work" data-complete="${job.id}">
-                    Mark as Completed
-                </button>
-
-                <button class="btn btn-pay" data-pay="${job.id}">
-                    Pay Platform Fee ₹50
-                </button>
-
-                <div class="small" style="margin-top:8px;">
-                    Platform Fee Paid: <b>${job.platformFeePaid ? "Yes" : "No"}</b>
-                </div>
-            `;
-        }
-
-        if (status === "accepted" && !acceptedByMe) {
-            btn = `<div class="small">Already accepted by another worker</div>`;
-        }
-
-        if (status === "completed") {
-            btn = `<div class="small">Job Completed ✓</div>`;
-        }
-
-        return `
-        <div class="job-card">
-            <div class="job-title">${job.title || "Job"}</div>
-            <div class="job-desc">${job.description || ""}</div>
-            <div class="job-price">₹${price}</div>
-            <div class="small">City: ${job.city}</div>
-
-            ${btn}
-        </div>`;
+/* PAY FEE */
+function payFee(id) {
+  window.location.href = `upi://pay?pa=${ADMIN_UPI}&pn=SevaCare&am=50&cu=INR`;
+  setTimeout(() => {
+    if (confirm("Did you complete the ₹50 payment?")) {
+      db.collection("jobs").doc(id).update({
+        platformFeePaid: true,
+        platformFeePaidBy: currentUser.uid,
+        platformFeePaidAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
     }
+  }, 500);
+}
 
-    function attachButtons() {
-        document.querySelectorAll("[data-accept]").forEach(btn => {
-            btn.onclick = () => acceptJob(btn.getAttribute("data-accept"));
-        });
-
-        document.querySelectorAll("[data-pay]").forEach(btn => {
-            btn.onclick = () => payFee(btn.getAttribute("data-pay"));
-        });
-
-        document.querySelectorAll("[data-complete]").forEach(btn => {
-            btn.onclick = () => markComplete(btn.getAttribute("data-complete"));
-        });
+/* COMPLETE JOB */
+function markComplete(id) {
+  db.collection("jobs").doc(id).get().then(doc => {
+    let job = doc.data();
+    if (job.acceptedBy !== currentUser.uid) {
+      alert("Not your job");
+      return;
     }
-
-    function acceptJob(id) {
-        db.collection("jobs").doc(id).update({
-            status: "accepted",
-            acceptedBy: currentUser.uid,
-            acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert("Job Accepted — Start Working!");
+    if (!job.platformFeePaid) {
+      alert("Please pay platform fee first");
+      return;
     }
+    db.collection("jobs").doc(id).update({
+      status: "completed",
+      completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    alert("Job Completed ✔");
+  });
+}
 
-    function payFee(id) {
-        let upi = `upi://pay?pa=${ADMIN_UPI}&pn=SevaPlatform&am=50&cu=INR`;
-        window.location.href = upi;
-
-        setTimeout(() => {
-            if (confirm("After paying the fee, click OK to confirm payment.")) {
-                db.collection("jobs").doc(id).update({
-                    platformFeePaid: true,
-                    platformFeePaidAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                alert("Fee Confirmed ✓ Now Mark as Completed");
-            }
-        }, 500);
-    }
-
-    function markComplete(id) {
-        db.collection("jobs").doc(id).get().then(doc => {
-            let job = doc.data();
-            if (!job.platformFeePaid) {
-                alert("Please pay the platform fee first.");
-                return;
-            }
-
-            db.collection("jobs").doc(id).update({
-                status: "completed",
-                completedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            alert("Job Completed ✓");
-        });
-    }
-
-    document.getElementById("logoutBtn").onclick = () => {
-        firebase.auth().signOut();
-        window.location = "login.html";
-    };
+document.getElementById("logoutBtn").onclick = () => {
+  firebase.auth().signOut();
+  window.location = "login.html";
+};
 </script>
 
 </body>
-  </html>
+</html>
